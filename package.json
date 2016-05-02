@@ -18,6 +18,11 @@
   "engines": {
     "node": ">=4.4.2"
   },
+  "keywords": [
+    "Eva",
+    "Engine"
+  ],
+  "author": "AlloVince",
   "dependencies": {
     "app-root-path": "^1.2.0",
     "bluebird": "^3.3.5",

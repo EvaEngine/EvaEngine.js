@@ -42,5 +42,4 @@ bower_components
 .DS_Store
 src/config/config.local*
 src/config/sequelize.json
-
-views/index.jade
+lib/*
