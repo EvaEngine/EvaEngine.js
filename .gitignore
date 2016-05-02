@@ -1,5 +1,3 @@
-# Logs
-logs
 *.log
 npm-debug.log*
 
@@ -21,13 +19,28 @@ coverage
 .lock-wscript
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
+build/*
 
 # Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules
+
+# Static file
+public
+
+# Bower
+bower_components
 
 # Optional npm cache directory
 .npm
 
 # Optional REPL history
 .node_repl_history
+
+.idea/*
+/coverage
+.DS_Store
+src/config/config.local*
+src/config/sequelize.json
+
+views/index.jade

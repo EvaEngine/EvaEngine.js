@@ -1,0 +1,41 @@
+{
+  "development": {
+    "dialect": "mysql",
+    "port": 3306,
+    "database": "fmarket",
+    "dialectOptions": {
+      "timeout": 3
+    },
+    "replication": {
+      "write": {
+        "host": "127.0.0.1",
+        "username": "root",
+        "password": "huaerjie001",
+        "pool": {}
+      },
+      "read": [
+        {
+          "host": "127.0.0.1",
+          "username": "root",
+          "password": "huaerjie001",
+          "pool": {}
+        }
+      ]
+    }
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "port": 3306
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "parser": "babel-eslint",
+  "extends": "airbnb",
+  "rules": {
+    "comma-dangle": [
+      1,
+      "never"
+    ],
+    "spaced-comment": [
+      0,
+      "always"
+    ]
+  }
+}
