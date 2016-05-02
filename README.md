@@ -1,5 +1,7 @@
 # EvaEngine For Node
 
+[![Build Status](https://travis-ci.org/EvaEngine/EvaNode.svg?branch=master)](https://travis-ci.org/EvaEngine/EvaNode)
+
 A development engine for NodeJS.
 
 
