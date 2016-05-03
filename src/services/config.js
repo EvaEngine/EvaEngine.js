@@ -1,6 +1,6 @@
 import merge from 'lodash/merge';
 import Env from './env';
-import * as EngineConfig from '../config';
+import EngineConfig from '../config';
 import { Dependencies } from 'constitute';
 
 let config = null;

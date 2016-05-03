@@ -20,3 +20,17 @@ EvaEngine.getApp().use('/',
   (req, res) => { res.json({ hello => 'world'}); });
 engine.run();
 ```
+
+## Swagger Support
+
+ES7 Files =(Babel)=> ES5 Files =(acorn)=> AST =(doctrine)=> Annotations + EvaEngine Exceptions + Sequelize Models =(Merge & Compile)=> Swagger Specification JSON File
+
+
+## Debug with Projects
+
+```
+cd EvaNode
+npm link
+cd your_project
+npm link evaengine
+```

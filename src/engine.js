@@ -25,7 +25,7 @@ export {
   DI,
   express,
   utils
-}
+};
 
 let app = null;
 let router = null;
@@ -54,10 +54,11 @@ export default class EvaEngine {
     this.uncaughtExceptionHandler = null;
 
     this.meta = {
+      mode,
+      port: this.port,
       projectRoot: path.normalize(projectRoot),
       configPath: path.normalize(configPath || `${projectRoot}/config`),
-      sourceRoot: path.normalize(sourceRoot || `${projectRoot}/src`),
-      buildRoot: path.normalize(sourceRoot || `${projectRoot}/build`)
+      sourceRoot: path.normalize(sourceRoot || `${projectRoot}/src`)
     };
     this.registerServiceProviders(this.getBaseServiceProviders());
     this.logger = DI.get('logger');
@@ -126,8 +127,8 @@ export default class EvaEngine {
     }
   }
 
-  register(providerClass) {
-    const provider = new providerClass(this);
+  register(ProviderClass) {
+    const provider = new ProviderClass(this);
     if (!(provider instanceof ServiceProviders.ServiceProvider)) {
       throw new RuntimeException(`Input provider ${provider.name} not service provider`);
     }
@@ -197,7 +198,7 @@ export default class EvaEngine {
             process.exit(1);
           }, 30000);
           killTimer.unref();
-          server.close();
+          this.server.close();
         } catch (e) {
           this.logger.error('Error when exit', e.stack);
         }

@@ -47,5 +47,23 @@ export default {
       key: 'eva',
       uid: 1
     }
+  },
+  swagger: {
+    swagger: '2.0',
+    info: {
+      title: '',
+      description: '',
+      version: ''
+    },
+    produces: [
+      'application/json'
+    ],
+    host: '',
+    basePath: '/v1',
+    schemes: [
+      'http'
+    ],
+    paths: {},
+    definitions: {}
   }
 };

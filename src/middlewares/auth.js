@@ -7,10 +7,9 @@ import Config from '../services/config';
 import JsonWebToken from '../services/jwt_token';
 import moment from 'moment';
 
-/*eslint-disable no-param-reassign*/
-Dependencies(Config, JsonWebToken)(AuthMiddleware)
 function AuthMiddleware(_config, token) {
   const config = _config.get();
+  /*eslint-disable no-param-reassign*/
   return () => wrapper(async(req, res, next) => {
     const jwToken = req.header('X-Token') || req.query.api_key;
     if (config.token.faker.enable === true && jwToken === config.token.faker.key) {
@@ -53,6 +52,7 @@ function AuthMiddleware(_config, token) {
     }
     throw new UnauthorizedException('No authority token found');
   });
+  /*eslint-enable no-param-reassign*/
 }
-/*eslint-enable no-param-reassign*/
+Dependencies(Config, JsonWebToken)(AuthMiddleware)
 export default AuthMiddleware;

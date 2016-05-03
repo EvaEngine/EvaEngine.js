@@ -54,11 +54,11 @@ describe('ExSwagger', () => {
   describe('Export JSON', () => {
     it('default properties', async () => {
       const exSwagger = new ExSwagger({
-        projectRoot: '/foo'
+        sourceRootPath: '/foo'
       });
       const states = exSwagger.getStates();
-      assert.equal('/foo/**/*.js', states.annotationPath);
-      assert.equal('/foo/**/exceptions/**/*.js', states.exceptionPath);
+      assert.equal('/foo/**/*.js', states.sourceFilesPath);
+      assert.equal('/foo/**/exceptions/**/*.js', states.exceptionPaths[1]);
     });
   });
 });

@@ -4,7 +4,6 @@ import Config from '../services/config';
 import Redis from '../services/redis';
 import { Dependencies } from 'constitute';
 
-Dependencies(Config, Redis)(SessionMiddleware)
 function SessionMiddleware(_config, redis) {
   return () => {
     const RedisStore = connectRedis(session);
@@ -26,7 +25,8 @@ function SessionMiddleware(_config, redis) {
       resave: config.resave,
       saveUninitialized: config.saveUninitialized
     });
-  }
+  };
 }
+Dependencies(Config, Redis)(SessionMiddleware)
 
 export default SessionMiddleware;

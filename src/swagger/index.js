@@ -1,10 +1,14 @@
 /*eslint new-cap: [1]*/
 
 import fs from 'fs';
+import Promise from 'bluebird';
 import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
+import { StandardException } from '../exceptions';
+
+Promise.promisifyAll(fs);
 
 export const TYPE_PATH = 'path';
 export const TYPE_DEFINITION = 'definition';
@@ -75,40 +79,6 @@ export default class ExSwagger {
   }
 
   /**
-   * Get file content
-   * @param path
-   * @param options
-   * @returns {Promise|string}
-   */
-  static async readFile(path, options = {}) {
-    return new Promise((resolve, reject) => {
-      fs.readFile(path, options, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(data);
-      });
-    });
-  }
-
-  /**
-   * Write content to file
-   * @param content
-   * @param dist
-   * @returns {Promise}
-   */
-  static async writeFile(content, dist) {
-    return new Promise((resolve, reject) => {
-      fs.open(dist, 'w', '0777', (error, fd) => {
-        if (error) {
-          return reject(error);
-        }
-        return resolve(fs.write(fd, content));
-      });
-    });
-  }
-
-  /**
    * Get annotations from comments
    * An annotation MUST start with double stars
    * @param files
@@ -117,7 +87,7 @@ export default class ExSwagger {
   static async getAnnotations(files) {
     const comments = [];
     for (const filepath of files) {
-      const source = await ExSwagger.readFile(filepath);
+      const source = await fs.readFileAsync(filepath);
       acorn.parse(source, {
         onComment: comments
       });
@@ -279,14 +249,23 @@ export default class ExSwagger {
     };
   }
 
-  async exportJson(dist) {
-    const files = await ExSwagger.scanFiles(this._annotationPath);
+  async exportJson(dist = this.swaggerDocsPath) {
+    this.logger.debug('Start export by meta', this.getStates());
+    const files = await ExSwagger.scanFiles(this.sourceFilesPath);
+    this.logger.debug('Scan found files', files);
     const annotations = await ExSwagger.getAnnotations(files);
     const docs = ExSwagger.getSwaggerDocs(annotations);
-    const template = this._swaggerTemplate;
-    const exceptions = await ExSwagger.scanExceptions(
-      this._exceptionPath, this._exceptionInterface
-    );
+    this.logger.debug('Get %s swaggger docs', docs.length);
+    const template = this.swaggerDocsTemplate;
+    this.logger.debug('Swagger template', template);
+    const exceptions = {};
+    for (const exceptionPath of this.exceptionPaths) {
+      this.logger.debug('Search exception in %s', exceptionPath);
+      const exceptionsInFile = await ExSwagger.scanExceptions(
+        exceptionPath, this.exceptionInterface
+      );
+      Object.assign(exceptions, exceptionsInFile);
+    }
     let key = '';
     for (const section of docs) {
       let path = null;
@@ -321,11 +300,12 @@ export default class ExSwagger {
         }
       }
     }
-    const models = ExSwagger.getModels(this._models, this._modelBlacklist);
+    const models = ExSwagger.getModels(this.models, this.modelBlacklist);
     models.forEach((model, modelName) => {
       template.definitions[modelName] = model;
     });
-    return await ExSwagger.writeFile(JSON.stringify(template), dist);
+    this.logger.debug('Export to', dist);
+    return await fs.writeFileAsync(dist, JSON.stringify(template));
   }
 
   static getYamlErrors() {
@@ -334,29 +314,52 @@ export default class ExSwagger {
 
   getStates() {
     return {
-      swaggerTemplate: this._swaggerTemplate,
-      models: this._models,
-      modelBlacklist: this._modelBlacklist,
-      annotationPath: this._annotationPath,
-      exceptionPath: this._exceptionPath,
-      exceptionInterface: this._exceptionInterface
+      swaggerTemplate: this.swaggerDocsTemplate,
+      modelBlacklist: this.modelBlacklist,
+      sourceFilesPath: this.sourceFilesPath,
+      exceptionPaths: this.exceptionPaths,
+      compileDistPath: this.compileDistPath,
+      swaggerUIPath: this.swaggerUIPath,
+      swaggerDocsPath: this.swaggerDocsPath
     };
   }
 
+  getSwaggerUIPath() {
+    return this.swaggerUIPath;
+  }
+
+  async getSwaggerIndexHtml() {
+    const content = await fs.readFileAsync(this.getSwaggerUIPath() + '/index.html');
+    return content.replace('http://petstore.swagger.io/v2/swagger.json',
+      this.swaggerDocsPath.replace(this.compileDistPath));
+  }
+
+  getCompileDistPath() {
+    return this.compileDistPath;
+  }
+
   constructor({
-    projectRoot,
-    swaggerTemplate,
-    annotationPath = `${projectRoot}/**/*.js`,
-    exceptionInterface,
+    sourceRootPath,
+    compileDistPath,
     models,
     modelBlacklist,
-    exceptionPath = `${projectRoot}/**/exceptions/**/*.js`
+    swaggerDocsTemplate,
+    logger = console,
+    swaggerUIPath,
+    swaggerDocsPath = `${compileDistPath}/docs.json`,
+    sourceFilesPath = `${sourceRootPath}/**/*.js`,
+    exceptionInterface = StandardException,
+    exceptionPaths = [`${sourceRootPath}/**/exceptions/**/*.js`]
   }) {
-    this._swaggerTemplate = swaggerTemplate;
-    this._models = models;
-    this._modelBlacklist = modelBlacklist;
-    this._annotationPath = annotationPath;
-    this._exceptionPath = exceptionPath;
-    this._exceptionInterface = exceptionInterface;
+    this.logger = logger;
+    this.swaggerDocsTemplate = swaggerDocsTemplate;
+    this.models = models;
+    this.modelBlacklist = modelBlacklist;
+    this.sourceFilesPath = sourceFilesPath;
+    this.exceptionPaths = [`${__dirname}/../exceptions`].concat(exceptionPaths);
+    this.exceptionInterface = exceptionInterface;
+    this.compileDistPath = compileDistPath;
+    this.swaggerUIPath = swaggerUIPath || `${__dirname}/../../node_modules/swagger-ui/dist`;
+    this.swaggerDocsPath = swaggerDocsPath;
   }
 }
