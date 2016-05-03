@@ -58,7 +58,7 @@ let yamlErrors = [];
  * Generate document from
  * - JS source code annotations (Parser is Doctrine)
  * - ORM entities (Based on Sequelize)
- * - Exceptions
+ * - EvaEngine Exceptions
  */
 export default class ExSwagger {
 
@@ -271,39 +271,51 @@ export default class ExSwagger {
 
   static mergeAll(_template, fragments, exceptions, modelDefinitions) {
     const template = _template;
+    let path = null;
+    let method = null;
     let key = '';
-    for (const fragmentGroup of fragments) {
-      let path = null;
-      let method = null;
-      for (const fragment of fragmentGroup) {
-        if (fragment.type === TYPE_PATH) {
-          path = Object.keys(fragment.value)[0];
-          method = Object.keys(fragment.value[path])[0];
-          if (!template.paths[path]) {
-            template.paths[path] = {};
-          }
-          template.paths[path][method] = fragment.value[path][method];
-        } else if (fragment.type === TYPE_DEFINITION) {
-          key = Object.keys(fragment.value)[0];
-          template.definitions[key] = fragment.value[key];
-        } else if (fragment.type === TYPE_EXCEPTION) {
-          //目前throw一定要定义在path下面
-          key = fragment.value;
-          const exception = exceptions[key];
-          //console.log(exceptionClass);
-          if (exception) {
-            template.definitions[key] = ExSwagger.exceptionToSwaggerDefinition(exception);
-            if (path && method) {
-              template.paths[path][method].responses[exception.getStatusCode()] = {
-                description: fragment.description,
-                schema: {
-                  $ref: `#/definitions/${key}`
-                }
-              };
-            }
-          }
+    const fragmentHandler = (fragment) => {
+      if (fragment.type === TYPE_PATH) {
+        path = Object.keys(fragment.value)[0];
+        method = Object.keys(fragment.value[path])[0];
+        if (!template.paths[path]) {
+          template.paths[path] = {};
         }
+        template.paths[path][method] = fragment.value[path][method];
+        return true;
       }
+
+      if (fragment.type === TYPE_DEFINITION) {
+        key = Object.keys(fragment.value)[0];
+        template.definitions[key] = fragment.value[key];
+        return true;
+      }
+
+      if (fragment.type === TYPE_UNKNOWN) {
+        return true;
+      }
+
+      //fragment.type === TYPE_EXCEPTION
+      //目前throw一定要定义在path下面
+      key = fragment.value;
+      const exception = exceptions[key];
+      if (!exception) {
+        return true;
+      }
+      template.definitions[key] = ExSwagger.exceptionToSwaggerDefinition(exception);
+      if (!(path && method)) {
+        return true;
+      }
+      template.paths[path][method].responses[exception.getStatusCode()] = {
+        description: fragment.description,
+        schema: {
+          $ref: `#/definitions/${key}`
+        }
+      };
+      return true;
+    };
+    for (const fragmentGroup of fragments) {
+      fragmentGroup.forEach(fragmentHandler);
     }
     modelDefinitions.forEach((definition, modelName) => {
       template.definitions[modelName] = definition;
@@ -333,8 +345,8 @@ export default class ExSwagger {
 
   async getSwaggerIndexHtml() {
     const content = await fs.readFileAsync(this.getSwaggerUIPath() + '/index.html');
-    return content.replace('http://petstore.swagger.io/v2/swagger.json',
-      this.swaggerDocsPath.replace(this.compileDistPath));
+    return content.toString().replace('http://petstore.swagger.io/v2/swagger.json',
+      this.swaggerDocsPath.replace(this.compileDistPath, ''));
   }
 
   getCompileDistPath() {
