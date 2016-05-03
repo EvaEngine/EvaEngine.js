@@ -23,7 +23,8 @@ engine.run();
 
 ## Swagger Support
 
-ES7 Files =(Babel)=> ES5 Files =(acorn)=> AST =(doctrine)=> Annotations + EvaEngine Exceptions + Sequelize Models =(Merge & Compile)=> Swagger Specification JSON File
+ES7 Files =(Babel)=> ES5 Files =(acorn)=> AST =(filter)=> Annotations =(doctrine)=> JsDocs
+   =(convert)=> Fragments + EvaEngine Exceptions + Sequelize Models =(Merge & Compile)=> Swagger Specification JSON File
 
 
 ## Debug with Projects
