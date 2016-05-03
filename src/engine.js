@@ -74,7 +74,7 @@ export default class EvaEngine {
 
   static getApp() {
     if (app) {
-      return app
+      return app;
     }
     app = express();
     return app;
@@ -82,7 +82,7 @@ export default class EvaEngine {
 
   static getRouter() {
     if (router) {
-      return router
+      return router;
     }
     router = express.Router();
     return router;
@@ -105,11 +105,12 @@ export default class EvaEngine {
       ServiceProviders.JsonWebTokenProvider
     ];
   }
-  
+
   getMiddlewareProviders() {
     return [
       MiddlewareProviders.SessionMiddlewareProvider,
-      MiddlewareProviders.AuthMiddlewareProvider
+      MiddlewareProviders.AuthMiddlewareProvider,
+      MiddlewareProviders.DebugMiddlewareProvider
     ];
   }
 
@@ -140,7 +141,18 @@ export default class EvaEngine {
 
   getDefaultErrorHandler() {
     const env = DI.get('env');
-    return this.defaultErrorHandler || ((err, req, res, next) => {
+    const stackHandler = (stack) => {
+      const lines = stack.split('\n');
+      const stackOut = [];
+      for (const line of lines) {
+        if (!line.match('/node_modules/')) {
+          stackOut.push(line);
+        }
+      }
+      return stackOut;
+    };
+    return this.defaultErrorHandler ||
+      ((err, req, res, next) => {
         let exception = err;
         if (exception.message === 'invalid json') {
           //Special handle for Body parser
@@ -152,7 +164,8 @@ export default class EvaEngine {
             code: -1,
             message: err.message,
             errors: [],
-            stack: env.isDevelopment() ? exception.stack : {}
+            quickStack: env.isDevelopment() ? stackHandler(exception.stack) : [],
+            stack: env.isDevelopment() ? exception.stack.split('\n') : []
           });
         }
         if (exception instanceof RuntimeException) {
@@ -164,7 +177,8 @@ export default class EvaEngine {
           code: exception.getCode(),
           message: exception.message,
           errors: exception.getDetails(),
-          stack: env.isDevelopment() ? exception.stack : {}
+          quickStack: env.isDevelopment() ? stackHandler(exception.stack) : [],
+          stack: env.isDevelopment() ? exception.stack.split('\n') : []
         });
       });
   }
@@ -175,7 +189,8 @@ export default class EvaEngine {
   }
 
   getUncaughtExceptionHandler() {
-    return this.uncaughtExceptionHandler || ((err) => {
+    return this.uncaughtExceptionHandler ||
+      ((err) => {
         this.logger.error(err);
         try {
           const killTimer = setTimeout(() => {
@@ -195,7 +210,8 @@ export default class EvaEngine {
   }
 
   getServerErrorHandler() {
-    return this.serverErrorHandler || ((error) => {
+    return this.serverErrorHandler ||
+      ((error) => {
         this.logger.error(error);
         if (error.syscall !== 'listen') {
           throw error;
