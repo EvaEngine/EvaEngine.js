@@ -29,7 +29,6 @@ export {
 };
 
 let app = null;
-let router = null;
 export default class EvaEngine {
   constructor({
     projectRoot,
@@ -85,12 +84,8 @@ export default class EvaEngine {
     return app;
   }
 
-  static getRouter() {
-    if (router) {
-      return router;
-    }
-    router = express.Router(); //eslint-disable-line new-cap
-    return router;
+  static createRouter() {
+    return express.Router(); //eslint-disable-line new-cap
   }
 
   getCLI() {
@@ -165,6 +160,7 @@ export default class EvaEngine {
   }
 
   registerCommands(commandClasses) {
+    //TODO 支持数组
     for (const commandClassName in commandClasses) {
       const commandClass = commandClasses[commandClassName];
       this.commands[commandClass.getName()] = commandClass;
@@ -281,7 +277,7 @@ export default class EvaEngine {
   bootstrap() {
     this.registerServiceProviders(EvaEngine.getServiceProvidersForWeb());
     this.registerServiceProviders(EvaEngine.getMiddlewareProviders());
-    this.logger.info('Engine bootstrapped');
+    this.logger.info('Engine bootstrapped under env', DI.get('env').get());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
     return this;
   }
@@ -297,7 +293,6 @@ export default class EvaEngine {
     this.server = http.createServer(EvaEngine.getApp());
     this.server.listen(this.port);
     this.server.on('error', this.getServerErrorHandler());
-    this.logger.info('Engine environment is', DI.get('env').get());
     this.logger.info('Engine running http server by listening', this.port);
   }
 
