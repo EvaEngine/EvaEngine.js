@@ -3,6 +3,7 @@ import Config from './config';
 import Logger from './logger';
 import Redis from './redis';
 import JsonWebToken from './jwt_token';
+import HttpClient from './http_client';
 import DI from '../di';
 
 export class ServiceProvider {
@@ -70,5 +71,15 @@ export class JsonWebTokenProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, JsonWebToken);
+  }
+}
+
+export class HttpClientProvider extends ServiceProvider {
+  get name() {
+    return 'http_client';
+  }
+
+  register() {
+    DI.bindClass(this.name, HttpClient);
   }
 }

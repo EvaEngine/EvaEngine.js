@@ -2,6 +2,7 @@ import DI from './di';
 import express from 'express';
 import http from 'http';
 import path from 'path';
+import yargs from 'yargs';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import wrapper from './utils/wrapper';
@@ -37,6 +38,8 @@ export default class EvaEngine {
     port
   }, mode = MODES.WEB) {
     this.server = null;
+    this.commands = {};
+    this.commandName = null;
     this.port = ((val) => {
       const rawPort = parseInt(val, 10);
       if (isNaN(rawPort)) {
@@ -91,6 +94,25 @@ export default class EvaEngine {
   }
 
   getCLI() {
+    this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
+    const [, , commandName] = process.argv;
+    if (!commandName) {
+      throw new RuntimeException('Please input command name.');
+    }
+    this.commandName = commandName;
+    if (!this.commands[commandName]) {
+      throw new RuntimeException('Command %s not registered.', commandName);
+    }
+    const command = this.commands[commandName];
+    const argv = yargs
+      .count('verbose')
+      .alias('v', 'verbose')
+      .command(commandName, command.getDescription(), command.getSpec())
+      .help('?')
+      .alias('?', 'help')
+      .epilog('')
+      .argv;
+    return argv;
   }
 
   static getBaseServiceProviders() {
@@ -101,9 +123,14 @@ export default class EvaEngine {
     ];
   }
 
+  getCommandName() {
+    return this.commandName;
+  }
+
   static getServiceProvidersForWeb() {
     return [
       ServiceProviders.RedisProvider,
+      ServiceProviders.HttpClientProvider,
       ServiceProviders.JsonWebTokenProvider
     ];
   }
@@ -118,22 +145,32 @@ export default class EvaEngine {
 
   static getServiceProvidersForCLI() {
     return [
+      ServiceProviders.HttpClientProvider,
       ServiceProviders.RedisProvider
     ];
   }
 
   registerServiceProviders(providers = []) {
     for (const providerClass of providers) {
-      this.register(providerClass);
+      this.registerService(providerClass);
     }
   }
 
-  register(ProviderClass) {
+  registerService(ProviderClass) {
     const provider = new ProviderClass(this);
     if (!(provider instanceof ServiceProviders.ServiceProvider)) {
       throw new RuntimeException(`Input provider ${provider.name} not service provider`);
     }
     provider.register();
+  }
+
+  registerCommands(commandClasses) {
+    for (const commandClassName in commandClasses) {
+      const commandClass = commandClasses[commandClassName];
+      this.commands[commandClass.getName()] = commandClass;
+    }
+    this.logger.debug('Registered commands', Object.keys(this.commands));
+    return this;
   }
 
   setDefaultErrorHandler(handler) {
@@ -249,6 +286,10 @@ export default class EvaEngine {
     return this;
   }
 
+  use(...args) {
+    return EvaEngine.getApp().use(...args);
+  }
+
   run() {
     process.on('uncaughtException', this.getUncaughtExceptionHandler());
     EvaEngine.getApp().set('port', this.port);
@@ -258,5 +299,16 @@ export default class EvaEngine {
     this.server.on('error', this.getServerErrorHandler());
     this.logger.info('Engine environment is', DI.get('env').get());
     this.logger.info('Engine running http server by listening', this.port);
+  }
+
+  async runCLI() {
+    const argv = this.getCLI();
+    const commandName = this.getCommandName();
+    this.logger.debug('Start run command', commandName);
+    this.logger.debug('Received arguments', argv);
+    const CommandClass = this.commands[commandName];
+    const command = new CommandClass();
+    await command.run(argv);
+    this.logger.debug('CLI run finished');
   }
 }

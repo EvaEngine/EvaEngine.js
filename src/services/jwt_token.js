@@ -21,7 +21,7 @@ export default class JsonWebToken {
   async save(uid, item) {
     const tokenString = JsonWebToken.encode(item);
     //TODO jwToken是否严格可以用.分割
-    const key = [JsonWebToken.getPrefix(), uid, tokenString.split('.').pop()].join(':');
+    const key = [this.getPrefix(), uid, tokenString.split('.').pop()].join(':');
     //TODO 过期时间
     await this.getRedis().setAsync(key, JSON.stringify(item));
     return tokenString;
@@ -31,11 +31,11 @@ export default class JsonWebToken {
     if (!tokenString) {
       return { uid: null, expiredAt: 0 };
     }
-    const parsedToken = JsonWebToken.decode(tokenString);
+    const parsedToken = this.decode(tokenString);
     if (!parsedToken || !parsedToken.hasOwnProperty('uid')) {
       return { uid: null, expiredAt: 0 };
     }
-    const key = [JsonWebToken.getPrefix(), parsedToken.uid, tokenString.split('.').pop()].join(':');
+    const key = [this.getPrefix(), parsedToken.uid, tokenString.split('.').pop()].join(':');
     const storedToken = await this.redis.getAsync(key);
     if (!storedToken) {
       return {
@@ -50,21 +50,21 @@ export default class JsonWebToken {
     if (!tokenString) {
       return true;
     }
-    const key = JsonWebToken.getRedisKey(tokenString);
+    const key = this.getRedisKey(tokenString);
     if (!key) {
       return true;
     }
     return await this.redis.delAsync(key);
   }
 
-  static getRedisKey(tokenString, groupOnly = false) {
-    const parsedToken = JsonWebToken.decode(tokenString);
+  getRedisKey(tokenString, groupOnly = false) {
+    const parsedToken = this.decode(tokenString);
     if (!parsedToken || !parsedToken.hasOwnProperty('uid')) {
       return '';
     }
     return groupOnly === true ?
-      [JsonWebToken.getPrefix(), parsedToken.uid].join(':') :
-      [JsonWebToken.getPrefix(), parsedToken.uid, tokenString.split('.').pop()].join(':');
+      [this.getPrefix(), parsedToken.uid].join(':') :
+      [this.getPrefix(), parsedToken.uid, tokenString.split('.').pop()].join(':');
   }
 
   encode(item, secret = this.config.secret) {

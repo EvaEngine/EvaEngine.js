@@ -22,7 +22,7 @@ export default class DI {
       if (!(providerInstance instanceof ServiceProvider)) {
         throw new RuntimeException(`Input provider ${provider.name} not service provider`);
       }
-      providerInstance.register();
+      providerInstance.registerService();
     }
   }
 

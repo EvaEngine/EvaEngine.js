@@ -15,18 +15,33 @@ A development engine for NodeJS.
 
 ## Quick Start
 
+### Run as web server
+
 ``` js
 import EvaEngine from 'evaengine/src/engine';
 const engine = new EvaEngine({
   projectRoot: `${__dirname}/..`,
   port: process.env.PORT || 3000
 });
-
 engine.bootstrap();
-EvaEngine.getApp().use('/', 
+engine.use('/', 
   (req, res) => { res.json({ hello => 'world'}); });
 engine.run();
 ```
+
+### Run as CLI
+
+```
+import EvaEngine from 'evaengine/src/engine';
+const engine = new EvaEngine({
+  projectRoot: `${__dirname}/..`,
+  commandRoot: `${__dirname}/commands`,
+}, 'cli');
+engine.run();
+```
+
+### Run as Cron job
+
 
 ## Swagger Support
 

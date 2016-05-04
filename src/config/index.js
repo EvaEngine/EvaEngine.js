@@ -59,7 +59,7 @@ export default {
       'application/json'
     ],
     host: '',
-    basePath: '/v1',
+    basePath: '/',
     schemes: [
       'http'
     ],
