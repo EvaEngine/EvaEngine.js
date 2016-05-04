@@ -19,6 +19,5 @@ function DebugMiddleware(env, logger) {
     });
   };
 }
-Dependencies(Env, Logger)(DebugMiddleware)
-
+Dependencies(Env, Logger)(DebugMiddleware); //eslint-disable-line new-cap
 export default DebugMiddleware;

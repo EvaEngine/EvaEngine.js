@@ -3,7 +3,7 @@ import Config from './config';
 import { Dependencies } from 'constitute';
 import winston from 'winston';
 
-@Dependencies(Env, Config)
+@Dependencies(Env, Config) //eslint-disable-line new-cap
 export default class Logger {
   constructor(env, config) {
     this.env = env;

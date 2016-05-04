@@ -27,6 +27,5 @@ function SessionMiddleware(_config, redis) {
     });
   };
 }
-Dependencies(Config, Redis)(SessionMiddleware)
-
+Dependencies(Config, Redis)(SessionMiddleware);  //eslint-disable-line new-cap
 export default SessionMiddleware;

@@ -153,7 +153,7 @@ export default class EvaEngine {
       return stackOut;
     };
     return this.defaultErrorHandler ||
-      ((err, req, res, next) => {
+      ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
         if (exception.message === 'invalid json') {
           //Special handle for Body parser

@@ -3,7 +3,6 @@ import bluebird from 'bluebird';
 import Config from './config';
 import { Dependencies } from 'constitute';
 
-
 //Redis
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);

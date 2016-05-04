@@ -3,7 +3,7 @@ export default {
     logging: true
   },
   logger: {
-    file: `${__dirname}/../logs/application.log`
+    file: ''
   },
   redis: {
     host: '127.0.0.1',

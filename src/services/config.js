@@ -5,7 +5,7 @@ import { Dependencies } from 'constitute';
 
 let config = null;
 
-@Dependencies(Env)
+@Dependencies(Env) //eslint-disable-line new-cap
 export default class Config {
   constructor(env) {
     this.env = env;
@@ -22,6 +22,7 @@ export default class Config {
     }
     const env = this.env.get();
     const configPath = this.path;
+    /*eslint-disable global-require*/
     const configDefault = require(`${configPath}/config.default`);
     const configEnv = require(`${configPath}/config.${env}`);
     let configLocal = {};
@@ -30,6 +31,7 @@ export default class Config {
     } catch (e) {
       configLocal = {};
     }
+    /*eslint-enable global-require*/
     config = merge(merge(merge(EngineConfig, configDefault), configEnv), configLocal);
     return key ? Config.search(key, config) : config;
   }
@@ -38,6 +40,4 @@ export default class Config {
     return target;
   }
 }
-
-
 

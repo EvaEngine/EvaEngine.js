@@ -3,7 +3,7 @@ import Redis from './redis';
 import { Dependencies } from 'constitute';
 import jwt from 'jwt-simple';
 
-@Dependencies(Config, Redis)
+@Dependencies(Config, Redis) //eslint-disable-line new-cap
 export default class JsonWebToken {
   constructor(config, redis) {
     this.redis = redis.getInstance();

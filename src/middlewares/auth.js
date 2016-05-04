@@ -9,11 +9,10 @@ import moment from 'moment';
 
 function AuthMiddleware(_config, token) {
   const config = _config.get();
-  /*eslint-disable no-param-reassign*/
   return () => wrapper(async(req, res, next) => {
     const jwToken = req.header('X-Token') || req.query.api_key;
     if (config.token.faker.enable === true && jwToken === config.token.faker.key) {
-      req.auth = {
+      req.auth = { //eslint-disable-line no-param-reassign
         type: 'fake',
         uid: config.token.faker.uid,
         token: config.token.faker.key
@@ -34,7 +33,7 @@ function AuthMiddleware(_config, token) {
       if (expiredAt < moment().unix()) {
         throw new UnauthorizedException('Token expired');
       }
-      req.auth = {
+      req.auth = { //eslint-disable-line no-param-reassign
         type: 'jwt',
         uid,
         token: jwToken
@@ -43,7 +42,7 @@ function AuthMiddleware(_config, token) {
     }
 
     if (req.session && req.session.uid) {
-      req.auth = {
+      req.auth = { //eslint-disable-line no-param-reassign
         type: 'session',
         uid: req.session.uid,
         token: ''
@@ -52,7 +51,6 @@ function AuthMiddleware(_config, token) {
     }
     throw new UnauthorizedException('No authority token found');
   });
-  /*eslint-enable no-param-reassign*/
 }
-Dependencies(Config, JsonWebToken)(AuthMiddleware)
+Dependencies(Config, JsonWebToken)(AuthMiddleware); //eslint-disable-line new-cap
 export default AuthMiddleware;
