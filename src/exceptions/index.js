@@ -74,25 +74,25 @@ export class StandardException extends Error {
       }
       fileName = lastArg;
     }
-    this._code = StandardException.generateCode(this.constructor.name, fileName) || -1;
-    this._statusCode = statusCode || 500;
-    this._details = [];
+    this.code = StandardException.generateCode(this.constructor.name, fileName) || -1;
+    this.statusCode = statusCode || 500;
+    this.details = [];
   }
 
   getCode() {
-    return this._code;
+    return this.code;
   }
 
   setStatusCode(statusCode) {
-    this._statusCode = statusCode;
+    this.statusCode = statusCode;
   }
 
   getStatusCode() {
-    return this._statusCode;
+    return this.statusCode;
   }
 
   getDetails() {
-    return this._details;
+    return this.details;
   }
 }
 
@@ -100,7 +100,7 @@ export class LogicException extends StandardException {
   constructor(...args) {
     args.push(__filename);
     super(...args);
-    this._statusCode = 400;
+    this.statusCode = 400;
   }
 }
 
@@ -118,7 +118,7 @@ export class FormInvalidateException extends InvalidArgumentException {
       }
     }
     super(...superArgs);
-    this._details = formErrors.errors;
+    this.details = formErrors.errors;
   }
 }
 
@@ -128,21 +128,21 @@ export class HttpRequestInvalidArgumentException extends InvalidArgumentExceptio
 export class UnauthorizedException extends LogicException {
   constructor(...args) {
     super(...args);
-    this._statusCode = 401;
+    this.statusCode = 401;
   }
 }
 
 export class ResourceNotFoundException extends LogicException {
   constructor(...args) {
     super(...args);
-    this._statusCode = 404;
+    this.statusCode = 404;
   }
 }
 
 export class ResourceConflictedException extends LogicException {
   constructor(...args) {
     super(...args);
-    this._statusCode = 409;
+    this.statusCode = 409;
   }
 }
 
@@ -150,7 +150,7 @@ export class RuntimeException extends StandardException {
   constructor(...args) {
     args.push(__filename);
     super(...args);
-    this._statusCode = 500;
+    this.statusCode = 500;
   }
 }
 

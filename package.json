@@ -10,8 +10,8 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "npm run build",
-    "test-raw": "NODE_ENV=test node --harmony ./node_modules/.bin/_mocha --require babel-core/register --require babel-polyfill --recursive",
-    "test": "NODE_ENV=test ./node_modules/.bin/babel-node --harmony ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- -t 50000 --recursive  -R spec test/",
+    "test-raw": "NODE_ENV=test node --harmony ./node_modules/.bin/mocha --harmony --compilers js:babel-core/register --require babel-polyfill --recursive",
+    "test": "NODE_ENV=test ./node_modules/.bin/babel-node --harmony node_modules/isparta/bin/isparta cover --report lcov node_modules/mocha/bin/_mocha -- --reporter dot",
     "lint": "./node_modules/.bin/eslint src/",
     "build": "babel -d lib/ src/"
   },

@@ -1,7 +1,7 @@
 import {
   RuntimeException
 } from './exceptions';
-import constitute, { Container, Dependencies } from 'constitute';
+import constitute from 'constitute';
 import { ServiceProvider } from './services/providers';
 
 const container = new constitute.Container();

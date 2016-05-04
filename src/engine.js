@@ -36,8 +36,6 @@ export default class EvaEngine {
     sourceRoot,
     port
   }, mode = MODES.WEB) {
-    this.app = null;
-    this.router = null;
     this.server = null;
     this.port = ((val) => {
       const rawPort = parseInt(val, 10);
@@ -60,7 +58,7 @@ export default class EvaEngine {
       configPath: path.normalize(configPath || `${projectRoot}/config`),
       sourceRoot: path.normalize(sourceRoot || `${projectRoot}/src`)
     };
-    this.registerServiceProviders(this.getBaseServiceProviders());
+    this.registerServiceProviders(EvaEngine.getBaseServiceProviders());
     this.logger = DI.get('logger');
     this.logger.info('Engine started, Meta:', this.meta);
   }
@@ -73,6 +71,9 @@ export default class EvaEngine {
     return DI;
   }
 
+  /**
+   * @returns {express}
+   */
   static getApp() {
     if (app) {
       return app;
@@ -85,14 +86,14 @@ export default class EvaEngine {
     if (router) {
       return router;
     }
-    router = express.Router();
+    router = express.Router(); //eslint-disable-line new-cap
     return router;
   }
 
   getCLI() {
   }
 
-  getBaseServiceProviders() {
+  static getBaseServiceProviders() {
     return [
       ServiceProviders.EnvProvider,
       ServiceProviders.ConfigProvider,
@@ -100,14 +101,14 @@ export default class EvaEngine {
     ];
   }
 
-  getServiceProvidersForWeb() {
+  static getServiceProvidersForWeb() {
     return [
       ServiceProviders.RedisProvider,
       ServiceProviders.JsonWebTokenProvider
     ];
   }
 
-  getMiddlewareProviders() {
+  static getMiddlewareProviders() {
     return [
       MiddlewareProviders.SessionMiddlewareProvider,
       MiddlewareProviders.AuthMiddlewareProvider,
@@ -115,7 +116,7 @@ export default class EvaEngine {
     ];
   }
 
-  getServiceProvidersForCLI() {
+  static getServiceProvidersForCLI() {
     return [
       ServiceProviders.RedisProvider
     ];
@@ -241,8 +242,8 @@ export default class EvaEngine {
   }
 
   bootstrap() {
-    this.registerServiceProviders(this.getServiceProvidersForWeb());
-    this.registerServiceProviders(this.getMiddlewareProviders());
+    this.registerServiceProviders(EvaEngine.getServiceProvidersForWeb());
+    this.registerServiceProviders(EvaEngine.getMiddlewareProviders());
     this.logger.info('Engine bootstrapped');
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
     return this;
