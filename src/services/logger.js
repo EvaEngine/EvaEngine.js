@@ -29,6 +29,12 @@ export default class Logger {
     const logPath = this.config.get().logger.file;
     this.instance = this.env.isProduction() ? new (winston.Logger)({
       transports: [
+        new (winston.transports.Console)({
+          name: 'global-console',
+          level: this.level,
+          label: this.label,
+          colorize: true
+        }),
         new (winston.transports.File)({
           name: 'global-file',
           level: this.level,
@@ -43,12 +49,6 @@ export default class Logger {
           level: this.level,
           label: this.label,
           colorize: true
-        }),
-        new (winston.transports.File)({
-          name: 'global-file',
-          level: this.level,
-          label: this.label,
-          filename: logPath
         })
       ]
     });

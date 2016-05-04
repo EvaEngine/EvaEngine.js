@@ -2,7 +2,6 @@ import httpMocker from 'node-mocks-http';
 import EventEmitter from 'events';
 import chai from 'chai';
 // import { config } from '../src/di';
-import assert from 'assert';
 
 module.exports.truncateAll = async(entities) => {
   const names = [];
@@ -25,9 +24,9 @@ module.exports.mockAuthRequest = (...args) => {
 };
 module.exports.httpMocker = httpMocker;
 
-// module.exports.assert = assert;
 chai.should();
 module.exports.assert = chai.assert;
+module.exports.expect = chai.expect;
 
 
 const runController = async(controller, request, response = mockResponse()) =>

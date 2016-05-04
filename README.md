@@ -33,7 +33,7 @@ Then visit `http://localhost:3000` to view API.
 
 ### Run as CLI
 
-```
+``` js
 import EvaEngine from 'evaengine/src/engine';
 import * as UserCommands from './commands/user';
 const engine = new EvaEngine({
@@ -47,7 +47,7 @@ engine.registerCommands(UserCommands);
 
 ### Run as Cron Job
 
-```
+``` js
 import EvaEngine from 'evaengine/src/engine';
 import * as UserCommands from './commands/user';
 const engine = new EvaEngine({
