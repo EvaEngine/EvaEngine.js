@@ -11,7 +11,7 @@
     "prestart": "npm run build",
     "prepublish": "npm run build",
     "test-raw": "NODE_ENV=test node --harmony ./node_modules/.bin/mocha --harmony --compilers js:babel-core/register --require babel-polyfill --recursive",
-    "test": "NODE_ENV=test ./node_modules/.bin/babel-node --harmony node_modules/isparta/bin/isparta cover --report lcov node_modules/mocha/bin/_mocha -- --reporter dot",
+    "test": "NODE_ENV=test ./node_modules/.bin/babel-node --harmony ./node_modules/isparta/bin/isparta cover --report text --report lcov node_modules/mocha/bin/_mocha -- --reporter dot",
     "lint": "./node_modules/.bin/eslint src/",
     "build": "babel -d lib/ src/"
   },
@@ -74,7 +74,7 @@
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",
     "gulp-sourcemaps": "^1.6.0",
-    "istanbul": "^0.4.3",
+    "isparta": "^4.0.0",
     "js-yaml": "^3.6.0",
     "mocha": "^2.4.5",
     "node-mocks-http": "^1.5.2"

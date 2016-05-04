@@ -8,7 +8,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 let redisClient = null;
 
-@Dependencies(Config)
+@Dependencies(Config) //eslint-disable-line new-cap
 export default class Redis {
   constructor(config) {
     this.config = config;
