@@ -2,7 +2,6 @@ import {
   RuntimeException
 } from './exceptions';
 import constitute from 'constitute';
-import { ServiceProvider } from './services/providers';
 
 const container = new constitute.Container();
 const bound = {};
@@ -14,16 +13,6 @@ export default class DI {
 
   static getBound() {
     return bound;
-  }
-
-  static registerFromProviders(providers) {
-    for (const provider of providers) {
-      const providerInstance = container.constitute(provider);
-      if (!(providerInstance instanceof ServiceProvider)) {
-        throw new RuntimeException(`Input provider ${provider.name} not service provider`);
-      }
-      providerInstance.registerService();
-    }
   }
 
   static get(service) {

@@ -3,6 +3,7 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import yargs from 'yargs';
+import later from 'later';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import wrapper from './utils/wrapper';
@@ -199,8 +200,8 @@ export default class EvaEngine {
             code: -1,
             message: err.message,
             errors: [],
-            quickStack: env.isDevelopment() ? stackHandler(exception.stack) : [],
-            stack: env.isDevelopment() ? exception.stack.split('\n') : []
+            stack: env.isDevelopment() ? stackHandler(exception.stack) : [],
+            fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
           });
         }
         if (exception instanceof RuntimeException) {
@@ -212,8 +213,8 @@ export default class EvaEngine {
           code: exception.getCode(),
           message: exception.message,
           errors: exception.getDetails(),
-          quickStack: env.isDevelopment() ? stackHandler(exception.stack) : [],
-          stack: env.isDevelopment() ? exception.stack.split('\n') : []
+          stack: env.isDevelopment() ? stackHandler(exception.stack) : [],
+          fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
         });
       });
   }
@@ -302,8 +303,27 @@ export default class EvaEngine {
     this.logger.debug('Start run command', commandName);
     this.logger.debug('Received arguments', argv);
     const CommandClass = this.commands[commandName];
-    const command = new CommandClass();
-    await command.run(argv);
+    const command = new CommandClass(argv);
+    await command.run();
     this.logger.debug('CLI run finished');
   }
+
+  async runCommand(command, sequence) {
+    if (!sequence) {
+      return await command.run();
+    }
+    const job = command.getName();
+    const options = command.getOptions();
+    later.setInterval(async() => {
+      this.logger.info('Cron job %s started with %s', job, options);
+      try {
+        return await command.run();
+      } catch (e) {
+        //TODO: 重试机制
+        this.logger.error(e);
+      }
+      this.logger.info('Cron job %s finished', job);
+    }, later.parse.cron(sequence, true)); //第二个参数为True表示支持秒
+  }
+
 }

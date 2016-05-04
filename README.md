@@ -21,7 +21,7 @@ A development engine for NodeJS.
 import EvaEngine from 'evaengine/src/engine';
 const engine = new EvaEngine({
   projectRoot: `${__dirname}/..`,
-  port: process.env.PORT || 3000
+  port: 3000
 });
 engine.bootstrap();
 engine.use('/', 
@@ -29,19 +29,34 @@ engine.use('/',
 engine.run();
 ```
 
+Then visit `http://localhost:3000` to view API.
+
 ### Run as CLI
 
 ```
 import EvaEngine from 'evaengine/src/engine';
+import * as UserCommands from './commands/user';
 const engine = new EvaEngine({
-  projectRoot: `${__dirname}/..`,
-  commandRoot: `${__dirname}/commands`,
+  projectRoot: `${__dirname}/..`
 }, 'cli');
-engine.run();
+engine.registerCommands(UserCommands);
+(async() => {
+    await engine.runCLI();
+})();
 ```
 
-### Run as Cron job
+### Run as Cron Job
 
+```
+import EvaEngine from 'evaengine/src/engine';
+import * as UserCommands from './commands/user';
+const engine = new EvaEngine({
+  projectRoot: `${__dirname}/..`
+}, 'cli');
+(async() => {
+    await engine.runCommand(new UserCommands.Create(), '* * 0/2 * * *');
+})();
+```
 
 ## Swagger Support
 
