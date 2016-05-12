@@ -101,13 +101,25 @@ export default class EvaEngine {
     }
     const command = this.commands[commandName];
     const argv = yargs
+      .command(commandName, command.getDescription(), Object.assign({
+        verbose: {
+          alias: 'v',
+          count: true
+        },
+        help: {
+          alias: '?'
+        }
+      }, command.getSpec()))
       .count('verbose')
-      .alias('v', 'verbose')
-      .command(commandName, command.getDescription(), command.getSpec())
-      .help('?')
-      .alias('?', 'help')
-      .epilog('')
       .argv;
+
+
+    const verbose = argv.verbose;
+    const levels = ['info', 'verbose', 'debug', 'debug'];
+    const level = levels[verbose] ? levels[verbose] : 'info';
+    for (const [, transport = {}] of Object.entries(this.logger.getInstance().transports)) {
+      transport.level = level;
+    }
     return argv;
   }
 
@@ -162,10 +174,10 @@ export default class EvaEngine {
 
   registerCommands(commandClasses) {
     //TODO 支持数组
-    for (const commandClassName in commandClasses) {
+    Object.keys(commandClasses).forEach((commandClassName) => {
       const commandClass = commandClasses[commandClassName];
       this.commands[commandClass.getName()] = commandClass;
-    }
+    });
     this.logger.debug('Registered commands', Object.keys(this.commands));
     return this;
   }
@@ -323,7 +335,9 @@ export default class EvaEngine {
         this.logger.error(e);
       }
       this.logger.info('Cron job %s finished', job);
+      return true;
     }, later.parse.cron(sequence, true)); //第二个参数为True表示支持秒
+    return true;
   }
 
 }

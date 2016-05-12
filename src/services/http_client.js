@@ -6,6 +6,10 @@ import requestDebugger from 'request-debug';
 
 @Dependencies(Config, Logger) //eslint-disable-line new-cap
 export default class HttpClient {
+  /**
+   * @param config {Config}
+   * @param logger {Logger}
+   */
   constructor(config, logger) {
     this.config = config.get();
     requestDebugger(request, (type, data) => {

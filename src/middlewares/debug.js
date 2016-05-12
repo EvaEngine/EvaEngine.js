@@ -3,6 +3,12 @@ import Env from '../services/env';
 import Logger from '../services/logger';
 import { Dependencies } from 'constitute';
 
+/**
+ * @param env {Env}
+ * @param logger {Logger}
+ * @returns {function()}
+ * @constructor
+ */
 function DebugMiddleware(env, logger) {
   return () => {
     if (!env.isDevelopment()) {

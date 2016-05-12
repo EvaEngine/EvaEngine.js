@@ -7,6 +7,12 @@ import Config from '../services/config';
 import JsonWebToken from '../services/jwt_token';
 import moment from 'moment';
 
+/**
+ * @param _config {Config}
+ * @param token {JsonWebToken}
+ * @returns {function()}
+ * @constructor
+ */
 function AuthMiddleware(_config, token) {
   const config = _config.get();
   return () => wrapper(async(req, res, next) => {

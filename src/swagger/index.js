@@ -163,10 +163,7 @@ export default class ExSwagger {
       properties: {}
     };
     const requires = [];
-    for (const columnName in model) {
-      if (!model.hasOwnProperty(columnName)) {
-        continue;
-      }
+    Object.keys(model).forEach((columnName) => {
       const column = model[columnName];
       const swaggerType = MODEL_TYPE_MAPPING[column.type.key];
       const property = {
@@ -182,23 +179,21 @@ export default class ExSwagger {
         requires.push(columnName);
       }
       definition.properties[columnName] = property;
-    }
+    });
     definition.required = requires;
     return definition;
   }
 
   static modelsToSwaggerDefinitions(models, blacklist = []) {
     const definitions = new Map();
-    for (const modelName in models) {
-      if (!models.hasOwnProperty(modelName)) {
-        continue;
-      }
+    Object.keys(models).forEach((modelName) => {
       if (blacklist.includes(modelName)) {
-        continue;
+        return true;
       }
       const definition = ExSwagger.modelToSwaggerDefinition(models[modelName].attributes);
       definitions.set(modelName, definition);
-    }
+      return true;
+    });
     return definitions;
   }
 
@@ -209,17 +204,14 @@ export default class ExSwagger {
       return exceptions;
     }
     for (const file of files) {
-      const exceptionsInFile = require(file);
-      for (const exceptionName in exceptionsInFile) {
-        if (!exceptionsInFile.hasOwnProperty(exceptionName)) {
-          continue;
-        }
+      const exceptionsInFile = require(file); //eslint-disable-line global-require
+      Object.keys(exceptionsInFile).forEach((exceptionName) => {
         const exceptionClass = exceptionsInFile[exceptionName];
         const exception = new exceptionClass(exceptionName);
         if (exception instanceof exceptionInterface) {
           exceptions[exceptionName] = exception;
         }
-      }
+      });
     }
     return exceptions;
   }
@@ -344,7 +336,8 @@ export default class ExSwagger {
   }
 
   async getSwaggerIndexHtml() {
-    const content = await fs.readFileAsync(this.getSwaggerUIPath() + '/index.html');
+    const uiPath = this.getSwaggerUIPath();
+    const content = await fs.readFileAsync(`${uiPath}/index.html`);
     return content.toString().replace('http://petstore.swagger.io/v2/swagger.json',
       this.swaggerDocsPath.replace(this.compileDistPath, ''));
   }

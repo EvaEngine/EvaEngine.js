@@ -4,6 +4,12 @@ import Config from '../services/config';
 import Redis from '../services/redis';
 import { Dependencies } from 'constitute';
 
+/**
+ * @param _config {Config}
+ * @param redis {Redis}
+ * @returns {function()}
+ * @constructor
+ */
 function SessionMiddleware(_config, redis) {
   return () => {
     const RedisStore = connectRedis(session);

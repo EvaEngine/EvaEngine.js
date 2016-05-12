@@ -10,6 +10,9 @@ let redisClient = null;
 
 @Dependencies(Config) //eslint-disable-line new-cap
 export default class Redis {
+  /**
+   * @param config Config
+   */
   constructor(config) {
     this.config = config;
   }

@@ -20,11 +20,11 @@ export default class Command {
 
   getOptions() {
     const options = {};
-    for (const key in this.argv) {
+    Object.keys(this.argv).forEach((key) => {
       if (key !== '$0' && ['string', 'number'].includes(typeof this.argv[key])) {
         options[key] = this.argv[key];
       }
-    }
+    });
     return options;
   }
 

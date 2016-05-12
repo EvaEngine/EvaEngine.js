@@ -5,6 +5,10 @@ import jwt from 'jwt-simple';
 
 @Dependencies(Config, Redis) //eslint-disable-line new-cap
 export default class JsonWebToken {
+  /**
+   * @param config {Config}
+   * @param redis {Redis}
+   */
   constructor(config, redis) {
     this.redis = redis.getInstance();
     this.config = config.get().token;

@@ -5,6 +5,10 @@ import winston from 'winston';
 
 @Dependencies(Env, Config) //eslint-disable-line new-cap
 export default class Logger {
+  /**
+   * @param env {Env}
+   * @param config {Config}
+   */
   constructor(env, config) {
     this.env = env;
     this.config = config;
@@ -22,6 +26,9 @@ export default class Logger {
     return winston;
   }
 
+  /**
+   * @returns {winston.Logger}
+   */
   getInstance() {
     if (this.instance) {
       return this.instance;

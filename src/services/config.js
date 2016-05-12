@@ -7,6 +7,9 @@ let config = null;
 
 @Dependencies(Env) //eslint-disable-line new-cap
 export default class Config {
+  /**
+   * @param env {Env}
+   */
   constructor(env) {
     this.env = env;
     this.path = null;
