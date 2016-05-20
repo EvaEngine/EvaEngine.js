@@ -26,7 +26,8 @@ const utils = {
 export {
   DI,
   express,
-  utils
+  yargs,
+  later
 };
 
 let app = null;
