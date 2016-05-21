@@ -6,6 +6,7 @@ import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import * as utils from './utils';
 import Command from './command';
+import Entities from './entities';
 import EvaEngine, * as engine from './engine';
 
 const providers = {
@@ -25,6 +26,7 @@ export default EvaEngine;
 export {
   Command,
   DI,
+  Entities,
   engine,
   express,
   exceptions,
