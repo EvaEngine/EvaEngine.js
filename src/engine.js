@@ -6,8 +6,6 @@ import yargs from 'yargs';
 import later from 'later';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
-import wrapper from './utils/wrapper';
-import { pagination, paginationFilter } from './utils/pagination';
 import {
   StandardException, InvalidArgumentException, RuntimeException
 } from './exceptions';
@@ -15,12 +13,6 @@ import {
 export const MODES = {
   WEB: 'web',
   CLI: 'cli'
-};
-
-const utils = {
-  wrapper,
-  pagination,
-  paginationFilter
 };
 
 export {
@@ -340,5 +332,4 @@ export default class EvaEngine {
     }, later.parse.cron(sequence, true)); //第二个参数为True表示支持秒
     return true;
   }
-
 }

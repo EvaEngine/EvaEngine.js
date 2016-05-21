@@ -1,7 +1,7 @@
 import httpMocker from 'node-mocks-http';
 import EventEmitter from 'events';
 import chai from 'chai';
-// import { config } from '../src/di';
+import { DI } from '../';
 
 module.exports.truncateAll = async(entities) => {
   const names = [];
@@ -18,6 +18,7 @@ module.exports.mockResponse = mockResponse;
 module.exports.mockRequest = (...args) => httpMocker.createRequest(...args);
 module.exports.mockAuthRequest = (...args) => {
   const { params: params = {} } = args[0];
+  const config = DI.get('config');
   params.api_key = config.token.faker.key;
   args[0].params = params;
   return httpMocker.createRequest(...args);
