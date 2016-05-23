@@ -9,6 +9,7 @@ A development engine for NodeJS.
 
 - Full DI support (Inject by ES7 decorators as well)
 - ES7 Async & Await support
+- CLI mode support
 - Better exceptions design
 - Swagger document generator
 
@@ -18,7 +19,7 @@ A development engine for NodeJS.
 ### Run as web server
 
 ``` js
-import EvaEngine from 'evaengine/src/engine';
+import { EvaEngine } from 'evaengine';
 const engine = new EvaEngine({
   projectRoot: `${__dirname}/..`,
   port: 3000
@@ -34,7 +35,7 @@ Then visit `http://localhost:3000` to view API.
 ### Run as CLI
 
 ``` js
-import EvaEngine from 'evaengine/src/engine';
+import { EvaEngine } from 'evaengine';
 import * as UserCommands from './commands/user';
 const engine = new EvaEngine({
   projectRoot: `${__dirname}/..`
@@ -48,7 +49,7 @@ engine.registerCommands(UserCommands);
 ### Run as Cron Job
 
 ``` js
-import EvaEngine from 'evaengine/src/engine';
+import { EvaEngine } from 'evaengine';
 import * as UserCommands from './commands/user';
 const engine = new EvaEngine({
   projectRoot: `${__dirname}/..`

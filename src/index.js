@@ -21,9 +21,8 @@ const {
         express
       } = engine;
 
-export default EvaEngine;
-
 export {
+  EvaEngine,
   Command,
   DI,
   Entities,
