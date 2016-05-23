@@ -1,6 +1,6 @@
 import chai from 'chai';
 import { describe, it } from 'mocha/lib/mocha';
-import ExSwagger from '../../src/swagger';
+import { ExSwagger } from '../../src/swagger';
 import * as exceptions from '../../src/exceptions';
 chai.should();
 const assert = chai.assert;
@@ -53,11 +53,11 @@ describe('ExSwagger', () => {
   describe('Export JSON', () => {
     it('default properties', async() => {
       const exSwagger = new ExSwagger({
+        swaggerDocsTemplate: {},
         sourceRootPath: '/foo'
       });
       const states = exSwagger.getStates();
       assert.equal('/foo/**/*.js', states.sourceFilesPath);
-      assert.equal('/foo/**/exceptions/**/*.js', states.exceptionPaths[1]);
     });
   });
 });

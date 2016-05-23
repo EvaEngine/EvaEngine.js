@@ -6,7 +6,8 @@ import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
-import { StandardException } from '../exceptions';
+import Entitles from '../entities';
+import { RuntimeException, StandardException } from '../exceptions';
 
 Promise.promisifyAll(fs);
 
@@ -60,7 +61,7 @@ let yamlErrors = [];
  * - ORM entities (Based on Sequelize)
  * - EvaEngine Exceptions
  */
-export default class ExSwagger {
+export class ExSwagger {
 
   /**
    * Get file path array by glob
@@ -241,10 +242,13 @@ export default class ExSwagger {
   async exportJson(dist = this.swaggerDocsPath) {
     this.logger.debug('Start export by meta', this.getStates());
     const files = await ExSwagger.scanFiles(this.sourceFilesPath);
-    this.logger.debug('Scan found files', files);
+    if (!files || files.length < 1) {
+      throw new RuntimeException('No swagger source files found');
+    }
+    this.logger.debug('Scanner found %s files:', files.length, files);
     const annotations = await ExSwagger.filesToAnnotations(files);
     const fragments = ExSwagger.annotationsToFragments(annotations);
-    this.logger.debug('Get %s swaggger docs', fragments.length);
+    this.logger.debug('Get %s swaggger fragments', fragments.length);
     const template = this.swaggerDocsTemplate;
     this.logger.debug('Swagger template', template);
     const exceptions = {};
@@ -254,8 +258,10 @@ export default class ExSwagger {
         exceptionPath, this.exceptionInterface
       );
       Object.assign(exceptions, exceptionsInFile);
+      this.logger.debug('Scanner found %s exceptions', Object.keys(exceptions).length, Object.keys(exceptions));
     }
-    const modelDefinitions = ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist);
+    const modelDefinitions = this.models ?
+      ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : {};
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
     this.logger.debug('Export to', dist);
     return await fs.writeFileAsync(dist, JSON.stringify(swaggerDocs));
@@ -350,21 +356,33 @@ export default class ExSwagger {
     sourceRootPath,
     compileDistPath,
     models,
-    modelBlacklist,
+    modelBlacklist = [],
     swaggerDocsTemplate,
-    logger = console,
+    logger,
     swaggerUIPath,
     swaggerDocsPath = `${compileDistPath}/docs.json`,
     sourceFilesPath = `${sourceRootPath}/**/*.js`,
     exceptionInterface = StandardException,
-    exceptionPaths = [`${sourceRootPath}/**/exceptions/**/*.js`]
+    exceptionPaths
   }) {
-    this.logger = logger;
+    this.logger = logger ||
+      {
+        debug: () => {
+        }
+      };
+
+    if (!swaggerDocsTemplate) {
+      throw new RuntimeException('No swagger docs template input');
+    }
     this.swaggerDocsTemplate = swaggerDocsTemplate;
-    this.models = models;
+    if (models && !(models instanceof Entitles)) {
+      throw new RuntimeException('Input models must instance of engine.Entities');
+    }
+    this.models = models ? models.getAll() : null;
     this.modelBlacklist = modelBlacklist;
     this.sourceFilesPath = sourceFilesPath;
-    this.exceptionPaths = [`${__dirname}/../exceptions`].concat(exceptionPaths);
+    this.exceptionPaths = exceptionPaths ?
+      [`${__dirname}/../exceptions`].concat(exceptionPaths) : [`${__dirname}/../exceptions`];
     this.exceptionInterface = exceptionInterface;
     this.compileDistPath = compileDistPath;
     this.swaggerUIPath = swaggerUIPath || `${__dirname}/../../node_modules/swagger-ui/dist`;

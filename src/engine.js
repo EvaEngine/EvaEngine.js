@@ -28,7 +28,7 @@ export default class EvaEngine {
     projectRoot,
     configPath,
     sourceRoot,
-    port
+    port = 3000
   }, mode = MODES.WEB) {
     this.server = null;
     this.commands = {};

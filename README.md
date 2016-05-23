@@ -20,13 +20,15 @@ A development engine for NodeJS.
 
 ``` js
 import { EvaEngine } from 'evaengine';
+
 const engine = new EvaEngine({
-  projectRoot: `${__dirname}/..`,
-  port: 3000
+  projectRoot: `${__dirname}/..`
 });
+
 engine.bootstrap();
-engine.use('/', 
-  (req, res) => { res.json({ hello => 'world'}); });
+engine.use('/', (req, res) => {
+  res.json({ hello: 'world' });
+});
 engine.run();
 ```
 
@@ -80,3 +82,9 @@ npm link
 cd your_project
 npm link evaengine
 ```
+
+
+## TODO
+
+- [ ] log format uniform
+- [ ] CLI list all available commands
