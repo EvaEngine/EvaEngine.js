@@ -8,4 +8,7 @@ try {
   //do nothing
 }
 
+/**
+ * @type {engineCore}
+ */
 exports = module.exports = require(exportPath);

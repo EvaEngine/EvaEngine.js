@@ -21,7 +21,10 @@ const {
         express
       } = engine;
 
-export {
+/**
+ * @typedef {Object} engineCore
+ */
+const engineCore = {
   EvaEngine,
   Command,
   DI,
@@ -36,3 +39,5 @@ export {
   wrapper,
   utils
 };
+
+exports = module.exports = engineCore;
