@@ -3,8 +3,8 @@ import {
 } from './exceptions';
 import constitute from 'constitute';
 
-const container = new constitute.Container();
-const bound = {};
+let container = new constitute.Container();
+let bound = {};
 
 export default class DI {
   static getContainer() {
@@ -39,5 +39,10 @@ export default class DI {
   static bindMethod(...args) {
     bound[args[0]] = args[1];
     return container.bindMethod(...args);
+  }
+
+  static reset() {
+    container = new constitute.Container();
+    bound = {};
   }
 }

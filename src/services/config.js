@@ -1,6 +1,7 @@
 import merge from 'lodash/merge';
 import Env from './env';
 import EngineConfig from '../config';
+import { RuntimeException } from '../exceptions';
 import { Dependencies } from 'constitute';
 
 let config = null;
@@ -13,6 +14,7 @@ export default class Config {
   constructor(env) {
     this.env = env;
     this.path = null;
+    this.mergedFiles = [];
   }
 
   setPath(path) {
@@ -25,12 +27,18 @@ export default class Config {
     }
     const env = this.env.get();
     const configPath = this.path;
+    const pathDefault = `${configPath}/config.default`;
+    const pathEnv = `${configPath}/config.${env}`;
+    const pathLocal = `${configPath}/config.local.${env}`;
     /*eslint-disable global-require*/
-    const configDefault = require(`${configPath}/config.default`);
-    const configEnv = require(`${configPath}/config.${env}`);
+    const configDefault = require(pathDefault);
+    this.mergedFiles.push(pathDefault);
+    const configEnv = require(pathEnv);
+    this.mergedFiles.push(pathEnv);
     let configLocal = {};
     try {
-      configLocal = require(`${configPath}/config.local.${env}`);
+      configLocal = require(pathLocal);
+      this.mergedFiles.push(pathLocal);
     } catch (e) {
       configLocal = {};
     }
@@ -39,8 +47,28 @@ export default class Config {
     return key ? Config.search(key, config) : config;
   }
 
-  static search(key, target) {
-    return target;
+  getMergedFiles() {
+    return this.mergedFiles;
+  }
+
+  /**
+   * @param {string} keyString
+   * @param {Object} target
+   * @returns {*}
+   */
+  static search(keyString, target) {
+    if (typeof keyString !== 'string') {
+      return target;
+    }
+    const keys = keyString.split('.');
+    let obj = target;
+    for (const key of keys) {
+      if (obj.hasOwnProperty(key) === false) {
+        throw new RuntimeException(`No config found by key ${keyString}`);
+      }
+      obj = obj[key];
+    }
+    return obj;
   }
 }
 
