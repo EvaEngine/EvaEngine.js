@@ -67,7 +67,9 @@ export default class EvaEngine {
     };
     this.registerServiceProviders(EvaEngine.getBaseServiceProviders());
     this.logger = DI.get('logger');
+    this.config = DI.get('config');
     this.logger.info('Engine started, Meta:', this.meta);
+    this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
   }
 
   /**

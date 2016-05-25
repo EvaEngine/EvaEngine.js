@@ -208,7 +208,7 @@ export class ExSwagger {
       const exceptionsInFile = require(file); //eslint-disable-line global-require
       Object.keys(exceptionsInFile).forEach((exceptionName) => {
         const exceptionClass = exceptionsInFile[exceptionName];
-        const exception = new exceptionClass(exceptionName);
+        const exception = new exceptionClass(exceptionName); //eslint-disable-line new-cap
         if (exception instanceof exceptionInterface) {
           exceptions[exceptionName] = exception;
         }
@@ -258,7 +258,8 @@ export class ExSwagger {
         exceptionPath, this.exceptionInterface
       );
       Object.assign(exceptions, exceptionsInFile);
-      this.logger.debug('Scanner found %s exceptions', Object.keys(exceptions).length, Object.keys(exceptions));
+      this.logger.debug('Scanner found %s exceptions',
+        Object.keys(exceptions).length, Object.keys(exceptions));
     }
     const modelDefinitions = this.models ?
       ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : {};
