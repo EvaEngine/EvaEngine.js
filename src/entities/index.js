@@ -26,9 +26,15 @@ Sequelize.prototype.validateIsUnique = (col, msg) => {
 };
 
 const entities = {};
+/**
+ * @type {null|Sequelize}
+ */
 let sequelize = null;
 
 export default class Entities {
+  /**
+   * @param {string} entitiesPath
+   */
   constructor(entitiesPath) {
     this.entitiesPath = entitiesPath;
   }
@@ -53,14 +59,17 @@ export default class Entities {
         const model = sequelize.import(path.join(this.entitiesPath, file));
         entities[model.name] = model;
       });
-
-    Object.keys(entities).forEach((modelName) => {
-      if ('associate' in entities[modelName]) {
-        entities[modelName].associate(entities);
+    
+    Object.values(entities).forEach((model) => {
+      if ('associate' in model) {
+        model.associate(entities);
       }
     });
   }
 
+  /**
+   * @returns {Sequelize}
+   */
   getSequelize() {
     return Sequelize;
   }
@@ -82,6 +91,9 @@ export default class Entities {
     return entities[name];
   }
 
+  /**
+   * @returns {Object}
+   */
   getAll() {
     this.init();
     return entities;

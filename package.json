@@ -41,6 +41,7 @@
     "moment": "^2.13.0",
     "morgan": "^1.7.0",
     "mysql": "^2.10.2",
+    "pug": "^2.0.0-alpha8",
     "redis": "^2.5.3",
     "request-debug": "^0.2.0",
     "request-promise": "^3.0.0",
