@@ -47,7 +47,7 @@ export default class Entities {
     const logger = DI.get('logger').getInstance();
     sequelize = new Sequelize(config.db.database, null, null,
       Object.assign({}, config.sequelize, config.db, { logging: logger.verbose }));
-    
+
     fs
       .readdirSync(this.entitiesPath)
       .filter((file) => {
@@ -59,7 +59,7 @@ export default class Entities {
         const model = sequelize.import(path.join(this.entitiesPath, file));
         entities[model.name] = model;
       });
-    
+
     Object.values(entities).forEach((model) => {
       if ('associate' in model) {
         model.associate(entities);
@@ -80,6 +80,12 @@ export default class Entities {
   getInstance() {
     this.init();
     return sequelize;
+  }
+
+  getTransaction() {
+    return this.getInstance().transaction({
+      autocommit: false
+    });
   }
 
   /**

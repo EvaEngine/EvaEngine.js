@@ -109,6 +109,7 @@ export default class EvaEngine {
    */
   getCLI() {
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
+    this.logger.debug('Bound services', Object.keys(DI.getBound()));
     const [, , commandName] = process.argv;
     if (!commandName) {
       throw new RuntimeException('Please input command name.');
