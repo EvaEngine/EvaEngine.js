@@ -23,7 +23,7 @@ export default class JsonWebToken {
   }
 
   async save(uid, item) {
-    const tokenString = JsonWebToken.encode(item);
+    const tokenString = this.encode(item);
     //TODO jwToken是否严格可以用.分割
     const key = [this.getPrefix(), uid, tokenString.split('.').pop()].join(':');
     //TODO 过期时间
