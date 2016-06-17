@@ -77,7 +77,7 @@ export default class Entities {
   /**
    * @returns {Sequelize}
    */
-  getIntance() {
+  getInstance() {
     this.init();
     return sequelize;
   }
