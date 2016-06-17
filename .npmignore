@@ -1,1 +1,5 @@
-!lib/
+*
+!lib/*
+!index.js
+!package.json
+!README.md
