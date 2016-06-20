@@ -276,7 +276,7 @@ export default class EvaEngine {
         if (exception instanceof RuntimeException) {
           this.logger.error(exception);
         } else {
-          this.logger.warn(exception);
+          this.logger.warn(exception.message);
         }
         return res.status(exception.getStatusCode()).json({
           code: exception.getCode(),

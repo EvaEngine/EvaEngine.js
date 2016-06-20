@@ -13,7 +13,7 @@ export default class HttpClient {
   constructor(config, logger) {
     this.config = config.get();
     requestDebugger(request, (type, data) => {
-      logger.verbose(data);
+      logger.debug(data);
     });
   }
 
