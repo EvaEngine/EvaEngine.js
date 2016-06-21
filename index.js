@@ -5,6 +5,9 @@ try {
    * @type {engineCore}
    */
   exports = module.exports = require('./lib');
+  if (!global._babelPolyfill) {
+    require('babel-polyfill');
+  }
 } catch (e) {
   /**
    * @type {engineCore}
