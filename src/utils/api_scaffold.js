@@ -73,8 +73,7 @@ export class OrderScaffold {
     return '';
   }
 
-  toSwaggerDocs(queryKey) {
-
+  toSwaggerDocs() {
   }
 }
 
@@ -105,7 +104,7 @@ const operatorMapping = {
   string: [],
   number: ['$gte', '$lte'],
   date: ['$gte', '$lte'],
-  'date-time': ['$gte', '$lte'],
+  'date-time': ['$gte', '$lte']
 };
 
 
