@@ -250,7 +250,7 @@ export default class EvaEngine {
       const lines = stack.split('\n');
       const stackOut = [];
       for (const line of lines) {
-        if (!line.match('/node_modules/')) {
+        if (!line.match(/node_modules|\(node\.js/)) {
           stackOut.push(line);
         }
       }
