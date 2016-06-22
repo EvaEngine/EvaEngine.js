@@ -91,6 +91,8 @@ export class ExSwagger {
     for (const filepath of files) {
       const source = await fs.readFileAsync(filepath);
       acorn.parse(source, {
+        ecmaVersion: 7,
+        allowImportExportEverywhere: true,
         onComment: comments
       });
     }

@@ -50,6 +50,9 @@ export class OrderScaffold {
   }
 
   getOrderByQuery(queryString) {
+    if (!queryString) {
+      return '';
+    }
     const queryArray = queryString.split(',');
     const orders = this.getAvailableOrders();
     const orderArray = [];
@@ -215,7 +218,7 @@ export class FilterScaffold {
     return conditions;
   }
 
-  getConditionsByString(queryString) {
-    return JSON.parse(queryString);
+  getConditionsByString(queryString, baseWhere = {}) {
+    return _.merge(baseWhere, JSON.parse(queryString));
   }
 }
