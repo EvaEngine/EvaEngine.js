@@ -8,6 +8,8 @@ import glob from 'glob';
 import yaml from 'js-yaml';
 import Entitles from '../entities';
 import { RuntimeException, StandardException } from '../exceptions';
+require('acorn-es7-plugin')(acorn);
+
 
 Promise.promisifyAll(fs);
 
@@ -92,6 +94,7 @@ export class ExSwagger {
       const source = await fs.readFileAsync(filepath);
       acorn.parse(source, {
         ecmaVersion: 7,
+        plugins: { asyncawait: true },
         allowImportExportEverywhere: true,
         onComment: comments
       });

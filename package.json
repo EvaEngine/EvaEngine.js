@@ -26,9 +26,10 @@
   "author": "AlloVince",
   "dependencies": {
     "acorn": "^3.2.0",
+    "acorn-es7-plugin": "^1.0.14",
     "app-root-path": "^1.2.0",
-    "bluebird": "^3.4.0",
     "babel-polyfill": "^6.9.1",
+    "bluebird": "^3.4.0",
     "connect-redis": "^3.1.0",
     "constitute": "^1.6.2",
     "doctrine": "^1.2.2",

@@ -72,6 +72,26 @@ describe('Filter Scaffold', () => {
       total_amount_$gte: 100,
       total_amount_$lte: 200
     }));
+
+    assert.throw(() => filterScaffold.getConditions({
+      total_amount_$gte: 100,
+      total_amount: 200
+    }, /conflict/));
+  });
+
+  it('replace default operators', () => {
+    const filterScaffold = new FilterScaffold();
+    filterScaffold.addFilterSchema('totalAmount', 'number', { operators: [] });
+    const schema = filterScaffold.getFilterSchema();
+    assert.lengthOf(schema.totalAmount.operators, 0);
+    assert.deepEqual({}, filterScaffold.getConditions({
+      total_amount_$gte: 100
+    }));
+    assert.deepEqual({
+      totalAmount: 100
+    }, filterScaffold.getConditions({
+      total_amount: 100
+    }));
   });
 
   it('skip without value', () => {

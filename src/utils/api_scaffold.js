@@ -82,8 +82,8 @@ const FILTER_TYPE_STRING = 'string';
 const FILTER_TYPE_NUMBER = 'number';
 
 export const filterTypes = {
-  FILTER_TYPE_STRING,
-  FILTER_TYPE_NUMBER
+  [FILTER_TYPE_STRING]: FILTER_TYPE_STRING,
+  [FILTER_TYPE_NUMBER]: FILTER_TYPE_NUMBER
 };
 
 export const supportOperators = {
@@ -101,9 +101,11 @@ export const supportOperators = {
   notBetween: '$notBetween'
 };
 
-const typeDefaultOperators = {
+const operatorMapping = {
   string: [],
-  number: ['$gte', '$lte']
+  number: ['$gte', '$lte'],
+  date: ['$gte', '$lte'],
+  'date-time': ['$gte', '$lte'],
 };
 
 
@@ -112,6 +114,7 @@ const typeDefaultOperators = {
  *  name: 'id',
  *  description: 'foo',
  *  type: 'string',
+ *  format: 'date',
  *  operators: ['$like'],
  *  defaultValue: 0,
  *  enumerate: [1, 2, 3]
@@ -134,17 +137,20 @@ export class FilterScaffold {
   }
 
   addFilterSchema(name, type = FILTER_TYPE_STRING, options = {}) {
+    let mappingKey = type;
     if (Object.keys(filterTypes).includes(type) === false) {
-      type = FILTER_TYPE_STRING;
+      mappingKey = FILTER_TYPE_STRING;
     }
     const {
+            format = null,
             description = null,
             defaultValue = null,
             enumerate = null
           } = options;
+    mappingKey = format || mappingKey;
     let { operators = null } = options;
     if (!operators) {
-      operators = typeDefaultOperators[type];
+      operators = operatorMapping[mappingKey];
     }
     const schema = {
       type,
@@ -162,11 +168,12 @@ export class FilterScaffold {
   }
 
   setFilterSchema(schema) {
+    //TODO: add check
     this.schema = schema;
     return this;
   }
 
-  getFieldAndOpterator(key) {
+  getFieldAndOperator(key) {
     const keyArray = key.split('_');
     let operator = keyArray.pop();
     let field = key;
@@ -194,8 +201,13 @@ export class FilterScaffold {
         continue;
       }
 
-      const [field, operator] = this.getFieldAndOpterator(key);
+      const [field, operator] = this.getFieldAndOperator(key);
       if (schemaKeys.includes(field) === false) {
+        continue;
+      }
+
+      const schemaAllowOperators = schema[field].operators;
+      if (operator && !schemaAllowOperators.includes(operator)) {
         continue;
       }
 
@@ -208,7 +220,7 @@ export class FilterScaffold {
         continue;
       }
 
-      if (typeof conditions[field] === 'object') {
+      if (operator && typeof conditions[field] === 'object') {
         conditions[field][operator] = value;
         continue;
       }
