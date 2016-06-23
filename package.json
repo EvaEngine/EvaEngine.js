@@ -11,7 +11,7 @@
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
     "test-raw": "NODE_ENV=test node --harmony ./node_modules/.bin/mocha --harmony --compilers js:babel-core/register --require babel-polyfill --recursive",
-    "test": "cross-env NODE_ENV=test ./node_modules/.bin/babel-node --harmony ./node_modules/isparta/bin/isparta cover --report text --report lcov node_modules/mocha/bin/_mocha -- --reporter dot",
+    "test": "./node_modules/.bin/cross-env NODE_ENV=test ./node_modules/.bin/babel-node --harmony ./node_modules/isparta/bin/isparta cover --report text --report lcov node_modules/mocha/bin/_mocha -- --reporter dot",
     "lint": "./node_modules/.bin/eslint src/",
     "build": "babel -d lib/ src/"
   },
@@ -63,6 +63,7 @@
     "babel-preset-stage-3": "^6.5.0",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "cross-env": "^1.0.8",
     "eslint": "^2.12.0",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.8.1",
