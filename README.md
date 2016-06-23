@@ -1,9 +1,9 @@
 # EvaEngine For Node
 
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
-[![Build Status](https://travis-ci.org/EvaEngine/EvaNode.svg?branch=master)](https://travis-ci.org/EvaEngine/EvaNode)
-[![Dependencies Status](https://david-dm.org/EvaEngine/EvaEngine.js.svg)](https://david-dm.org/EvaEngine/EvaNode)
-[![Coverage Status](https://coveralls.io/repos/github/EvaEngine/EvaNode/badge.svg?branch=master)](https://coveralls.io/github/EvaEngine/EvaNode?branch=master)
+[![Build Status](https://travis-ci.org/EvaEngine/EvaEngine.js.svg?branch=master)](https://travis-ci.org/EvaEngine/EvaEngine)
+[![Dependencies Status](https://david-dm.org/EvaEngine/EvaEngine.js.svg)](https://david-dm.org/EvaEngine/EvaEngine.js)
+[![Coverage Status](https://coveralls.io/repos/github/EvaEngine/EvaEngine.js/badge.svg?branch=master)](https://coveralls.io/github/EvaEngine/EvaEngine.js?branch=master)
 
 A development engine for NodeJS.
 
@@ -57,13 +57,16 @@ engine.registerCommands(UserCommands);
 
 ``` js
 import { EvaEngine } from 'evaengine';
-import * as UserCommands from './commands/user';
+import * as HelloWorldCommands from './commands/hello_world';
+
 const engine = new EvaEngine({
   projectRoot: `${__dirname}/..`
 }, 'cli');
-(async() => {
-    await engine.runCommand(new UserCommands.Create(), '* * 0/2 * * *');
-})();
+engine.registerCommands([
+  HelloWorldCommands
+]);
+
+engine.runCrontab('0/10 * * * * *', 'hello:world --id=EvaEngine');
 ```
 
 ## Swagger Support
