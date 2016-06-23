@@ -108,12 +108,17 @@ export default class EvaEngine {
    * @returns {yargs}
    */
   getCLI() {
+    if (Object.keys(this.commands).length < 1) {
+      throw new RuntimeException('No command registered yet');
+    }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
     const [, , commandName] = process.argv;
+
     if (!commandName) {
-      throw new RuntimeException('Please input command name.');
+      return yargs.argv;
     }
+
     this.commandName = commandName;
     if (!this.commands[commandName]) {
       throw new RuntimeException('Command %s not registered.', commandName);
@@ -224,7 +229,11 @@ export default class EvaEngine {
       });
     };
     if (Array.isArray(commands)) {
-      commands.forEach(registerCommandClass);
+      if (Array.isArray(commands[0])) {
+        commands.forEach(commandsPerFile => commandsPerFile.forEach(registerCommandClass));
+      } else {
+        commands.forEach(registerCommandClass);
+      }
     } else {
       registerCommandClass(commands);
     }
@@ -394,6 +403,14 @@ export default class EvaEngine {
   async runCLI() {
     const argv = this.getCLI();
     const commandName = this.getCommandName();
+    if (!commandName) {
+      this.logger.info('Available commands:');
+      Object.entries(this.commands).forEach(([name, commandClass]) => {
+        this.logger.info('-', (`${name}  `).padEnd(30, '-'), commandClass.getDescription());
+      });
+      return;
+    }
+
     this.logger.debug('Start run command', commandName);
     this.logger.debug('Received arguments', argv);
     const CommandClass = this.commands[commandName];
@@ -402,23 +419,27 @@ export default class EvaEngine {
     this.logger.debug('CLI run finished');
   }
 
-  async runCommand(command, sequence) {
-    if (!sequence) {
-      return await command.run();
+  runCrontab(sequence, commandString, useSeconds = true) {
+    if (Object.keys(this.commands).length < 1) {
+      throw new RuntimeException('No command registered yet');
     }
-    const job = command.getName();
-    const options = command.getOptions();
+    this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
+    this.logger.debug('Bound services', Object.keys(DI.getBound()));
+
+    const [commandName, ...options] = commandString.split(' ');
+    if (Object.keys(this.commands).includes(commandName) === false) {
+      throw new RuntimeException('Command %s not registered', commandName);
+    }
+    const argv = yargs(options ? options.join(' ') : '').argv;
+    const command = new this.commands[commandName](argv);
+    let i = 1;
     later.setInterval(async() => {
-      this.logger.info('Cron job %s started with %s', job, options);
-      try {
-        return await command.run();
-      } catch (e) {
-        //TODO: 重试机制
-        this.logger.error(e);
-      }
-      this.logger.info('Cron job %s finished', job);
-      return true;
-    }, later.parse.cron(sequence, true)); //第二个参数为True表示支持秒
-    return true;
+      this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
+      //Let job crash if any exception happen
+      await command.run();
+      this.logger.info('Round %d | Cron job %s finished', i, commandName);
+      i++;
+    }, later.parse.cron(sequence, useSeconds)); //第二个参数为True表示支持秒
+    this.logger.info('Cron job %s registered by [ %s ]', commandString, sequence);
   }
 }

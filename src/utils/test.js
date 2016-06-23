@@ -19,10 +19,12 @@ module.exports.mockResponse = mockResponse;
 module.exports.mockRequest = (...args) => httpMocker.createRequest(...args);
 
 module.exports.mockAuthRequest = (...args) => {
-  const { params: params = {} } = args[0];
-  const config = DI.get('config');
-  params.api_key = config.token.faker.key;
-  args[0].params = params; //eslint-disable-line no-param-reassign
+  const uid = DI.get('config').get('token.faker.uid');
+  Object.assign(args[0], {
+    auth: {
+      uid
+    }
+  });
   return httpMocker.createRequest(...args);
 };
 
