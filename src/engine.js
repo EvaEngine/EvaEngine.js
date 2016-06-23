@@ -376,15 +376,19 @@ export default class EvaEngine {
   /**
    * @returns {EvaEngine}
    */
-  run() {
+  run(port) {
     process.on('uncaughtException', this.getUncaughtExceptionHandler());
-    EvaEngine.getApp().set('port', this.port);
+    EvaEngine.getApp().set('port', port || this.port);
     EvaEngine.getApp().use(this.getDefaultErrorHandler());
     this.server = http.createServer(EvaEngine.getApp());
-    this.server.listen(this.port);
+    this.server.listen(port || this.port);
     this.server.on('error', this.getServerErrorHandler());
     this.logger.info('Engine running http server by listening', this.port);
     return this;
+  }
+
+  getServer() {
+    return this.server;
   }
 
   async runCLI() {

@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
 [![Build Status](https://travis-ci.org/EvaEngine/EvaNode.svg?branch=master)](https://travis-ci.org/EvaEngine/EvaNode)
-[![Dependencies Status](https://david-dm.org/EvaEngine/EvaNode.svg)](https://david-dm.org/EvaEngine/EvaNode)
+[![Dependencies Status](https://david-dm.org/EvaEngine/EvaEngine.js.svg)](https://david-dm.org/EvaEngine/EvaNode)
 [![Coverage Status](https://coveralls.io/repos/github/EvaEngine/EvaNode/badge.svg?branch=master)](https://coveralls.io/github/EvaEngine/EvaNode?branch=master)
 
 A development engine for NodeJS.
@@ -16,13 +16,18 @@ A development engine for NodeJS.
 
 ## Quick Start
 
+Clone this skeleton project to quick start:
+
+[EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)
+
 ### Run as web server
 
 ``` js
 import { EvaEngine } from 'evaengine';
 
 const engine = new EvaEngine({
-  projectRoot: `${__dirname}/..`
+  projectRoot: `${__dirname}/..`,
+  port: 3000
 });
 
 engine.bootstrap();
