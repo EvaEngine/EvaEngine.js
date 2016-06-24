@@ -12,8 +12,8 @@ describe('Engine', () => {
     });
     const meta = engine.getMeta();
     assert.equal(meta.projectRoot, projectRoot);
-    assert.equal(meta.configPath, `${projectRoot}/config`);
-    assert.equal(meta.sourceRoot, `${projectRoot}/src`);
+    assert.equal(meta.configPath, `${projectRoot}${path.sep}config`);
+    assert.equal(meta.sourceRoot, `${projectRoot}${path.sep}src`);
     assert.equal(meta.port, 3000);
     assert.equal(engine.getDI(), DI);
   });

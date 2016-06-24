@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha/lib/mocha';
-import { assert, expect } from '../helpers';
+import { assert } from '../helpers';
 import Config from '../../src/services/config';
 import Env from '../../src/services/env';
 

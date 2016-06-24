@@ -246,7 +246,13 @@ export class ExSwagger {
 
   async exportJson(dist = this.swaggerDocsPath) {
     this.logger.debug('Start export by meta', this.getStates());
-    const files = await ExSwagger.scanFiles(this.sourceFilesPath);
+    const fileGroups = await Promise.all(
+      this.sourceFilesPath.map(path => ExSwagger.scanFiles(path))
+    );
+    let files = [];
+    fileGroups.forEach((fileGroup) => {
+      files = files.concat(fileGroup);
+    });
     if (!files || files.length < 1) {
       throw new RuntimeException('No swagger source files found');
     }
@@ -386,12 +392,23 @@ export class ExSwagger {
     }
     this.models = models ? models.getAll() : null;
     this.modelBlacklist = modelBlacklist;
-    this.sourceFilesPath = sourceFilesPath;
+
+    const extraSourcePaths = [`${__dirname}/../utils/**/*.js`];
+    this.sourceFilesPath = Array.isArray(sourceFilesPath)
+      ? extraSourcePaths.concat(sourceFilesPath) :
+      extraSourcePaths.concat([sourceFilesPath]);
     this.exceptionPaths = exceptionPaths ?
       [`${__dirname}/../exceptions`].concat(exceptionPaths) : [`${__dirname}/../exceptions`];
     this.exceptionInterface = exceptionInterface;
     this.compileDistPath = compileDistPath;
-    this.swaggerUIPath = swaggerUIPath || `${__dirname}/../../node_modules/swagger-ui/dist`;
+    if (swaggerUIPath) {
+      this.swaggerUIPath = swaggerUIPath;
+    } else {
+      const [nodeVersion] = process.version.slice(1, 2);
+      this.swaggerUIPath = nodeVersion <= 4 ?
+        `${__dirname}/../../node_modules/swagger-ui/dist` :
+        `${__dirname}/../../../swagger-ui/dist`; //for npm3
+    }
     this.swaggerDocsPath = swaggerDocsPath;
   }
 }

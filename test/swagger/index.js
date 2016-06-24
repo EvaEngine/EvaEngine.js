@@ -1,15 +1,14 @@
-import chai from 'chai';
+import { assert } from '../helpers';
+import path from 'path';
 import { describe, it } from 'mocha/lib/mocha';
 import { ExSwagger } from '../../src/swagger';
 import * as exceptions from '../../src/exceptions';
-chai.should();
-const assert = chai.assert;
 
 describe('ExSwagger', () => {
   describe('Annotations', () => {
     it('Could get file lists', async() => {
       const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
-      assert.include(files, `${__dirname}/_example/controller.js`);
+      assert.include(files, `${__dirname}${path.sep}_example${path.sep}controller.js`);
     });
     it('Could parse annotions', async() => {
       const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
@@ -57,7 +56,7 @@ describe('ExSwagger', () => {
         sourceRootPath: '/foo'
       });
       const states = exSwagger.getStates();
-      assert.equal('/foo/**/*.js', states.sourceFilesPath);
+      assert.include(states.sourceFilesPath, '/foo/**/*.js');
     });
   });
 });
