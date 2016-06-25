@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
 import DI from '../di';
+import util from 'util';
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
@@ -33,7 +34,9 @@ let sequelize = null;
 
 export default class Entities {
   /**
+   * 
    * @param {string} entitiesPath
+   * @param {Sequelize|Function} sequelizeInstance
    */
   constructor(entitiesPath, sequelizeInstance = null) {
     this.entitiesPath = entitiesPath;
@@ -51,7 +54,7 @@ export default class Entities {
       sequelize = new Sequelize(config.db.database, null, null,
         Object.assign({}, config.sequelize, config.db, { logging: logger.verbose }));
     } else {
-      sequelize = this.sequelize;
+      sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
     }
 
     fs
