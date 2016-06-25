@@ -35,18 +35,24 @@ export default class Entities {
   /**
    * @param {string} entitiesPath
    */
-  constructor(entitiesPath) {
+  constructor(entitiesPath, sequelizeInstance = null) {
     this.entitiesPath = entitiesPath;
+    this.sequelize = sequelizeInstance;
   }
 
   init() {
     if (sequelize) {
       return;
     }
-    const config = DI.get('config').get();
-    const logger = DI.get('logger').getInstance();
-    sequelize = new Sequelize(config.db.database, null, null,
-      Object.assign({}, config.sequelize, config.db, { logging: logger.verbose }));
+
+    if (!this.sequelize) {
+      const config = DI.get('config').get();
+      const logger = DI.get('logger').getInstance();
+      sequelize = new Sequelize(config.db.database, null, null,
+        Object.assign({}, config.sequelize, config.db, { logging: logger.verbose }));
+    } else {
+      sequelize = this.sequelize;
+    }
 
     fs
       .readdirSync(this.entitiesPath)
