@@ -17,11 +17,11 @@ export const supportOrders = [
 ];
 
 /**
- * Convert query string (snake case or camel case) to DB order string
+ * Convert query string (snake case or camel case) to DB order array
  * Support convert:
- * id => id ASC
- * -created_at => createdAt DESC
- * -id,created_at => id DESC, createdAt ASC
+ * id => [['id', 'ASC']]
+ * -created_at => [['createdAt', 'DESC']]
+ * -id,created_at => [['id', 'DESC'], ['createdAt', 'ASC']]
  */
 export class OrderScaffold {
   constructor(queryCase = SNAKE_CASE, fieldCase = CAMEL_CASE) {
@@ -43,37 +43,40 @@ export class OrderScaffold {
     fields.forEach((field) => {
       const ascKey = queryCase === SNAKE_CASE ? _.snakeCase(field) : _.camelCase(field);
       const descKey = `-${ascKey}`;
-      orders[ascKey] = `${field} ASC`;
-      orders[descKey] = `${field} DESC`;
+      orders[ascKey] = [field, ORDER_ASC];
+      orders[descKey] = [field, ORDER_DESC];
     });
     return orders;
   }
 
+  /**
+   * Return sequelize order array
+   * @param queryString
+   * @returns {*}
+   */
   getOrderByQuery(queryString) {
     if (!queryString) {
-      return '';
+      if (this.defaultOrderField) {
+        return [[this.defaultOrderField, this.defaultOrder]];
+      }
+      return [];
     }
     const queryArray = queryString.split(',');
     const orders = this.getAvailableOrders();
     const orderArray = [];
-
     queryArray.forEach(query => {
       if (Object.keys(orders).includes(query) === true) {
-        orderArray.push(` ${orders[query]}`);
+        orderArray.push(orders[query]);
       }
     });
     if (orderArray.length > 0) {
-      return orderArray.join(',');
+      return orderArray;
     }
 
     if (this.defaultOrderField) {
-      return ` ${this.defaultOrderField} ${this.defaultOrder}`;
+      return [[this.defaultOrderField, this.defaultOrder]];
     }
-
-    return '';
-  }
-
-  toSwaggerDocs() {
+    return [];
   }
 }
 

@@ -8,33 +8,37 @@ describe('Order Scaffold', () => {
       const orderScaffold = new OrderScaffold();
       orderScaffold.setFields(['startDate']);
       assert.deepEqual({
-        start_date: 'startDate ASC',
-        '-start_date': 'startDate DESC'
+        start_date: ['startDate', 'ASC'],
+        '-start_date': ['startDate', 'DESC']
       }, orderScaffold.getAvailableOrders());
-      assert.equal(' startDate DESC', orderScaffold.getOrderByQuery('-start_date'));
-      assert.equal('', orderScaffold.getOrderByQuery('unknown order'));
+      assert.deepEqual(orderScaffold.getOrderByQuery('-start_date'), [['startDate', 'DESC']]);
+      assert.deepEqual(orderScaffold.getOrderByQuery('unknown order'), []);
     });
 
     it('Works with default order', () => {
       const orderScaffold = new OrderScaffold();
       orderScaffold.setFields(['id', 'startDate'], 'id');
-      assert.equal(' id DESC', orderScaffold.getOrderByQuery('unknown order'));
+      assert.deepEqual(orderScaffold.getOrderByQuery(null), [['id', 'DESC']]);
+      assert.deepEqual(orderScaffold.getOrderByQuery('unknown order'), [['id', 'DESC']]);
     });
 
     it('Works with camel case', () => {
       const orderScaffold = new OrderScaffold('camel');
       orderScaffold.setFields(['start_date']);
-      assert.deepEqual({
-        startDate: 'start_date ASC',
-        '-startDate': 'start_date DESC'
-      }, orderScaffold.getAvailableOrders());
-      assert.equal(' start_date DESC', orderScaffold.getOrderByQuery('-startDate'));
+      assert.deepEqual(orderScaffold.getAvailableOrders(), {
+        startDate: ['start_date', 'ASC'],
+        '-startDate': ['start_date', 'DESC']
+      });
+      assert.deepEqual(orderScaffold.getOrderByQuery('-startDate'), [['start_date', 'DESC']]);
     });
 
     it('Works with multi order', () => {
       const orderScaffold = new OrderScaffold();
       orderScaffold.setFields(['id', 'startDate']);
-      assert.equal(' id DESC, startDate ASC', orderScaffold.getOrderByQuery('-id,start_date'));
+      assert.deepEqual(
+        orderScaffold.getOrderByQuery('-id,start_date'),
+        [['id', 'DESC'], ['startDate', 'ASC']]
+      );
     });
   });
 });
