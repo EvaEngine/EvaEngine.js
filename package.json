@@ -10,13 +10,13 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
-    "test-raw": "NODE_ENV=test node --harmony ./node_modules/.bin/mocha --harmony --compilers js:babel-core/register --require babel-polyfill --recursive",
-    "test": "./node_modules/.bin/cross-env NODE_ENV=test ./node_modules/.bin/babel-node --harmony ./node_modules/isparta/bin/isparta cover --report text --report lcov node_modules/mocha/bin/_mocha -- --reporter dot",
+    "ava": "LOG_LEVEL=error NODE_ENV=test ./node_modules/.bin/cross-env node --harmony ./node_modules/.bin/ava --verbose --serial",
+    "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "./node_modules/.bin/eslint src/",
     "build": "babel -d lib/ src/"
   },
   "engines": {
-    "node": ">=4.4.2"
+    "node": ">=4.4.5"
   },
   "keywords": [
     "Eva",
@@ -24,9 +24,34 @@
   ],
   "main": "index.js",
   "author": "AlloVince",
+  "ava": {
+    "files": [
+      "test/**/*.js",
+      "!test/_*/**/*.js",
+      "!test/swagger/_*/**/*.js"
+    ],
+    "source": [
+      "src/**/*.js"
+    ],
+    "failFast": false,
+    "tap": false,
+    "require": [
+      "babel-core/register",
+      "babel-polyfill"
+    ],
+    "babel": "inherit"
+  },
+  "nyc": {
+    "require": [
+      "babel-core/register"
+    ],
+    "include": [
+      "src/**/*.js"
+    ]
+  },
   "dependencies": {
     "acorn": "^3.2.0",
-    "acorn-es7-plugin": "^1.0.14",
+    "acorn-es7-plugin": "^1.0.15",
     "app-root-path": "^1.2.0",
     "babel-polyfill": "^6.9.1",
     "bluebird": "^3.4.0",
@@ -34,7 +59,7 @@
     "constitute": "^1.6.2",
     "doctrine": "^1.2.2",
     "express": "^4.14.0",
-    "express-session": "^1.13.0",
+    "express-session": "^1.14.0",
     "glob": "^7.0.4",
     "js-yaml": "^3.6.1",
     "jwt-simple": "^0.5.0",
@@ -48,32 +73,32 @@
     "redis": "^2.6.2",
     "request-debug": "^0.2.0",
     "request-promise": "^3.0.0",
-    "sequelize": "^3.23.3",
+    "sequelize": "^3.23.4",
     "swagger-ui": "^2.1.4",
     "winston": "^2.2.0",
     "yargs": "^4.7.1"
   },
   "devDependencies": {
+    "ava": "^0.15.2",
     "babel-cli": "^6.10.1",
     "babel-core": "^6.9.1",
     "babel-eslint": "^6.1.0",
+    "babel-plugin-__coverage__": "^11.0.0",
     "babel-plugin-transform-builtin-extend": "^1.1.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-polyfill": "^6.9.1",
     "babel-preset-es2015-node4": "^2.1.0",
-    "babel-preset-stage-3": "^6.5.0",
-    "babel-register": "^6.9.0",
-    "chai": "^3.5.0",
+    "babel-preset-stage-3": "^6.11.0",
     "cross-env": "^1.0.8",
-    "eslint": "^2.12.0",
+    "eslint": "^2.13.1",
     "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.8.1",
+    "eslint-plugin-import": "^1.10.0",
     "eslint-plugin-jsx-a11y": "^1.5.3",
     "eslint-plugin-react": "^5.2.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",
     "gulp-sourcemaps": "^1.6.0",
-    "isparta": "^4.0.0",
-    "mocha": "^2.5.3"
+    "nyc": "^6.6.1"
   }
 }

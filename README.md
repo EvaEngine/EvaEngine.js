@@ -3,7 +3,7 @@
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
 [![Build Status](https://travis-ci.org/EvaEngine/EvaEngine.js.svg?branch=master)](https://travis-ci.org/EvaEngine/EvaEngine.js)
 [![Dependencies Status](https://david-dm.org/EvaEngine/EvaEngine.js.svg)](https://david-dm.org/EvaEngine/EvaEngine.js)
-[![Coverage Status](https://coveralls.io/repos/github/EvaEngine/EvaEngine.js/badge.svg?branch=master)](https://coveralls.io/github/EvaEngine/EvaEngine.js?branch=master)
+[![codecov](https://codecov.io/gh/EvaEngine/EvaEngine.js/branch/master/graph/badge.svg)](https://codecov.io/gh/EvaEngine/EvaEngine.js)
 
 A development engine for NodeJS.
 

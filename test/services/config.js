@@ -1,13 +1,10 @@
-import { describe, it } from 'mocha/lib/mocha';
-import { assert } from '../helpers';
+import test from 'ava';
 import Config from '../../src/services/config';
 import Env from '../../src/services/env';
 
-describe('Config Service', () => {
-  it('merge 3 levels files', () => {
-    const config = new Config(new Env());
-    config.setPath(`${__dirname}/../_demo_project/config`);
-    assert.isAbove(Object.keys(config.get()).length, 6);
-    assert.equal(config.get('swagger.basePath'), '/');
-  });
+test('merge 3 levels files', (t) => {
+  const config = new Config(new Env());
+  config.setPath(`${__dirname}/../_demo_project/config`);
+  t.true(Object.keys(config.get()).length > 6);
+  t.is(config.get('swagger.basePath'), '/');
 });

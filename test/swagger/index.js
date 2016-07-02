@@ -1,62 +1,43 @@
-import { assert } from '../helpers';
+import test from 'ava';
 import path from 'path';
-import { describe, it } from 'mocha/lib/mocha';
 import { ExSwagger } from '../../src/swagger';
 import * as exceptions from '../../src/exceptions';
 
-describe('ExSwagger', () => {
-  describe('Annotations', () => {
-    it('Could get file lists', async() => {
-      const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
-      assert.include(files, `${__dirname}${path.sep}_example${path.sep}controller.js`);
-    });
-    it('Could parse annotions', async() => {
-      const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
-      assert.lengthOf(annotations, 6);
-    });
-    //it('Multi folders support', async () => {
-    //});
+test('Could get file lists', async(t) => {
+  const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
+  t.true(files.includes(`${__dirname}${path.sep}_example${path.sep}controller.js`));
+});
+test('Could parse annotions', async(t) => {
+  const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
+  t.is(annotations.length, 6);
+});
+test('Could parse swagger docs', async(t) => {
+  const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
+  const docs = ExSwagger.annotationsToFragments(annotations);
+  t.is(docs.length, 4);
+  t.is('definition', docs[0][0].type);
+  t.true(typeof docs[0][0].value === 'object');
+  t.true(typeof docs[0][0].description === 'string');
+  t.is('path', docs[1][0].type);
+  t.true(typeof docs[1][0].value === 'object');
+  t.true(typeof docs[1][0].description === 'string');
+  t.is('exception', docs[1][1].type);
+  t.true(typeof docs[1][1].value === 'string');
+  t.true(typeof docs[1][1].description === 'string');
+  t.is('unknown', docs[3][0].type);
+  t.is(1, ExSwagger.getYamlErrors().length);
+});
+test('Scan exceptions', async(t) => {
+  const scannedExceptions = await ExSwagger.scanExceptions(
+    `${__dirname}/../../src/exceptions/**/*.js`, exceptions.StandardException
+  );
+  t.true(Object.keys(scannedExceptions).length >= 12);
+});
+test('default properties', async(t) => {
+  const exSwagger = new ExSwagger({
+    swaggerDocsTemplate: {},
+    sourceRootPath: '/foo'
   });
-  describe('Swagger Docs', () => {
-    it('Could parse swagger docs', async() => {
-      const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
-      const docs = ExSwagger.annotationsToFragments(annotations);
-      assert.lengthOf(docs, 4);
-      assert.equal('definition', docs[0][0].type);
-      assert.isObject(docs[0][0].value);
-      assert.isString(docs[0][0].description);
-      assert.equal('path', docs[1][0].type);
-      assert.isObject(docs[1][0].value);
-      assert.isString(docs[1][0].description);
-      assert.equal('exception', docs[1][1].type);
-      assert.isString(docs[1][1].value);
-      assert.isString(docs[1][1].description);
-      assert.equal('unknown', docs[3][0].type);
-      assert.equal(1, ExSwagger.getYamlErrors().length);
-    });
-  });
-  describe('Models', () => {
-    it('Get entities', async() => {
-      //const swaggerModels = ExSwagger.modelsToSwaggerDefinitions(entities, ['sequelize', 'Sequelize']);
-      //console.log(swaggerModels);
-    });
-  });
-  describe('Exceptions', () => {
-    it('Scan exceptions', async() => {
-      const scannedExceptions = await ExSwagger.scanExceptions(
-        `${__dirname}/../../src/exceptions/**/*.js`, exceptions.StandardException
-      );
-      assert.isAtLeast(Object.keys(scannedExceptions).length, 12);
-    });
-  });
-  describe('Export JSON', () => {
-    it('default properties', async() => {
-      const exSwagger = new ExSwagger({
-        swaggerDocsTemplate: {},
-        sourceRootPath: '/foo'
-      });
-      const states = exSwagger.getStates();
-      assert.include(states.sourceFilesPath, '/foo/**/*.js');
-    });
-  });
+  const states = exSwagger.getStates();
+  t.true(states.sourceFilesPath.includes('/foo/**/*.js'));
 });
