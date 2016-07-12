@@ -273,7 +273,7 @@ export class ExSwagger {
         Object.keys(exceptions).length, Object.keys(exceptions));
     }
     const modelDefinitions = this.models ?
-      ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : {};
+      ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : new Map();
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
     this.logger.debug('Export to', dist);
     return await fs.writeFileAsync(dist, JSON.stringify(swaggerDocs));
@@ -327,9 +327,12 @@ export class ExSwagger {
     for (const fragmentGroup of fragments) {
       fragmentGroup.forEach(fragmentHandler);
     }
-    modelDefinitions.forEach((definition, modelName) => {
-      template.definitions[modelName] = definition;
-    });
+
+    if (modelDefinitions) {
+      modelDefinitions.forEach((definition, modelName) => {
+        template.definitions[modelName] = definition;
+      });
+    }
     return template;
   }
 
