@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const toUrl = (scheme, host, path, query = {}) => {
   let queryString = Object.keys(query)
     .map(key => `${key}=${query[key]}`)
@@ -16,6 +18,15 @@ const toPaginationUrl = (query, req) =>
 const toPositiveInteger = (number) => {
   const integer = parseInt(number, 10);
   return integer >= 0 ? integer : 0;
+};
+
+const transferProperties = (obj, snakeCase = false) => {
+  if (snakeCase === true) {
+    return _.transform(obj, (result, value, key) => {
+      result[_.snakeCase(key)] = value; //eslint-disable-line no-param-reassign
+    });
+  }
+  return obj;
 };
 
 //@formatter:off
@@ -87,7 +98,8 @@ export const pagination = ({
   total,
   limit,
   offset,
-  req
+  req,
+  snakeCase
 }) => {
   const totalNumber = toPositiveInteger(total);
   let offsetNumber = parseInt(offset, 10);
@@ -102,7 +114,7 @@ export const pagination = ({
   let lastUri = '';
 
   if (total < 1) {
-    return {
+    return transferProperties({
       total: totalNumber,
       offset: offsetNumber,
       limit: limitNumber,
@@ -114,7 +126,7 @@ export const pagination = ({
       nextUri,
       firstUri,
       lastUri
-    };
+    }, snakeCase);
   }
 
   const isFirst = offset <= 0;
@@ -125,7 +137,7 @@ export const pagination = ({
   nextUri = isLast ? nextUri : toPaginationUrl({ offset: next, limit: limitNumber }, req);
   firstUri = toPaginationUrl({ offset: 0, limit: limitNumber }, req);
   lastUri = toPaginationUrl({ offset: last, limit: limitNumber }, req);
-  return {
+  return transferProperties({
     total: totalNumber,
     offset: offsetNumber,
     limit: limitNumber,
@@ -137,7 +149,7 @@ export const pagination = ({
     nextUri,
     firstUri,
     lastUri
-  };
+  }, snakeCase);
 };
 
 export const paginationFilter = ({ offset, limit }, defaultLimit = 15, maxLimit = 100) => {

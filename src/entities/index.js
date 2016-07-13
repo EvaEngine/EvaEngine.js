@@ -34,7 +34,7 @@ let sequelize = null;
 
 export default class Entities {
   /**
-   * 
+   *
    * @param {string} entitiesPath
    * @param {Sequelize|Function} sequelizeInstance
    */
@@ -74,6 +74,12 @@ export default class Entities {
         model.associate(entities);
       }
     });
+  }
+
+  query(sql, bind = {}, options = {}) {
+    return this.getInstance().query(sql, Object.assign({
+      type: this.getSequelize().QueryTypes.SELECT
+    }, options, { bind }));
   }
 
   /**
