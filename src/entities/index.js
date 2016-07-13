@@ -76,10 +76,23 @@ export default class Entities {
     });
   }
 
+  /**
+   * Shortcut for Sequelize query
+   * @param sql
+   * @param bind
+   * @param options
+   * @returns {*|{foo}|{}}
+   */
   query(sql, bind = {}, options = {}) {
     return this.getInstance().query(sql, Object.assign({
       type: this.getSequelize().QueryTypes.SELECT
     }, options, { bind }));
+  }
+
+  getTransaction() {
+    return this.getInstance().transaction({
+      autocommit: false
+    });
   }
 
   /**
@@ -95,12 +108,6 @@ export default class Entities {
   getInstance() {
     this.init();
     return sequelize;
-  }
-
-  getTransaction() {
-    return this.getInstance().transaction({
-      autocommit: false
-    });
   }
 
   /**
