@@ -20,6 +20,8 @@ Clone this skeleton project to quick start:
 
 [EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)
 
+- [项目规范(中文版)](docs/new_project_guide.md)
+
 ### Run as web server
 
 ``` js
