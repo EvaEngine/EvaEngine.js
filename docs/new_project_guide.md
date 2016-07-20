@@ -1,4 +1,4 @@
-# EvaEngine项目规范
+# EvaEngine.js项目规范
 
 ## 基础依赖
 
@@ -102,6 +102,8 @@ Root
 ## 测试
 
 单元测试基于[ava](https://github.com/avajs/ava)
+
+建议单元测试目录下保持与`src`目录下完全一致的目录结构,测试文件与源代码文件一一对应
 
 ## API规范
 

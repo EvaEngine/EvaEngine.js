@@ -1,4 +1,5 @@
 import Env from './env';
+import Cache from './cache';
 import Config from './config';
 import Logger from './logger';
 import Redis from './redis';
@@ -81,5 +82,15 @@ export class HttpClientProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, HttpClient);
+  }
+}
+
+export class CacheProvider extends ServiceProvider {
+  get name() {
+    return 'cache';
+  }
+
+  register() {
+    DI.bindClass(this.name, Cache);
   }
 }

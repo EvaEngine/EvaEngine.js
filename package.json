@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "EvaEngine For NodeJS",
   "license": "MIT",
   "repository": {
@@ -53,7 +53,6 @@
     "acorn": "^3.2.0",
     "acorn-es7-plugin": "^1.0.15",
     "app-root-path": "^1.2.0",
-    "babel-polyfill": "^6.9.1",
     "bluebird": "^3.4.0",
     "connect-redis": "^3.1.0",
     "constitute": "^1.6.2",
@@ -74,6 +73,8 @@
     "request-debug": "^0.2.0",
     "request-promise": "^3.0.0",
     "sequelize": "^3.23.4",
+    "shortid": "^2.2.6",
+    "stow": "^1.0.1",
     "swagger-ui": "^2.1.4",
     "winston": "^2.2.0",
     "yargs": "^4.8.0"
@@ -92,9 +93,6 @@
     "cross-env": "^1.0.8",
     "eslint": "^2.13.1",
     "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.10.2",
-    "eslint-plugin-jsx-a11y": "^1.5.3",
-    "eslint-plugin-react": "^5.2.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",

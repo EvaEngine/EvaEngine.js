@@ -171,6 +171,7 @@ export default class EvaEngine {
   static getServiceProvidersForWeb() {
     return [
       ServiceProviders.RedisProvider,
+      ServiceProviders.CacheProvider,
       ServiceProviders.HttpClientProvider,
       ServiceProviders.JsonWebTokenProvider
     ];
@@ -183,7 +184,8 @@ export default class EvaEngine {
     return [
       MiddlewareProviders.SessionMiddlewareProvider,
       MiddlewareProviders.AuthMiddlewareProvider,
-      MiddlewareProviders.DebugMiddlewareProvider
+      MiddlewareProviders.DebugMiddlewareProvider,
+      MiddlewareProviders.RequestIdMiddlewareProvider
     ];
   }
 
@@ -192,6 +194,7 @@ export default class EvaEngine {
    */
   static getServiceProvidersForCLI() {
     return [
+      ServiceProviders.CacheProvider,
       ServiceProviders.HttpClientProvider,
       ServiceProviders.RedisProvider
     ];
