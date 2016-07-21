@@ -173,6 +173,7 @@ export default class EvaEngine {
       ServiceProviders.RedisProvider,
       ServiceProviders.CacheProvider,
       ServiceProviders.HttpClientProvider,
+      ServiceProviders.RestClientProvider,
       ServiceProviders.JsonWebTokenProvider
     ];
   }
@@ -196,6 +197,7 @@ export default class EvaEngine {
     return [
       ServiceProviders.CacheProvider,
       ServiceProviders.HttpClientProvider,
+      ServiceProviders.RestClientProvider,
       ServiceProviders.RedisProvider
     ];
   }
@@ -280,6 +282,7 @@ export default class EvaEngine {
           return res.status(500).json({
             code: -1,
             message: err.message,
+            prevError: {},
             errors: [],
             stack: env.isDevelopment() ? stackHandler(exception.stack) : [],
             fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
@@ -293,7 +296,9 @@ export default class EvaEngine {
         return res.status(exception.getStatusCode()).json({
           code: exception.getCode(),
           message: exception.message,
-          errors: exception.getDetails(),
+          prevError: exception.getPrevError(),
+          errors: Array.isArray(exception.getDetails()) ?
+            exception.getDetails() : [exception.getDetails()],
           stack: env.isDevelopment() ? stackHandler(exception.stack) : [],
           fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
         });

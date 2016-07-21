@@ -1,26 +1,33 @@
 import stow from 'stow';
 import Redis from './redis';
+import Config from './config';
 import bluebird from 'bluebird';
-import RedisBackend from 'stow/backends/redis';
 import { Dependencies } from 'constitute';
 
-let instance = null;
 bluebird.promisifyAll(stow.Cache.prototype);
 
-@Dependencies(Redis) //eslint-disable-line new-cap
+@Dependencies(Redis, Config) //eslint-disable-line new-cap
 export default class Cache {
-  constructor(redis) {
-    this.redis = redis;
+  constructor(redis, config) {
+    this.redis = redis.getInstance();
+    this.config = config.get('cache');
+    this.namespace = this.config.namespace;
   }
 
-  getInstance(options) {
-    if (instance) {
-      return instance;
-    }
+  setNamespace(namespace) {
+    this.namespace = namespace;
+  }
 
-    instance = stow.createCache(RedisBackend, Object.assign({
-      client: this.redis.getInstance()
-    }, options));
-    return instance;
+  getNamespace() {
+    return this.namespace;
+  }
+
+  set(keyOrOptions, data, tags = {}) {
+  }
+
+  get(key) {
+  }
+
+  invalidate(tags) {
   }
 }

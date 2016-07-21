@@ -5,6 +5,7 @@ import Logger from './logger';
 import Redis from './redis';
 import JsonWebToken from './jwt_token';
 import HttpClient from './http_client';
+import RestClient from './rest_client';
 import DI from '../di';
 
 export class ServiceProvider {
@@ -82,6 +83,16 @@ export class HttpClientProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, HttpClient);
+  }
+}
+
+export class RestClientProvider extends ServiceProvider {
+  get name() {
+    return 'rest_client';
+  }
+
+  register() {
+    DI.bindClass(this.name, RestClient);
   }
 }
 

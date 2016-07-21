@@ -77,6 +77,7 @@ export class StandardException extends Error {
     this.code = StandardException.generateCode(this.constructor.name, fileName) || -1;
     this.statusCode = statusCode || 500;
     this.details = [];
+    this.prevError = {};
   }
 
   getCode() {
@@ -93,6 +94,10 @@ export class StandardException extends Error {
 
   getDetails() {
     return this.details;
+  }
+
+  getPrevError() {
+    return this.prevError;
   }
 }
 
@@ -122,7 +127,58 @@ export class FormInvalidateException extends InvalidArgumentException {
   }
 }
 
-export class HttpRequestInvalidArgumentException extends InvalidArgumentException {
+export class HttpRequestLogicException extends InvalidArgumentException {
+  constructor(...args) {
+    let remoteErrors = {};
+    let superArgs = args;
+    if (args.length > 0 && typeof args[0] === 'object') {
+      remoteErrors = args.shift();
+      if (args.length === 0) {
+        superArgs = ['Remote Logic errors'];
+      }
+    }
+    super(...superArgs);
+    this.details = remoteErrors;
+    const { response } = remoteErrors;
+    this.response = response || null;
+    this.request = response ? response.request : null;
+    this.prevError = remoteErrors;
+  }
+
+  getRequest() {
+    return this.request;
+  }
+
+  getResponse() {
+    return this.response;
+  }
+}
+
+export class RestServiceLogicException extends InvalidArgumentException {
+  constructor(...args) {
+    let remoteErrors = {};
+    let superArgs = args;
+    if (args.length > 0 && typeof args[0] === 'object') {
+      remoteErrors = args.shift();
+      if (args.length === 0) {
+        superArgs = ['Remote Logic errors'];
+      }
+    }
+    super(...superArgs);
+    const { error, response } = remoteErrors;
+    this.details = typeof error === 'object' ? error : remoteErrors;
+    this.response = response || null;
+    this.request = response ? response.request : null;
+    this.prevError = typeof error === 'object' ? error : remoteErrors;
+  }
+
+  getRequest() {
+    return this.request;
+  }
+
+  getResponse() {
+    return this.response;
+  }
 }
 
 export class UnauthorizedException extends LogicException {
@@ -158,6 +214,33 @@ export class IOException extends RuntimeException {
 }
 
 export class HttpRequestIOException extends IOException {
+  constructor(...args) {
+    let remoteErrors = {};
+    let superArgs = args;
+    if (args.length > 0 && typeof args[0] === 'object') {
+      remoteErrors = args.shift();
+      if (args.length === 0) {
+        superArgs = ['Remote IO errors'];
+      }
+    }
+    super(...superArgs);
+    this.details = remoteErrors;
+    const { response } = remoteErrors;
+    this.response = response || null;
+    this.request = response ? response.request : null;
+    this.prevError = remoteErrors;
+  }
+
+  getRequest() {
+    return this.request;
+  }
+
+  getResponse() {
+    return this.response;
+  }
+}
+
+export class RestServiceIOException extends HttpRequestIOException {
 }
 
 export class DatabaseIOException extends IOException {
