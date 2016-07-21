@@ -295,6 +295,7 @@ export default class EvaEngine {
         }
         return res.status(exception.getStatusCode()).json({
           code: exception.getCode(),
+          name: exception.constructor.name,
           message: exception.message,
           prevError: exception.getPrevError(),
           errors: Array.isArray(exception.getDetails()) ?

@@ -241,6 +241,30 @@ export class HttpRequestIOException extends IOException {
 }
 
 export class RestServiceIOException extends HttpRequestIOException {
+  constructor(...args) {
+    let remoteErrors = {};
+    let superArgs = args;
+    if (args.length > 0 && typeof args[0] === 'object') {
+      remoteErrors = args.shift();
+      if (args.length === 0) {
+        superArgs = ['Remote IO errors'];
+      }
+    }
+    super(...superArgs);
+    const { error, response } = remoteErrors;
+    this.details = typeof error === 'string' ? remoteErrors : error;
+    this.response = response || null;
+    this.request = response ? response.request : null;
+    this.prevError = typeof error === 'string' ? remoteErrors : error;
+  }
+
+  getRequest() {
+    return this.request;
+  }
+
+  getResponse() {
+    return this.response;
+  }
 }
 
 export class DatabaseIOException extends IOException {

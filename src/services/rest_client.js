@@ -5,39 +5,33 @@ import { RestServiceLogicException, RestServiceIOException } from '../exceptions
 @Dependencies(HttpClient) //eslint-disable-line new-cap
 export default class RestClient {
   /**
-   * @param {HttpClient} request
+   * @param {HttpClient} client
    */
-  constructor(request) {
-    this.client = request.getInstance();
-    this.baseUrl = '';
+  constructor(client) {
+    this.client = client;
   }
 
   setBaseUrl(baseUrl) {
-    this.baseUrl = baseUrl;
-    this.client = this.client.defaults({ baseUrl });
+    this.client.setBaseUrl(baseUrl);
   }
 
-  getBaseUri() {
-    return this.baseUrl;
+  getBaseUrl() {
+    return this.client.getBaseUrl();
   }
 
-  rawRequest(...args) {
-    return this.client(...args);
+  rawRequest(params) {
+    return this.client.getInstance()(params);
   }
 
-  async request(...args) {
+  async request(params) {
     try {
-      return await this.client(...args);
+      return await this.client.getInstance()(params);
     } catch (e) {
       const { statusCode } = e;
       if (statusCode && statusCode >= 400 && statusCode < 500) {
         throw new RestServiceLogicException(e);
       }
-      const { code } = e.error;
-      switch (code) {
-        default:
-          throw new RestServiceIOException(e);
-      }
+      throw new RestServiceIOException(e);
     }
   }
 }

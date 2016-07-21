@@ -21,13 +21,4 @@ export default class Cache {
   getNamespace() {
     return this.namespace;
   }
-
-  set(keyOrOptions, data, tags = {}) {
-  }
-
-  get(key) {
-  }
-
-  invalidate(tags) {
-  }
 }
