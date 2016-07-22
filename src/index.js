@@ -10,6 +10,7 @@ import Entities from './entities';
 import EvaEngine, * as engine from './engine';
 import constitute from 'constitute';
 import mysql from 'mysql';
+import sequelize from 'sequelize';
 
 const providers = {
   services: ServiceProviders,
@@ -26,7 +27,7 @@ const {
 /**
  * @typedef {Object} engineCore
  */
-const engineCore = {
+const core = {
   EvaEngine,
   Command,
   DI,
@@ -35,6 +36,7 @@ const engineCore = {
   express,
   dependencies: {
     constitute,
+    sequelize,
     mysql
   },
   exceptions,
@@ -46,4 +48,4 @@ const engineCore = {
   utils
 };
 
-exports = module.exports = engineCore;
+exports = module.exports = core;
