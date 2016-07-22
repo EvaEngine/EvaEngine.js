@@ -19,6 +19,10 @@ export default class RestClient {
     return this.client.getBaseUrl();
   }
 
+  getInstance() {
+    return this.client.getInstance();
+  }
+
   rawRequest(params) {
     return this.client.getInstance()(params);
   }

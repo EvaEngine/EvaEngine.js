@@ -20,10 +20,26 @@ export default class Logger {
     winston.level = this.level = level;
     this.instance = null;
     this.label = null;
+    this.logfile = null;
   }
 
   getWinston() {
     return winston;
+  }
+
+  setLogFile(logfile) {
+    this.logfile = logfile;
+    return this;
+  }
+
+  setLabel(label) {
+    this.label = label;
+    return this;
+  }
+
+  setLevel(level) {
+    this.level = level;
+    return this;
   }
 
   /**
@@ -33,7 +49,7 @@ export default class Logger {
     if (this.instance) {
       return this.instance;
     }
-    const logPath = this.config.get().logger.file;
+    const logPath = this.logfile || this.config.get('logger.file');
     this.instance = this.env.isProduction() ? new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
@@ -60,10 +76,6 @@ export default class Logger {
       ]
     });
     return this.instance;
-  }
-
-  setLabel(label) {
-    this.label = label;
   }
 
   debug(...args) {

@@ -1,4 +1,4 @@
-import redis from 'redis';
+import redis, { RedisClient } from 'redis';
 import bluebird from 'bluebird';
 import Config from './config';
 import { Dependencies } from 'constitute';
@@ -15,17 +15,23 @@ export default class Redis {
    */
   constructor(config) {
     this.config = config;
+    this.options = null;
   }
 
   getRedis() {
     return redis;
   }
 
+  setOptions(options) {
+    this.options = options;
+    return this;
+  }
+
   getInstance() {
     if (redisClient) {
       return redisClient;
     }
-    redisClient = redis.createClient(Object.assign({}, this.config.get().redis));
+    redisClient = redis.createClient(Object.assign({}, this.options || this.config.get('redis')));
     redisClient.on('error', (err) => {
       throw err;
     });
