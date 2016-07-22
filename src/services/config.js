@@ -19,6 +19,7 @@ export default class Config {
 
   setPath(path) {
     this.path = path;
+    return this;
   }
 
   get(key) {
@@ -49,6 +50,10 @@ export default class Config {
 
   getMergedFiles() {
     return this.mergedFiles;
+  }
+
+  reload() {
+    config = null;
   }
 
   /**

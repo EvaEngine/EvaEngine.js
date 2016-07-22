@@ -11,7 +11,7 @@ export default class JsonWebToken {
    */
   constructor(config, redis) {
     this.redis = redis.getInstance();
-    this.config = config.get().token;
+    this.config = config.get('token');
   }
 
   getRedis() {
@@ -23,11 +23,11 @@ export default class JsonWebToken {
   }
 
   async save(uid, item) {
-    const tokenString = this.encode(item);
-    //TODO jwToken是否严格可以用.分割
+    const toSaveItem = Object.assign({ uid }, item);
+    const tokenString = this.encode(toSaveItem);
     const key = [this.getPrefix(), uid, tokenString.split('.').pop()].join(':');
     //TODO 过期时间
-    await this.getRedis().setAsync(key, JSON.stringify(item));
+    await this.getRedis().setAsync(key, JSON.stringify(toSaveItem));
     return tokenString;
   }
 
