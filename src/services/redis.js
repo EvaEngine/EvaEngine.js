@@ -1,4 +1,4 @@
-import redis, { RedisClient } from 'redis';
+import redis from 'redis';
 import bluebird from 'bluebird';
 import Config from './config';
 import { Dependencies } from 'constitute';
