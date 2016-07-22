@@ -54,6 +54,6 @@ test('Generate json file', async(t) => {
     swaggerDocsTemplate: { definitions: {}, paths: {} },
     sourceRootPath: `${__dirname}/_example`
   });
-  exSwagger.exportJson();
+  await exSwagger.exportJson();
   t.truthy(JSON.parse(fs.readFileSync(`${compileDistPath}/docs.json`)));
 });

@@ -276,7 +276,8 @@ export class ExSwagger {
       ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : new Map();
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
     this.logger.debug('Export to', dist);
-    return await fs.writeFileAsync(dist, JSON.stringify(swaggerDocs));
+    await fs.writeFileAsync(dist, JSON.stringify(swaggerDocs));
+    return swaggerDocs;
   }
 
   static mergeAll(_template, fragments, exceptions, modelDefinitions) {
