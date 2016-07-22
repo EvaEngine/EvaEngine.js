@@ -1,11 +1,7 @@
 import test from 'ava';
 import * as exceptions from './../../src/exceptions';
 
-test('CRC32', (t) => {
-  t.is(exceptions.StandardException.crc32('Hello World'), 1243066710);
-});
 test('Hash', (t) => {
-  t.is(exceptions.StandardException.crc32('111111'), 404288374);
   t.is(exceptions.StandardException.hash('111111'), '0404288374');
 });
 test('Should extends standard exception', (t) => {
@@ -16,4 +12,13 @@ test('Code', (t) => {
 });
 test('Status code', (t) => {
   t.is(new exceptions.LogicException('foo').getStatusCode(), 400);
+});
+test('Stack Beautifier', (t) => {
+  t.deepEqual(exceptions.StandardException.stackBeautifier(`foo
+bar`), ['foo', 'bar']);
+  t.deepEqual(exceptions.StandardException.stackBeautifier(`foo
+node_modules/abc
+something/(node.js)
+something/(native)
+bar`), ['foo', 'bar']);
 });

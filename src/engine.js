@@ -260,16 +260,6 @@ export default class EvaEngine {
    */
   getDefaultErrorHandler() {
     const env = DI.get('env');
-    const stackHandler = (stack) => {
-      const lines = stack.split('\n');
-      const stackOut = [];
-      for (const line of lines) {
-        if (!line.match(/node_modules|\(node\.js|\(native/)) {
-          stackOut.push(line);
-        }
-      }
-      return stackOut;
-    };
     return this.defaultErrorHandler ||
       ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
@@ -284,7 +274,8 @@ export default class EvaEngine {
             message: err.message,
             prevError: {},
             errors: [],
-            stack: env.isDevelopment() ? stackHandler(exception.stack) : [],
+            stack: env.isDevelopment() ?
+              exception.constructor.stackBeautifier(exception.stack) : [],
             fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
           });
         }
@@ -293,16 +284,7 @@ export default class EvaEngine {
         } else {
           this.logger.warn(exception.message);
         }
-        return res.status(exception.getStatusCode()).json({
-          code: exception.getCode(),
-          name: exception.constructor.name,
-          message: exception.message,
-          prevError: exception.getPrevError(),
-          errors: Array.isArray(exception.getDetails()) ?
-            exception.getDetails() : [exception.getDetails()],
-          stack: env.isDevelopment() ? stackHandler(exception.stack) : [],
-          fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
-        });
+        return res.status(exception.getStatusCode()).json(exception.toJSON(env));
       });
   }
 
