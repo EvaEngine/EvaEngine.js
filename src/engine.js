@@ -107,14 +107,15 @@ export default class EvaEngine {
   /**
    * @returns {yargs}
    */
-  getCLI() {
+  getCLI(commandNameInput) {
     if (Object.keys(this.commands).length < 1) {
       throw new RuntimeException('No command registered yet');
     }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
-    const [, , commandName] = process.argv;
+    const [, , commandNameFromArgv] = process.argv;
 
+    const commandName = commandNameInput || commandNameFromArgv;
     if (!commandName) {
       return yargs.argv;
     }
@@ -124,6 +125,10 @@ export default class EvaEngine {
       throw new RuntimeException('Command %s not registered.', commandName);
     }
     const command = this.commands[commandName];
+
+    if (!command.hasOwnProperty('getSpec') || !command.hasOwnProperty('getDescription')) {
+      throw new RuntimeException('Command require getSpec and getDescription static method');
+    }
     const argv = yargs
       .command(commandName, command.getDescription(), Object.assign({
         verbose: {
@@ -227,6 +232,7 @@ export default class EvaEngine {
    * @returns {EvaEngine}
    */
   registerCommands(commands) {
+    //TODO: validate command
     const registerCommandClass = (commandClasses) => {
       Object.keys(commandClasses).forEach((commandClassName) => {
         const commandClass = commandClasses[commandClassName];
@@ -244,6 +250,14 @@ export default class EvaEngine {
     }
     this.logger.debug('Registered commands', Object.keys(this.commands));
     return this;
+  }
+
+  getCommands() {
+    return this.commands;
+  }
+
+  clearCommands() {
+    this.commands = [];
   }
 
   /**
@@ -389,6 +403,10 @@ export default class EvaEngine {
 
   getServer() {
     return this.server;
+  }
+
+  static getVersion() {
+    return require(`${__dirname}/../package.json`).version; //eslint-disable-line global-require
   }
 
   async runCLI() {
