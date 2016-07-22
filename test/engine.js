@@ -23,6 +23,18 @@ test('create app', (t) => {
   t.true(EvaEngine.getApp().hasOwnProperty('route'));
 });
 
+test('bootstrap', (t) => {
+  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot,
+    port: 3000
+  });
+  t.is(Object.keys(DI.getBound()).length, 3);
+  engine.bootstrap();
+  t.true(Object.keys(DI.getBound()).length > 10);
+});
+
+
 test('CLI without commands', (t) => {
   const projectRoot = path.normalize(`${__dirname}/_demo_project`);
   const engine = new EvaEngine({
