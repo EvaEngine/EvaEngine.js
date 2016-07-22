@@ -1,7 +1,10 @@
 import test from 'ava';
 import path from 'path';
+import fs from 'fs';
 import { ExSwagger } from '../../src/swagger';
 import * as exceptions from '../../src/exceptions';
+import Entities from './../../src/entities';
+import Sequelize from 'sequelize';
 
 test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
@@ -33,6 +36,7 @@ test('Scan exceptions', async(t) => {
   );
   t.true(Object.keys(scannedExceptions).length >= 12);
 });
+
 test('default properties', async(t) => {
   const exSwagger = new ExSwagger({
     swaggerDocsTemplate: {},
@@ -40,4 +44,16 @@ test('default properties', async(t) => {
   });
   const states = exSwagger.getStates();
   t.true(states.sourceFilesPath.includes('/foo/**/*.js'));
+});
+
+test('Generate json file', async(t) => {
+  const compileDistPath = `${__dirname}/_example/exports`;
+  const exSwagger = new ExSwagger({
+    compileDistPath,
+    models: new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize()),
+    swaggerDocsTemplate: { definitions: {}, paths: {} },
+    sourceRootPath: `${__dirname}/_example`
+  });
+  exSwagger.exportJson();
+  t.truthy(JSON.parse(fs.readFileSync(`${compileDistPath}/docs.json`)));
 });
