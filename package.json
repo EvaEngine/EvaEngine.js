@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.0.27",
+  "version": "0.0.29",
   "description": "EvaEngine For NodeJS",
   "license": "MIT",
   "repository": {
@@ -61,6 +61,7 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "glob": "^7.0.4",
+    "harmony-reflect": "^1.4.6",
     "js-yaml": "^3.6.1",
     "jwt-simple": "^0.5.0",
     "later": "^1.2.0",
@@ -101,7 +102,6 @@
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",
     "gulp-sourcemaps": "^1.6.0",
-    "harmony-reflect": "^1.4.6",
     "nyc": "^7.0.0"
   }
 }
