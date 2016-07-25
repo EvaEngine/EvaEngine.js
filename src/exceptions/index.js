@@ -2,6 +2,21 @@ import appRoot from 'app-root-path';
 import path from 'path';
 import crc32 from '../utils/crc32';
 
+
+if (!('toJSON' in Error.prototype)) {
+  Object.defineProperty(Error.prototype, 'toJSON', { //eslint-disable-line
+    value: function () { //eslint-disable-line
+      const alt = {};
+      Object.getOwnPropertyNames(this).forEach(function (key) { //eslint-disable-line
+        alt[key] = this[key];
+      }, this);
+      return alt;
+    },
+    configurable: true,
+    writable: true
+  });
+}
+
 export class StandardException extends Error {
 
   static hash(str, padstr = '0000000000') {

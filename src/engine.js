@@ -327,7 +327,7 @@ export default class EvaEngine {
             prevError: {},
             errors: [],
             stack: env.isDevelopment() ?
-              exception.constructor.stackBeautifier(exception.stack) : [],
+              StandardException.stackBeautifier(exception.stack) : [],
             fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
           });
         }
