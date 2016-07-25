@@ -24,6 +24,34 @@ export {
 
 let app = null;
 
+let baseServiceProviders = [
+  ServiceProviders.EnvProvider,
+  ServiceProviders.ConfigProvider,
+  ServiceProviders.LoggerProvider
+];
+
+let serviceProvidersForWeb = [
+  ServiceProviders.RedisProvider,
+  ServiceProviders.CacheProvider,
+  ServiceProviders.HttpClientProvider,
+  ServiceProviders.RestClientProvider,
+  ServiceProviders.JsonWebTokenProvider
+];
+
+let middlewareProviders = [
+  MiddlewareProviders.SessionMiddlewareProvider,
+  MiddlewareProviders.AuthMiddlewareProvider,
+  MiddlewareProviders.DebugMiddlewareProvider,
+  MiddlewareProviders.RequestIdMiddlewareProvider
+];
+
+let serviceProvidersForCLI = [
+  ServiceProviders.CacheProvider,
+  ServiceProviders.HttpClientProvider,
+  ServiceProviders.RestClientProvider,
+  ServiceProviders.RedisProvider
+];
+
 /**
  * @class EvaEngine
  */
@@ -32,6 +60,8 @@ export default class EvaEngine {
    * @param {string} projectRoot
    * @param {string} configPath
    * @param {string} sourceRoot
+   * @param {Config} config
+   * @param {Logger} logger
    * @param {number} port
    * @param {string} mode
    */
@@ -39,10 +69,13 @@ export default class EvaEngine {
     projectRoot,
     configPath,
     sourceRoot,
+    config,
+    logger,
     port = 3000
   }, mode = MODES.WEB) {
     this.server = null;
     this.commands = {};
+    this.command = null;
     this.commandName = null;
     this.port = ((val) => {
       const rawPort = parseInt(val, 10);
@@ -66,8 +99,8 @@ export default class EvaEngine {
       sourceRoot: path.normalize(sourceRoot || `${projectRoot}/src`)
     };
     this.registerServiceProviders(EvaEngine.getBaseServiceProviders());
-    this.logger = DI.get('logger');
-    this.config = DI.get('config');
+    this.logger = logger || DI.get('logger');
+    this.config = config || DI.get('config');
     this.logger.info('Engine started, Meta:', this.meta);
     this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
   }
@@ -152,59 +185,52 @@ export default class EvaEngine {
     return argv;
   }
 
+  static setBaseServiceProviders(providers) {
+    baseServiceProviders = providers;
+  }
+
   /**
    * @returns {[]}
    */
   static getBaseServiceProviders() {
-    return [
-      ServiceProviders.EnvProvider,
-      ServiceProviders.ConfigProvider,
-      ServiceProviders.LoggerProvider
-    ];
+    return baseServiceProviders;
   }
 
-  /**
-   * @returns {string}
-   */
-  getCommandName() {
-    return this.commandName;
-  }
 
   /**
-   * @returns {[]}
+   * @returns []
    */
   static getServiceProvidersForWeb() {
-    return [
-      ServiceProviders.RedisProvider,
-      ServiceProviders.CacheProvider,
-      ServiceProviders.HttpClientProvider,
-      ServiceProviders.RestClientProvider,
-      ServiceProviders.JsonWebTokenProvider
-    ];
+    return serviceProvidersForWeb;
   }
 
   /**
-   * @returns {[]}
+   * @param {Array} providers
+   */
+  static setServiceProvidersForWeb(providers) {
+    serviceProvidersForWeb = providers;
+  }
+
+  /**
+   * @returns []
    */
   static getMiddlewareProviders() {
-    return [
-      MiddlewareProviders.SessionMiddlewareProvider,
-      MiddlewareProviders.AuthMiddlewareProvider,
-      MiddlewareProviders.DebugMiddlewareProvider,
-      MiddlewareProviders.RequestIdMiddlewareProvider
-    ];
+    return middlewareProviders;
+  }
+
+  static setMiddlewareProviders(providers) {
+    middlewareProviders = providers;
   }
 
   /**
-   * @returns {[]}
+   * @returns []
    */
   static getServiceProvidersForCLI() {
-    return [
-      ServiceProviders.CacheProvider,
-      ServiceProviders.HttpClientProvider,
-      ServiceProviders.RestClientProvider,
-      ServiceProviders.RedisProvider
-    ];
+    return serviceProvidersForCLI;
+  }
+
+  static setServiceProvidersForCLI(providers) {
+    serviceProvidersForCLI = providers;
   }
 
   /**
@@ -252,12 +278,23 @@ export default class EvaEngine {
     return this;
   }
 
+  getCommand() {
+    return this.command;
+  }
+
   getCommands() {
     return this.commands;
   }
 
   clearCommands() {
     this.commands = [];
+  }
+
+  /**
+   * @returns {string}
+   */
+  getCommandName() {
+    return this.commandName;
   }
 
   /**
@@ -285,6 +322,7 @@ export default class EvaEngine {
           this.logger.error(exception);
           return res.status(500).json({
             code: -1,
+            name: 'BuiltinError',
             message: err.message,
             prevError: {},
             errors: [],
@@ -409,8 +447,8 @@ export default class EvaEngine {
     return require(`${__dirname}/../package.json`).version; //eslint-disable-line global-require
   }
 
-  async runCLI() {
-    const argv = this.getCLI();
+  async runCLI(inputCommandName) {
+    const argv = this.getCLI(inputCommandName);
     const commandName = this.getCommandName();
     if (!commandName) {
       this.logger.info('Available commands:');
@@ -423,8 +461,8 @@ export default class EvaEngine {
     this.logger.debug('Start run command', commandName);
     this.logger.debug('Received arguments', argv);
     const CommandClass = this.commands[commandName];
-    const command = new CommandClass(argv);
-    await command.run();
+    this.command = new CommandClass(argv);
+    await this.command.run();
     this.logger.debug('CLI run finished');
   }
 

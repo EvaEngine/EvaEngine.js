@@ -2,6 +2,9 @@ import httpMocker from 'node-mocks-http';
 import EventEmitter from 'events';
 import DI from '../di';
 
+if (process.version.replace(/v|\./g, '') < 600) {
+  global.Reflect = require('harmony-reflect'); //eslint-disable-line global-require
+}
 module.exports.truncateAll = async(entities) => {
   const names = [];
   const allEntities = entities.getAll();
@@ -17,6 +20,13 @@ const mockResponse = () => httpMocker.createResponse({ eventEmitter: EventEmitte
 module.exports.mockResponse = mockResponse;
 
 module.exports.mockRequest = (...args) => httpMocker.createRequest(...args);
+
+module.exports.mockInstance = () =>
+  new Proxy({}, {
+    get: () =>
+      () => {
+      }
+  });
 
 module.exports.mockAuthRequest = (...args) => {
   const uid = DI.get('config').get('token.faker.uid');

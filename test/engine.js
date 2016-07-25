@@ -70,10 +70,34 @@ test('CLI with commands', (t) => {
   t.is(Object.keys(engine.getCommands()).length, 0);
 });
 
-test('Default errorHandler', (t) => {
+test('Run commands', (t) => {
+  class TestCommand extends Command {
+    static getName() {
+      return 'hello:world';
+    }
+
+    static getDescription() {
+      return 'something';
+    }
+
+    static getSpec() {
+      return {};
+    }
+
+    getFoo() {
+      return this.foo;
+    }
+
+    run() {
+      this.foo = 'bar';
+    }
+  }
   const projectRoot = path.normalize(`${__dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
-  });
-  t.true(typeof engine.getDefaultErrorHandler() === 'function');
+  }, 'cli');
+  engine.registerCommands({ test: TestCommand });
+  engine.runCLI('hello:world');
+  t.is(engine.getCommand().getFoo(), 'bar');
 });
+

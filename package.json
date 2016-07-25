@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "description": "EvaEngine For NodeJS",
   "license": "MIT",
   "repository": {
@@ -10,7 +10,7 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
-    "ava": "LOG_LEVEL=error NODE_ENV=test ./node_modules/.bin/cross-env node --harmony ./node_modules/.bin/ava --verbose --serial",
+    "ava": "LOG_LEVEL=error NODE_ENV=test ./node_modules/.bin/cross-env node --harmony --harmony-proxies ./node_modules/.bin/ava --verbose --serial",
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "./node_modules/.bin/eslint src/",
     "build": "babel -d lib/ src/"
@@ -101,6 +101,7 @@
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",
     "gulp-sourcemaps": "^1.6.0",
+    "harmony-reflect": "^1.4.6",
     "nyc": "^7.0.0"
   }
 }

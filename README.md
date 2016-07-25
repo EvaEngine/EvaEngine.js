@@ -1,4 +1,4 @@
-# EvaEngine For Node
+# EvaEngine For NodeJS
 
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
 [![Build Status](https://travis-ci.org/EvaEngine/EvaEngine.js.svg?branch=master)](https://travis-ci.org/EvaEngine/EvaEngine.js)
