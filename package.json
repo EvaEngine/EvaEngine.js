@@ -1,11 +1,11 @@
 {
   "name": "evaengine",
-  "version": "0.0.30",
-  "description": "EvaEngine For NodeJS",
+  "version": "0.1.0",
+  "description": "EvaEngine For NodeJS, a micro service development engine",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/EvaEngine/EvaNode.git"
+    "url": "git://github.com/EvaEngine/EvaEngine.js.git"
   },
   "scripts": {
     "prestart": "npm run build",
@@ -19,8 +19,11 @@
     "node": ">=4.4.5"
   },
   "keywords": [
-    "Eva",
-    "Engine"
+    "es7",
+    "es2015",
+    "engine",
+    "micro service",
+    "orm"
   ],
   "main": "index.js",
   "author": "AlloVince",

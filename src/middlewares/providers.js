@@ -2,6 +2,7 @@ import SessionMiddleware from '../middlewares/session';
 import AuthMiddleware from '../middlewares/auth';
 import DebugMiddleware from '../middlewares/debug';
 import RequestIdMiddleware from '../middlewares/request_id';
+import ViewCacheMiddleware from '../middlewares/view_cache';
 import DI from '../di';
 import { ServiceProvider } from '../services/providers';
 
@@ -42,5 +43,15 @@ export class RequestIdMiddlewareProvider extends ServiceProvider {
 
   register() {
     DI.bindMethod(this.name, RequestIdMiddleware);
+  }
+}
+
+export class ViewCacheMiddlewareProvider extends ServiceProvider {
+  get name() {
+    return 'view_cache';
+  }
+
+  register() {
+    DI.bindMethod(this.name, ViewCacheMiddleware);
   }
 }

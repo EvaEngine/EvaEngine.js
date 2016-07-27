@@ -1,5 +1,5 @@
 import Redis from './redis';
-import { UnsupportedOperationException, RuntimeException } from './../exceptions';
+import { UnsupportedOperationException } from './../exceptions';
 import DI from './../di';
 import Config from './config';
 import { Dependencies } from 'constitute';
@@ -53,7 +53,11 @@ export class RedisNamespaceStore extends Store {
   }
 
   set(key, value, minutes) {
-    return this.redis.set(this.key(key), JSON.stringify(value));
+    return minutes ?
+      this.redis
+        .set(this.key(key), JSON.stringify(value), 'ex', minutes * 60) :
+      this.redis
+        .set(this.key(key), JSON.stringify(value));
   }
 
   flush() {
@@ -63,11 +67,15 @@ export class RedisNamespaceStore extends Store {
 }
 
 export class RedisStore extends Store {
-  constructor(prefix) {
+  constructor(prefix, redis) {
     super();
     this.prefix = prefix;
     this.namespaceHandler = {};
-    this.redis = DI.get('redis').getInstance();
+    this.redis = redis || DI.get('redis').getInstance();
+  }
+
+  getInstance() {
+    return this.redis;
   }
 
   namespace(namespace) {
@@ -91,7 +99,11 @@ export class RedisStore extends Store {
   }
 
   set(key, value, minutes) {
-    return this.redis.set(this.key(key), JSON.stringify(value));
+    return minutes ?
+      this.redis
+        .set(this.key(key), JSON.stringify(value), 'ex', minutes * 60) :
+      this.redis
+        .set(this.key(key), JSON.stringify(value));
   }
 
   flush() {

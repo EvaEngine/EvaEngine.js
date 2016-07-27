@@ -5,13 +5,13 @@
 [![Dependencies Status](https://david-dm.org/EvaEngine/EvaEngine.js.svg)](https://david-dm.org/EvaEngine/EvaEngine.js)
 [![codecov](https://codecov.io/gh/EvaEngine/EvaEngine.js/branch/master/graph/badge.svg)](https://codecov.io/gh/EvaEngine/EvaEngine.js)
 
-A development engine for NodeJS.
+A micro service development engine for NodeJS.
 
 - Full DI support (Inject by ES7 decorators as well)
-- ES7 Async & Await support
+- ES7 `async` & `await` support
 - CLI mode support
 - Better exceptions design
-- Swagger document generator
+- API document generator
 
 
 ## Quick Start
@@ -92,9 +92,3 @@ npm link
 cd your_project
 npm link evaengine
 ```
-
-
-## TODO
-
-- [ ] log format uniform
-- [ ] CLI list all available commands
