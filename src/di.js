@@ -1,6 +1,7 @@
 import {
   RuntimeException
 } from './exceptions';
+import { ServiceProvider } from './services/providers';
 import constitute from 'constitute';
 
 let container = new constitute.Container();
@@ -44,5 +45,36 @@ export default class DI {
   static reset() {
     container = new constitute.Container();
     bound = {};
+  }
+
+  /**
+   * @param {Array} providers
+   * @param {EvaEngine} engine
+   */
+  static registerServiceProviders(providers = [], engine) {
+    for (const providerClass of providers) {
+      DI.registerService(providerClass, engine);
+    }
+  }
+
+  /**
+   * @param {constructor} ProviderClass
+   * @param {EvaEngine} engine
+   */
+  static registerService(ProviderClass, engine) {
+    const provider = new ProviderClass(engine);
+    if (!(provider instanceof ServiceProvider)) {
+      throw new RuntimeException(`Input provider ${provider.name} not service provider`);
+    }
+    provider.register();
+  }
+
+  static registerMockedProviders(providers, configPath) {
+    const mockEngine = {
+      getMeta: () => ({
+        configPath
+      })
+    };
+    DI.registerServiceProviders(providers, mockEngine);
   }
 }

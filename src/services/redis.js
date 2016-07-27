@@ -1,11 +1,7 @@
-import redis from 'redis';
-import bluebird from 'bluebird';
+import Ioredis from 'ioredis';
 import Config from './config';
 import { Dependencies } from 'constitute';
 
-//Redis
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
 let redisClient = null;
 
 @Dependencies(Config) //eslint-disable-line new-cap
@@ -19,7 +15,7 @@ export default class Redis {
   }
 
   getRedis() {
-    return redis;
+    return Ioredis;
   }
 
   setOptions(options) {
@@ -27,14 +23,15 @@ export default class Redis {
     return this;
   }
 
+  /**
+   * @returns {Ioredis}
+   */
   getInstance() {
     if (redisClient) {
       return redisClient;
     }
-    redisClient = redis.createClient(Object.assign({}, this.options || this.config.get('redis')));
-    redisClient.on('error', (err) => {
-      throw err;
-    });
+    redisClient = new Ioredis(Object.assign({}, this.options || this.config.get('redis')));
     return redisClient;
   }
 }
+

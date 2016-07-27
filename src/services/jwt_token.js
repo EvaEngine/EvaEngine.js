@@ -27,7 +27,7 @@ export default class JsonWebToken {
     const tokenString = this.encode(toSaveItem);
     const key = [this.getPrefix(), uid, tokenString.split('.').pop()].join(':');
     //TODO 过期时间
-    await this.getRedis().setAsync(key, JSON.stringify(toSaveItem));
+    await this.getRedis().set(key, JSON.stringify(toSaveItem));
     return tokenString;
   }
 
@@ -40,7 +40,7 @@ export default class JsonWebToken {
       return { uid: null, expiredAt: 0 };
     }
     const key = [this.getPrefix(), parsedToken.uid, tokenString.split('.').pop()].join(':');
-    const storedToken = await this.redis.getAsync(key);
+    const storedToken = await this.redis.get(key);
     if (!storedToken) {
       return {
         uid: parsedToken.uid,
@@ -58,7 +58,7 @@ export default class JsonWebToken {
     if (!key) {
       return true;
     }
-    return await this.redis.delAsync(key);
+    return await this.redis.del(key);
   }
 
   getRedisKey(tokenString, groupOnly = false) {

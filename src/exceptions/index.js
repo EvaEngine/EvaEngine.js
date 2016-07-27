@@ -206,6 +206,9 @@ export class RuntimeException extends StandardException {
   }
 }
 
+export class UnsupportedOperationException extends RuntimeException {
+}
+
 export class IOException extends RuntimeException {
 }
 

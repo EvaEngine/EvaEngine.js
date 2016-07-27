@@ -50,8 +50,8 @@ export class LoggerProvider extends ServiceProvider {
 
   register() {
     const logger = DI.get(Logger);
-    const mode = this.engine.meta.mode;
-    logger.setLabel(mode === 'web' ? mode + this.engine.meta.port : 'cli');
+    const mode = this.engine.getMeta().mode;
+    logger.setLabel(mode === 'web' ? mode + this.engine.getMeta().port : 'cli');
     DI.bindClass(this.name, Logger, [logger]);
   }
 }

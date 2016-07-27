@@ -237,20 +237,14 @@ export default class EvaEngine {
    * @param {Array} providers
    */
   registerServiceProviders(providers = []) {
-    for (const providerClass of providers) {
-      this.registerService(providerClass);
-    }
+    return DI.registerServiceProviders(providers, this);
   }
 
   /**
    * @param {constructor} ProviderClass
    */
   registerService(ProviderClass) {
-    const provider = new ProviderClass(this);
-    if (!(provider instanceof ServiceProviders.ServiceProvider)) {
-      throw new RuntimeException(`Input provider ${provider.name} not service provider`);
-    }
-    provider.register();
+    return DI.registerService(ProviderClass, this);
   }
 
   /**
