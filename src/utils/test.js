@@ -3,7 +3,7 @@ import EventEmitter from 'events';
 import DI from '../di';
 
 if (process.version.replace(/v|\./g, '') < 600) {
-  global.Reflect = require('harmony-reflect'); //eslint-disable-line global-require
+  // global.Reflect = require('harmony-reflect'); //eslint-disable-line global-require
 }
 module.exports.truncateAll = async(entities) => {
   const names = [];

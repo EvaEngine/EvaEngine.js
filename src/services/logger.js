@@ -2,6 +2,7 @@ import Env from './env';
 import Config from './config';
 import { Dependencies } from 'constitute';
 import winston from 'winston';
+import { getNamespace } from 'continuation-local-storage';
 
 @Dependencies(Env, Config) //eslint-disable-line new-cap
 export default class Logger {
@@ -79,22 +80,47 @@ export default class Logger {
   }
 
   debug(...args) {
+    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
+      args.push({
+        rid: getNamespace('eva.engine').get('rid')
+      });
+    }
     return this.getInstance().debug(...args);
   }
 
   verbose(...args) {
+    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
+      args.push({
+        rid: getNamespace('eva.engine').get('rid')
+      });
+    }
     return this.getInstance().verbose(...args);
   }
 
   info(...args) {
+    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
+      args.push({
+        rid: getNamespace('eva.engine').get('rid')
+      });
+    }
     return this.getInstance().info(...args);
   }
 
   warn(...args) {
+    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
+      args.push({
+        rid: getNamespace('eva.engine').get('rid')
+      });
+    }
     return this.getInstance().warn(...args);
   }
 
   error(...args) {
+    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
+      args.push({
+        rid: getNamespace('eva.engine').get('rid')
+      });
+    }
     return this.getInstance().error(...args);
   }
 }

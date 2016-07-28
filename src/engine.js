@@ -4,6 +4,7 @@ import http from 'http';
 import path from 'path';
 import yargs from 'yargs';
 import later from 'later';
+import { createNamespace } from 'continuation-local-storage';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import {
@@ -409,6 +410,7 @@ export default class EvaEngine {
    * @returns {EvaEngine}
    */
   bootstrap() {
+    createNamespace('eva.engine');
     this.registerServiceProviders(EvaEngine.getServiceProvidersForWeb());
     this.registerServiceProviders(EvaEngine.getMiddlewareProviders());
     this.logger.info('Engine bootstrapped under env', DI.get('env').get());
