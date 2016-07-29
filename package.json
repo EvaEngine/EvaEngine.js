@@ -30,6 +30,7 @@
   "ava": {
     "files": [
       "test/**/*.js",
+      "!test/bootstrap.js",
       "!test/_*/**/*.js",
       "!test/swagger/_*/**/*.js"
     ],
@@ -40,7 +41,8 @@
     "tap": false,
     "require": [
       "babel-core/register",
-      "babel-polyfill"
+      "babel-polyfill",
+      "./test/bootstrap"
     ],
     "babel": "inherit"
   },
@@ -64,7 +66,6 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "glob": "^7.0.4",
-    "harmony-reflect": "^1.4.6",
     "ioredis": "^2.2.0",
     "js-yaml": "^3.6.1",
     "jwt-simple": "^0.5.0",
@@ -105,6 +106,7 @@
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",
     "gulp-sourcemaps": "^1.6.0",
+    "harmony-reflect": "^1.4.6",
     "nyc": "^7.0.0"
   }
 }
