@@ -5,6 +5,10 @@ export default {
   logger: {
     file: ''
   },
+  namespace: {
+    enable: true,
+    defaultName: 'eva.ns'
+  },
   cache: {
     prefix: 'eva',
     driver: 'redis'

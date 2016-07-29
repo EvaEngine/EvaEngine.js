@@ -30,7 +30,12 @@ export default class Redis {
     if (redisClient) {
       return redisClient;
     }
-    redisClient = new Ioredis(Object.assign({}, this.options || this.config.get('redis')));
+    redisClient = new Ioredis(Object.assign({
+      enableOfflineQueue: true //make redis connect failings throw error
+    }, this.options || this.config.get('redis')));
+    redisClient.on('error', (e) => {
+      throw e;
+    });
     return redisClient;
   }
 }

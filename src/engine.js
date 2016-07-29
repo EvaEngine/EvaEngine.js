@@ -4,7 +4,6 @@ import http from 'http';
 import path from 'path';
 import yargs from 'yargs';
 import later from 'later';
-import { createNamespace } from 'continuation-local-storage';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import {
@@ -28,7 +27,8 @@ let app = null;
 let baseServiceProviders = [
   ServiceProviders.EnvProvider,
   ServiceProviders.ConfigProvider,
-  ServiceProviders.LoggerProvider
+  ServiceProviders.LoggerProvider,
+  ServiceProviders.NamespaceProvider
 ];
 
 let serviceProvidersForWeb = [
@@ -73,6 +73,7 @@ export default class EvaEngine {
     sourceRoot,
     config,
     logger,
+    namespace,
     port = 3000
   }, mode = MODES.WEB) {
     this.server = null;
@@ -103,6 +104,7 @@ export default class EvaEngine {
     this.registerServiceProviders(EvaEngine.getBaseServiceProviders());
     this.logger = logger || DI.get('logger');
     this.config = config || DI.get('config');
+    this.namespace = namespace || DI.get('namespace');
     this.logger.info('Engine started, Meta:', this.meta);
     this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
   }
@@ -410,7 +412,6 @@ export default class EvaEngine {
    * @returns {EvaEngine}
    */
   bootstrap() {
-    createNamespace('eva.engine');
     this.registerServiceProviders(EvaEngine.getServiceProvidersForWeb());
     this.registerServiceProviders(EvaEngine.getMiddlewareProviders());
     this.logger.info('Engine bootstrapped under env', DI.get('env').get());

@@ -1,18 +1,20 @@
 import Env from './env';
 import Config from './config';
+import Namespace from './namespace';
 import { Dependencies } from 'constitute';
 import winston from 'winston';
-import { getNamespace } from 'continuation-local-storage';
 
-@Dependencies(Env, Config) //eslint-disable-line new-cap
+@Dependencies(Env, Config, Namespace) //eslint-disable-line new-cap
 export default class Logger {
   /**
    * @param env {Env}
    * @param config {Config}
+   * @param namespace {Namespace}
    */
-  constructor(env, config) {
+  constructor(env, config, namespace) {
     this.env = env;
     this.config = config;
+    this.namespace = namespace;
 
     let level = env.isProduction() ? 'info' : 'debug';
     if (process.env.LOG_LEVEL) {
@@ -79,48 +81,33 @@ export default class Logger {
     return this.instance;
   }
 
-  debug(...args) {
-    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
-      args.push({
-        rid: getNamespace('eva.engine').get('rid')
-      });
+  populateRequestId(args) {
+    if (!this.namespace.get('rid')) {
+      return args;
     }
-    return this.getInstance().debug(...args);
+    args.push({
+      rid: this.namespace.get('rid')
+    });
+    return args;
+  }
+
+  debug(...args) {
+    return this.getInstance().debug(...this.populateRequestId(args));
   }
 
   verbose(...args) {
-    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
-      args.push({
-        rid: getNamespace('eva.engine').get('rid')
-      });
-    }
-    return this.getInstance().verbose(...args);
+    return this.getInstance().verbose(...this.populateRequestId(args));
   }
 
   info(...args) {
-    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
-      args.push({
-        rid: getNamespace('eva.engine').get('rid')
-      });
-    }
-    return this.getInstance().info(...args);
+    return this.getInstance().info(...this.populateRequestId(args));
   }
 
   warn(...args) {
-    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
-      args.push({
-        rid: getNamespace('eva.engine').get('rid')
-      });
-    }
-    return this.getInstance().warn(...args);
+    return this.getInstance().warn(...this.populateRequestId(args));
   }
 
   error(...args) {
-    if (getNamespace('eva.engine') && getNamespace('eva.engine').get('rid')) {
-      args.push({
-        rid: getNamespace('eva.engine').get('rid')
-      });
-    }
-    return this.getInstance().error(...args);
+    return this.getInstance().error(...this.populateRequestId(args));
   }
 }

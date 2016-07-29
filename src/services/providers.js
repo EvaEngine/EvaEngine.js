@@ -1,11 +1,12 @@
-import Env from './env';
 import Cache from './cache';
 import Config from './config';
+import Env from './env';
+import HttpClient from './http_client';
+import JsonWebToken from './jwt_token';
 import Logger from './logger';
 import Redis from './redis';
-import JsonWebToken from './jwt_token';
-import HttpClient from './http_client';
 import RestClient from './rest_client';
+import Namespace from './namespace';
 import DI from '../di';
 
 export class ServiceProvider {
@@ -103,5 +104,15 @@ export class CacheProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, Cache);
+  }
+}
+
+export class NamespaceProvider extends ServiceProvider {
+  get name() {
+    return 'namespace';
+  }
+
+  register() {
+    DI.bindClass(this.name, Namespace);
   }
 }

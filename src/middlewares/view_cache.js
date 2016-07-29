@@ -90,7 +90,7 @@ function ViewCacheMiddleware(cache, logger) {
         body: null
       };
       if (cachedBody) {
-        logger.debug('View cache hit by key %s', cacheKey, { request_id: req.id });
+        logger.debug('View cache hit by key %s', cacheKey);
         if (cachedHeaders.length > 0) {
           cachedHeaders.forEach(([key, value]) => {
             res.setHeader(key, value);
@@ -102,7 +102,7 @@ function ViewCacheMiddleware(cache, logger) {
       }
       res.realSend = res.send; //eslint-disable-line no-param-reassign
       res.send = (body) => { //eslint-disable-line no-param-reassign
-        logger.debug('View cache missed by key %s, creating...', cacheKey, { request_id: req.id });
+        logger.debug('View cache missed by key %s, creating...', cacheKey);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
         cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).finally(() => {
