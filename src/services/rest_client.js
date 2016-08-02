@@ -35,7 +35,7 @@ export default class RestClient {
     }
 
     if (!params.headers) {
-      Object.assign(params.headers, {});
+      Object.assign(params, { headers: {} });
     }
     Object.assign(params.headers, {
       'X-B3-TraceId': traceId,

@@ -7,16 +7,16 @@ import onHeaders from 'on-headers';
 import os from 'os';
 
 
-export const randomTraceId = (n = 16) => {
+export const randomTraceId = (len = 16) => {
   const digits = '0123456789abcdefghijklmnopqrstuvwxyz';
   let str = '';
-  for (let i = 0; i < n; i++) {
-    const rand = Math.floor(Math.random() * 16);
-    if (rand !== 0 || n.length > 0) {
+  for (let i = 0; i < len; i++) {
+    const rand = Math.floor(Math.random() * len);
+    if (rand !== 0 || str.length > 0) {
       str += digits[rand];
     }
   }
-  return n;
+  return str;
 };
 
 export const getMicroTimestamp = () => {
@@ -40,10 +40,10 @@ export const getLocalIp = () => {
   return addresses.length > 0 ? addresses[0] : '127.0.0.1';
 };
 
-export const getRequestIp = req => req.headers['x-forwarded-for'] ||
-req.connection.remoteAddress ||
-req.socket.remoteAddress ||
-req.connection.socket.remoteAddress;
+// export const getRequestIp = req => req.headers['x-forwarded-for'] ||
+// req.connection.remoteAddress ||
+// req.socket.remoteAddress ||
+// req.connection.socket.remoteAddress;
 
 export const getPort = req => {
   if (!req.headers || !req.headers.host) {

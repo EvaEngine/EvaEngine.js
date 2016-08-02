@@ -78,7 +78,6 @@
     "on-headers": "^1.0.1",
     "pug": "^2.0.0-alpha8",
     "request": "^2.73.0",
-    "request-debug": "^0.2.0",
     "request-promise": "^4.0.2",
     "sequelize": "^3.23.6",
     "swagger-ui": "^2.1.8-M1",
