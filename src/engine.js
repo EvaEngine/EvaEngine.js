@@ -43,7 +43,6 @@ let middlewareProviders = [
   MiddlewareProviders.SessionMiddlewareProvider,
   MiddlewareProviders.AuthMiddlewareProvider,
   MiddlewareProviders.DebugMiddlewareProvider,
-  MiddlewareProviders.RequestIdMiddlewareProvider,
   MiddlewareProviders.ViewCacheMiddlewareProvider,
   MiddlewareProviders.TraceMiddlewareProvider
 ];

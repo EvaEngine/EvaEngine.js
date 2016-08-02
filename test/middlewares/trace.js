@@ -7,10 +7,10 @@ import { mockRequest, mockResponse } from '../../src/utils/test';
 DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
 DI.registerMockedProviders(Object.values(middlewares));
 test('Unique request id', (t) => {
-  const middleware = DI.get('request_id')();
+  const middleware = DI.get('trace')();
   const req = mockRequest();
   const res = mockResponse();
   middleware(req, res, () => {
   });
-  t.truthy(res.getHeader('X-Request-Id'));
+  t.truthy(res.getHeader('X-B3-SpanId'));
 });

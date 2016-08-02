@@ -45,6 +45,14 @@ req.connection.remoteAddress ||
 req.socket.remoteAddress ||
 req.connection.socket.remoteAddress;
 
+export const getPort = req => {
+  if (!req.headers || !req.headers.host) {
+    return -1;
+  }
+  const [, port] = req.headers.host.split(':');
+  return port || -1;
+};
+
 export const tracerToZipkin = (tracer) => {
   const {
           serviceName,
@@ -106,7 +114,7 @@ function TraceMiddleware(ns, config, logger, client) {
       traceId,
       parentId,
       timestamp,
-      port: req.headers.host.split(':')[1],
+      port: getPort(req),
       duration: null
     };
     res.set({
