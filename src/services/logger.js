@@ -53,7 +53,7 @@ export default class Logger {
       return this.instance;
     }
     const logPath = this.logfile || this.config.get('logger.file');
-    this.instance = this.env.isProduction() ? new (winston.Logger)({
+    this.instance = logPath && this.env.isProduction() ? new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
           name: 'global-console',
@@ -81,33 +81,34 @@ export default class Logger {
     return this.instance;
   }
 
-  populateRequestId(args) {
-    if (!this.namespace.get('rid')) {
+  populateTraceId(args) {
+    if (!this.namespace.get('spanId')) {
       return args;
     }
     args.push({
-      rid: this.namespace.get('rid')
+      spanId: this.namespace.get('spanId'),
+      traceId: this.namespace.get('traceId')
     });
     return args;
   }
 
   debug(...args) {
-    return this.getInstance().debug(...this.populateRequestId(args));
+    return this.getInstance().debug(...this.populateTraceId(args));
   }
 
   verbose(...args) {
-    return this.getInstance().verbose(...this.populateRequestId(args));
+    return this.getInstance().verbose(...this.populateTraceId(args));
   }
 
   info(...args) {
-    return this.getInstance().info(...this.populateRequestId(args));
+    return this.getInstance().info(...this.populateTraceId(args));
   }
 
   warn(...args) {
-    return this.getInstance().warn(...this.populateRequestId(args));
+    return this.getInstance().warn(...this.populateTraceId(args));
   }
 
   error(...args) {
-    return this.getInstance().error(...this.populateRequestId(args));
+    return this.getInstance().error(...this.populateTraceId(args));
   }
 }

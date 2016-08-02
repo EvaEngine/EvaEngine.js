@@ -4,7 +4,7 @@ import { Dependencies } from 'constitute';
 
 function RequestIdMiddleware(ns) {
   return () => (req, res, next) => {
-    const id = req.get('X-Request-Id') || shortid.generate();
+    const id = shortid.generate();
     Object.assign(req, { id });
     res.setHeader('X-Request-Id', req.id);
     ns.bindEmitter(req);

@@ -44,7 +44,8 @@ let middlewareProviders = [
   MiddlewareProviders.AuthMiddlewareProvider,
   MiddlewareProviders.DebugMiddlewareProvider,
   MiddlewareProviders.RequestIdMiddlewareProvider,
-  MiddlewareProviders.ViewCacheMiddlewareProvider
+  MiddlewareProviders.ViewCacheMiddlewareProvider,
+  MiddlewareProviders.TraceMiddlewareProvider
 ];
 
 let serviceProvidersForCLI = [

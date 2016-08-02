@@ -1,9 +1,16 @@
 export default {
+  app: {
+    name: 'evaengine'
+  },
   sequelize: {
     logging: true
   },
   logger: {
-    file: ''
+    file: false //set to false to disable logger
+  },
+  trace: {
+    enable: true,
+    zipkinApi: 'http://docker:9411/api/v1'
   },
   namespace: {
     enable: true,

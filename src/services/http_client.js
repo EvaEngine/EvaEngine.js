@@ -25,6 +25,7 @@ export default class HttpClient {
 
   setBaseUrl(baseUrl) {
     this.client = this.client.defaults({ baseUrl });
+    return this;
   }
 
   async request(...args) {

@@ -2,6 +2,7 @@ import SessionMiddleware from '../middlewares/session';
 import AuthMiddleware from '../middlewares/auth';
 import DebugMiddleware from '../middlewares/debug';
 import RequestIdMiddleware from '../middlewares/request_id';
+import TraceMiddleware from '../middlewares/trace';
 import ViewCacheMiddleware from '../middlewares/view_cache';
 import DI from '../di';
 import { ServiceProvider } from '../services/providers';
@@ -53,5 +54,15 @@ export class ViewCacheMiddlewareProvider extends ServiceProvider {
 
   register() {
     DI.bindMethod(this.name, ViewCacheMiddleware);
+  }
+}
+
+export class TraceMiddlewareProvider extends ServiceProvider {
+  get name() {
+    return 'trace';
+  }
+
+  register() {
+    DI.bindMethod(this.name, TraceMiddleware);
   }
 }
