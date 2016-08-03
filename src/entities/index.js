@@ -50,23 +50,27 @@ export default class Entities {
 
   static addTracer(options = {}) {
     const tracer = DI.get('namespace').get('tracer');
+    const logger = DI.get('logger').getInstance();
     if (!tracer) {
+      logger.warn('No tracer found, maybe Entities booted before tracer middleware called');
       return options;
     }
-    const logger = DI.get('logger').getInstance();
+
+    function logging(...args) {
+      const [query, cost] = args;
+      if (cost > 0) {
+        tracer.queries.push({
+          query,
+          cost: cost * 1000,
+          finishedAt: getMicroTimestamp()
+        });
+      }
+      logger.verbose(...args);
+    }
+
     return Object.assign(options, {
       benchmark: true,
-      logging: (...args) => {
-        const [query, cost] = args;
-        if (cost > 0) {
-          tracer.queries.push({
-            query,
-            cost: cost * 1000,
-            finishedAt: getMicroTimestamp()
-          });
-        }
-        logger.verbose(...args);
-      }
+      logging: logging
     });
   }
 
