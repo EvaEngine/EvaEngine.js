@@ -52,6 +52,9 @@
     ],
     "include": [
       "src/**/*.js"
+    ],
+    "exclude": [
+      "src/config/index.js"
     ]
   },
   "dependencies": {
