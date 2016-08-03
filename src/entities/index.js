@@ -4,6 +4,11 @@ import Sequelize from 'sequelize';
 import DI from '../di';
 import util from 'util';
 
+export const getMicroTimestamp = () => {
+  const d = new Date();
+  return d.getTime() * 1000;
+};
+
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
   const conditions = { where: {} };
@@ -43,6 +48,28 @@ export default class Entities {
     this.sequelize = sequelizeInstance;
   }
 
+  static addTracer(options = {}) {
+    const tracer = DI.get('namespace').get('tracer');
+    if (!tracer) {
+      return options;
+    }
+    const logger = DI.get('logger').getInstance();
+    return Object.assign(options, {
+      benchmark: true,
+      logging: (...args) => {
+        const [query, cost] = args;
+        if (cost > 0) {
+          tracer.queries.push({
+            query,
+            cost: cost * 1000,
+            finishedAt: getMicroTimestamp()
+          });
+        }
+        logger.verbose(...args);
+      }
+    });
+  }
+
   init() {
     if (sequelize) {
       return;
@@ -52,7 +79,9 @@ export default class Entities {
       const config = DI.get('config').get();
       const logger = DI.get('logger').getInstance();
       sequelize = new Sequelize(config.db.database, null, null,
-        Object.assign({}, config.sequelize, config.db, { logging: logger.verbose }));
+        Object.assign({}, config.sequelize, config.db, Entities.addTracer())
+      );
+      logger.debug('Sequelize inited');
     } else {
       sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
     }
@@ -74,6 +103,7 @@ export default class Entities {
         model.associate(entities);
       }
     });
+
   }
 
   /**

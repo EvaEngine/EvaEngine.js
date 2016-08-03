@@ -24,7 +24,20 @@ export const getMicroTimestamp = () => {
   return d.getTime() * 1000;
 };
 
+export const getRequestFullUrl = (req) => {
+  const {
+          protocol,
+          originalUrl
+        } = req;
+  const host = req.get('host');
+  return `${protocol}://${host}${originalUrl}`;
+};
+
+let localIp = null;
 export const getLocalIp = () => {
+  if (localIp) {
+    return localIp;
+  }
   const ifaces = os.networkInterfaces();
   const addresses = [];
 
@@ -37,7 +50,8 @@ export const getLocalIp = () => {
       addresses.push(iface.address);
     });
   });
-  return addresses.length > 0 ? addresses[0] : '127.0.0.1';
+  localIp = addresses.length > 0 ? addresses[0] : '127.0.0.1';
+  return localIp;
 };
 
 // export const getRequestIp = req => req.headers['x-forwarded-for'] ||
@@ -53,50 +67,108 @@ export const getPort = req => {
   return port || -1;
 };
 
-export const tracerToZipkin = (tracer) => {
+export const tracerToZipkins = (tracer) => {
   const {
+          url,
+          method,
           serviceName,
           spanId: id,
           traceId,
           parentId,
           timestamp,
           duration,
-          port
-
+          statusCode,
+          port,
+          queries
         } = tracer;
+
+  const name = `${statusCode} ${method} ${url}`;
+  const endpoint = {
+    serviceName,
+    ipv4: getLocalIp(),
+    port
+  };
   const zipkin = {
     id,
     traceId,
-    name: 'Succeed-Request',
+    name,
     timestamp,
     duration,
     annotations: [
       {
-        endpoint: {
-          serviceName,
-          ipv4: getLocalIp(),
-          port
-        },
+        endpoint,
         timestamp,
         value: 'sr'
       },
       {
-        endpoint: {
-          serviceName,
-          ipv4: getLocalIp(),
-          port
-        },
+        endpoint,
         timestamp: timestamp + duration,
         value: 'ss'
       }
     ],
-    binaryAnnotations: []
+    binaryAnnotations: [
+      {
+        key: 'traceId',
+        value: traceId
+      },
+      {
+        key: 'spanId',
+        value: id
+      },
+      {
+        key: 'method',
+        value: method
+      },
+      {
+        key: 'url',
+        value: url
+      },
+      {
+        key: 'port',
+        value: port.toString()
+      },
+      {
+        key: 'statusCode',
+        value: statusCode.toString()
+      }
+    ]
   };
 
   if (parentId) {
     zipkin.parentId = parentId;
   }
-  return [zipkin];
+
+  const zipkins = [zipkin];
+  if (queries && queries.length > 0) {
+    queries.forEach((element) => {
+      const { query, cost, finishedAt } = element;
+      zipkins.push({
+        id: randomTraceId(),
+        parentId: id,
+        traceId,
+        name: 'sequelize',
+        timestamp: finishedAt - cost,
+        duration: cost,
+        annotations: [
+          {
+            endpoint,
+            timestamp: finishedAt - cost,
+            value: 'cs'
+          },
+          {
+            endpoint,
+            timestamp: finishedAt,
+            value: 'cr'
+          }
+        ],
+        binaryAnnotations: [{
+          key: 'query',
+          value: query
+        }]
+      });
+    });
+  }
+  return zipkins;
 };
 
 
@@ -110,12 +182,16 @@ function TraceMiddleware(ns, config, logger, client) {
     const serviceName = name || config.get('app.name');
     const tracer = {
       serviceName,
+      method: req.method,
+      url: getRequestFullUrl(req),
+      port: getPort(req),
       spanId,
       traceId,
       parentId,
       timestamp,
-      port: getPort(req),
-      duration: null
+      duration: null,
+      statusCode: null,
+      queries: []
     };
     res.set({
       'X-Service-Name': serviceName,
@@ -130,26 +206,31 @@ function TraceMiddleware(ns, config, logger, client) {
       const [seconds, nanoseconds] = process.hrtime(startedAt);
       const duration = (seconds * 1e3 + nanoseconds * 1e-6) * 1000;
       tracer.duration = parseInt(duration, 10);
+      tracer.statusCode = res.statusCode;
       res.set('X-Response-Milliseconds', tracer.duration / 1000);
     });
 
-    res.on('finish', () => {
+    const recordZipkin = () => {
       if (!config.get('trace.enable')) {
         return;
       }
-      const zipkin = tracerToZipkin(ns.get('tracer'));
+      const zipkins = tracerToZipkins(ns.get('tracer'));
       client.setBaseUrl(config.get('trace.zipkinApi')).request({
         url: '/spans',
         method: 'POST',
-        json: zipkin
+        json: zipkins
       }).catch((e) => {
-        logger.error('------- Error happened on sending tracing data', e);
+        logger.error('Error happened on sending tracing data', e);
       });
-    });
+    };
+
+    res.on('finish', recordZipkin);
+    res.on('error', recordZipkin);
 
     ns.bindEmitter(req);
     ns.bindEmitter(res);
     ns.run(() => {
+      logger.debug('Tracer settled for request %s', spanId);
       ns.set('tracer', tracer);
       next();
     });

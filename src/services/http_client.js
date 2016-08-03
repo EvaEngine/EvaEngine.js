@@ -8,7 +8,7 @@ export const deepClone = (obj) =>
   JSON.parse(JSON.stringify(obj));
 
 /* eslint-disable */
-export const requestDebug = (logger) => {
+export const requestDebug = (logger, maxBodyLength = 20000) => {
   let proto = {};
   let debugId = 0;
   if (request.Request) {
@@ -27,10 +27,6 @@ export const requestDebug = (logger) => {
     return;
   }
 
-  const toUri = () => {
-
-  };
-
   proto._initBeforeDebug = proto.init;
 
   proto.init = function () {
@@ -42,7 +38,7 @@ export const requestDebug = (logger) => {
         headers: deepClone(this.headers)
       };
       if (this.body) {
-        data.body = this.body.length < 5000 ? this.body.toString('utf8') : '______TOO_LONG_SKIPPED______';
+        data.body = maxBodyLength > 0 && this.body.length < maxBodyLength ? this.body.toString('utf8') : '______TOO_LONG_SKIPPED______';
       }
       logger.verbose(`[REQUEST__${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, data.headers, { body: data.body || null });
     }).on('response', function (res) {
@@ -52,14 +48,14 @@ export const requestDebug = (logger) => {
       }
 
       logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
-    }).on('complete', function (res, body) {
+    }).on('complete', function (res) {
 
       if (!this.callback) {
         return;
       }
 
       logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
-        body: res.body && res.body.length < 5000 ? res.body : '______TOO_LONG_SKIPPED______'
+        body: res.body && maxBodyLength > 0 && res.body.length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
       });
     }).on('redirect', function () {
 
