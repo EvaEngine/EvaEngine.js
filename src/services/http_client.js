@@ -8,9 +8,9 @@ export const deepClone = (obj) =>
   JSON.parse(JSON.stringify(obj));
 
 /* eslint-disable */
-let debugId = 0;
 export const requestDebug = (logger) => {
   let proto = {};
+  let debugId = 0;
   if (request.Request) {
     proto = request.Request.prototype;
   } else if (request.get && request.post) {
@@ -21,69 +21,60 @@ export const requestDebug = (logger) => {
     });
     proto = req.constructor.prototype;
   } else {
-    throw new Error(
-      "Pass the object returned by require('request') to this function.");
+    throw new Error('Pass the object returned by require("request") to this function.');
   }
-  if (!proto._initBeforeDebug) {
-    proto._initBeforeDebug = proto.init;
+  if (proto._initBeforeDebug) {
+    return;
+  }
 
-    proto.init = function () {
-      if (!this._debugId) {
-        this.on('request', function (req) {
-          const data = {
-            // debugId: this._debugId,
-            uri: this.uri.href,
-            method: this.method,
-            headers: deepClone(this.headers)
-          };
-          if (this.body) {
-            data.body = this.body.toString('utf8');
-          }
-          logger.verbose('REQUEST', data);
-        }).on('response', function (res) {
+  const toUri = () => {
 
-          if (this.callback) {
-            // callback specified, request will buffer the body for
-            // us, so wait until the complete event to do anything
-          } else {
-            // cannot get body since no callback specified
-            logger.verbose('RESPONSE', {
-              // debugId: this._debugId,
-              headers: deepClone(res.headers),
-              statusCode: res.statusCode
-            });
-          }
-        }).on('complete', function (res, body) {
+  };
 
-          if (this.callback) {
-            logger.verbose('RESPONSE', {
-              // debugId: this._debugId,
-              headers: deepClone(res.headers),
-              statusCode: res.statusCode,
-              body: res.body && res.body.length < 1500 ? res.body : '______TOO_LONG_SKIPPED______'
-            });
-          }
-        }).on('redirect', function () {
+  proto._initBeforeDebug = proto.init;
 
-          logger.verbose('REDIRECT', {
-            // debugId: this._debugId,
-            statusCode: this.response.statusCode,
-            headers: deepClone(this.response.headers),
-            uri: this.uri.href
-          }, this);
-        });
-        this._debugId = ++debugId;
+  proto.init = function () {
+    if (this._debugId) {
+      return;
+    }
+    this.on('request', function (req) {
+      const data = {
+        headers: deepClone(this.headers)
+      };
+      if (this.body) {
+        data.body = this.body.length < 5000 ? this.body.toString('utf8') : '______TOO_LONG_SKIPPED______';
       }
-      return proto._initBeforeDebug.apply(this, arguments);
-    };
-  }
+      logger.verbose(`[REQUEST__${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, data.headers, { body: data.body || null });
+    }).on('response', function (res) {
 
-  if (!request.stopDebugging) {
-    request.stopDebugging = () => {
-      proto.init = proto._initBeforeDebug;
-      delete proto._initBeforeDebug;
-    };
-  }
+      if (this.callback) {
+        return;
+      }
+
+      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
+    }).on('complete', function (res, body) {
+
+      if (!this.callback) {
+        return;
+      }
+
+      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
+        body: res.body && res.body.length < 5000 ? res.body : '______TOO_LONG_SKIPPED______'
+      });
+    }).on('redirect', function () {
+
+      logger.verbose(`[REDIRECT_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, this.response.statusCode, this.response.headers, { body: null });
+    });
+    this._debugId = ++debugId;
+    return proto._initBeforeDebug.apply(this, arguments);
+  };
+
+  // if (!request.stopDebugging) {
+  //   request.stopDebugging = () => {
+  //     proto.init = proto._initBeforeDebug;
+  //     delete proto._initBeforeDebug;
+  //   };
+  // }
 };
 /* eslint-enable */
 

@@ -118,8 +118,8 @@ function TraceMiddleware(ns, config, logger, client) {
       duration: null
     };
     res.set({
-      'X-Requested-At': timestamp,
       'X-Service-Name': serviceName,
+      'X-Requested-At': timestamp,
       'X-B3-SpanId': spanId,
       'X-B3-TraceId': traceId,
       'X-B3-ParentSpanId': parentId,
