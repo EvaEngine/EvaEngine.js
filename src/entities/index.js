@@ -52,25 +52,24 @@ export default class Entities {
     const tracer = DI.get('namespace').get('tracer');
     const logger = DI.get('logger').getInstance();
     if (!tracer) {
-      logger.warn('No tracer found, maybe Entities booted before tracer middleware called');
+      logger.warn('Trying to add tracer to Entities, but no tracer found, maybe Entities boot before tracer middleware called');
       return options;
     }
-
-    function logging(...args) {
-      const [query, cost] = args;
-      if (cost > 0) {
-        tracer.queries.push({
-          query,
-          cost: cost * 1000,
-          finishedAt: getMicroTimestamp()
-        });
-      }
-      logger.verbose(...args);
-    }
-
     return Object.assign(options, {
       benchmark: true,
-      logging: logging
+      logging: (...args) => {
+        const [query, cost] = args;
+        let pushed = false;
+        if (cost > 0) {
+          tracer.queries.push({
+            query,
+            cost: cost * 1000,
+            finishedAt: getMicroTimestamp()
+          });
+          pushed = true;
+        }
+        logger.verbose(...args, pushed ? '| Pushed to tracer' : '');
+      }
     });
   }
 
@@ -85,7 +84,7 @@ export default class Entities {
       sequelize = new Sequelize(config.db.database, null, null,
         Object.assign({}, config.sequelize, config.db, Entities.addTracer())
       );
-      logger.debug('Sequelize inited');
+      logger.debug('Builtin sequelize inited');
     } else {
       sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
     }

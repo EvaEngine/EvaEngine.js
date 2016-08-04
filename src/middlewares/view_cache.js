@@ -96,18 +96,22 @@ function ViewCacheMiddleware(cache, logger) {
             res.setHeader(key, value);
           });
         }
-        res.setHeader('X-View-Cache', cacheKey);
+        res.setHeader('X-View-Cache-Hit', cacheKey);
         res.send(cachedBody);
         return;
       }
       res.realSend = res.send; //eslint-disable-line no-param-reassign
       res.send = (body) => { //eslint-disable-line no-param-reassign
         logger.debug('View cache missed by key %s, creating...', cacheKey);
+        res.setHeader('X-View-Cache-Miss', cacheKey);
+        res.realSend(body);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
-        cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).finally(() => {
-          res.realSend(body);
-        });
+        cache.namespace(namespace)
+          .set(cacheKey, { headers, body }, ttl)
+          .catch((e) => {
+            logger.error('View cache set failed for %s', cacheKey, e);
+          });
       };
       next();
     });

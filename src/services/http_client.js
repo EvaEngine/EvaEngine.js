@@ -7,8 +7,14 @@ import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions
 export const deepClone = (obj) =>
   JSON.parse(JSON.stringify(obj));
 
+
+let debugFlag = false;
 /* eslint-disable */
 export const requestDebug = (logger, maxBodyLength = 20000) => {
+  if (debugFlag === true) {
+    return;
+  }
+
   let proto = {};
   let debugId = 0;
   if (request.Request) {
@@ -47,24 +53,25 @@ export const requestDebug = (logger, maxBodyLength = 20000) => {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
+      logger.verbose(`[RESPONSE_${this._debugId}_on_response]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
     }).on('complete', function (res) {
 
       if (!this.callback) {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
+      logger.verbose(`[RESPONSE_${this._debugId}_on_complete]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
         body: res.body && maxBodyLength > 0 && res.body.length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
       });
     }).on('redirect', function () {
 
-      logger.verbose(`[REDIRECT_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, this.response.statusCode, this.response.headers, { body: null });
+      logger.verbose(`[REDIRECT_${this._debugId}_on_redirect]`, `${this.method.toUpperCase()} ${this.uri.href}`, this.response.statusCode, this.response.headers, { body: null });
     });
     this._debugId = ++debugId;
     return proto._initBeforeDebug.apply(this, arguments);
   };
 
+  debugFlag = true;
   // if (!request.stopDebugging) {
   //   request.stopDebugging = () => {
   //     proto.init = proto._initBeforeDebug;
@@ -90,14 +97,9 @@ export default class HttpClient {
     return this.client;
   }
 
-  setBaseUrl(baseUrl) {
-    this.client = this.client.defaults({ baseUrl });
-    return this;
-  }
-
-  async request(...args) {
+  async request(params) {
     try {
-      return await this.client(...args);
+      return await this.client(params);
     } catch (e) {
       const { statusCode } = e;
       if (statusCode && statusCode >= 400 && statusCode < 500) {

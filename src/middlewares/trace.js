@@ -68,6 +68,9 @@ export const getPort = req => {
 };
 
 export const tracerToZipkins = (tracer) => {
+  if (!tracer) {
+    return false;
+  }
   const {
           url,
           method,
@@ -214,9 +217,14 @@ function TraceMiddleware(ns, config, logger, client) {
       if (!config.get('trace.enable')) {
         return;
       }
+      logger.debug('Tracer prepare to send for request %s', spanId, ns.get('tracer'));
       const zipkins = tracerToZipkins(ns.get('tracer'));
-      client.setBaseUrl(config.get('trace.zipkinApi')).request({
-        url: '/spans',
+      if (!zipkins) {
+        logger.warn('Tracer not send by no data for request %s', spanId);
+        return;
+      }
+      client.request({
+        url: config.get('trace.zipkinApi') + '/spans',
         method: 'POST',
         json: zipkins
       }).catch((e) => {
@@ -230,7 +238,7 @@ function TraceMiddleware(ns, config, logger, client) {
     ns.bindEmitter(req);
     ns.bindEmitter(res);
     ns.run(() => {
-      logger.debug('Tracer settled for request %s', spanId);
+      logger.debug('Tracer settled for request %s, tracer: ', spanId, tracer);
       ns.set('tracer', tracer);
       next();
     });
