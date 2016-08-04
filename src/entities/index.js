@@ -49,15 +49,14 @@ export default class Entities {
   }
 
   static addTracer(options = {}) {
-    const tracer = DI.get('namespace').get('tracer');
     const logger = DI.get('logger').getInstance();
-    if (!tracer) {
-      logger.warn('Trying to add tracer to Entities, but no tracer found, maybe Entities boot before tracer middleware called');
-      return options;
-    }
     return Object.assign(options, {
       benchmark: true,
       logging: (...args) => {
+        const tracer = DI.get('namespace').get('tracer');
+        if (!tracer) {
+          logger.warn('Trying to add tracer to Entities, but no tracer found, maybe Entities boot before tracer middleware called');
+        }
         const [query, cost] = args;
         let pushed = false;
         if (cost > 0) {
@@ -81,6 +80,12 @@ export default class Entities {
     if (!this.sequelize) {
       const config = DI.get('config').get();
       const logger = DI.get('logger').getInstance();
+      const ns = DI.get('namespace');
+      if (ns.isEnabled()) {
+        //Inject sequelize inner namespace, refer: http://docs.sequelizejs.com/en/latest/docs/transactions/
+        Sequelize.cls = ns.use().getContext();
+      }
+
       sequelize = new Sequelize(config.db.database, null, null,
         Object.assign({}, config.sequelize, config.db, Entities.addTracer())
       );
