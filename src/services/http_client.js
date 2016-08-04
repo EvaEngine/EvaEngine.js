@@ -53,19 +53,19 @@ export const requestDebug = (logger, maxBodyLength = 20000) => {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}_on_response]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
+      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
     }).on('complete', function (res) {
 
       if (!this.callback) {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}_on_complete]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
+      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
         body: res.body && maxBodyLength > 0 && res.body.length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
       });
     }).on('redirect', function () {
 
-      logger.verbose(`[REDIRECT_${this._debugId}_on_redirect]`, `${this.method.toUpperCase()} ${this.uri.href}`, this.response.statusCode, this.response.headers, { body: null });
+      logger.verbose(`[REDIRECT_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, this.response.statusCode, this.response.headers, { body: null });
     });
     this._debugId = ++debugId;
     return proto._initBeforeDebug.apply(this, arguments);

@@ -13,7 +13,6 @@ export default class RestClient {
     this.client = client;
     this.ns = ns;
     this.baseUrl = null;
-    console.log('-------------------------')
   }
 
   setBaseUrl(baseUrl) {
@@ -48,13 +47,17 @@ export default class RestClient {
   }
 
   rawRequest(params) {
-    params.url = this.baseUrl ? this.baseUrl + params.url : params.url;
+    if (this.baseUrl) {
+      Object.assign(params, { url: this.baseUrl + (params.url || params.uri) });
+    }
     return this.client.getInstance()(this.populateTrace(params));
   }
 
   async request(params) {
+    if (this.baseUrl) {
+      Object.assign(params, { url: this.baseUrl + (params.url || params.uri) });
+    }
     try {
-      params.url = this.baseUrl ? this.baseUrl + params.url : params.url;
       return await this.client.getInstance()(this.populateTrace(params));
     } catch (e) {
       const { statusCode } = e;

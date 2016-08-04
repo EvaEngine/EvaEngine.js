@@ -224,7 +224,7 @@ function TraceMiddleware(ns, config, logger, client) {
         return;
       }
       client.request({
-        url: config.get('trace.zipkinApi') + '/spans',
+        url: config.get('trace.zipkinApi'),
         method: 'POST',
         json: zipkins
       }).catch((e) => {
