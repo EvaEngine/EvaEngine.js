@@ -10,9 +10,8 @@ export default {
   },
   trace: {
     enable: true,
-    header: true,
-    // api: false
-    api: 'http://docker:9411/api/v1/spans'
+    header: false,
+    api: false
   },
   namespace: {
     enable: true,

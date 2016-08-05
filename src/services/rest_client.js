@@ -65,6 +65,9 @@ export default class RestClient {
   rawRequest(params) {
     if (this.baseUrl) {
       Object.assign(params, { url: this.baseUrl + (params.url || params.uri) });
+      if (params.uri) {
+        delete params.uri; //eslint-disable-line no-param-reassign
+      }
     }
     return this.client.getInstance()(this.populateTrace(params));
   }
@@ -75,6 +78,9 @@ export default class RestClient {
         url: this.baseUrl + (params.url || params.uri),
         resolveWithFullResponse: true
       });
+      if (params.uri) {
+        delete params.uri; //eslint-disable-line no-param-reassign
+      }
     }
     try {
       const { headers, body } = await this.client.getInstance()(this.populateTrace(params));
