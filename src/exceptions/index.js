@@ -251,10 +251,10 @@ export class RestServiceIOException extends HttpRequestIOException {
     }
     super(...superArgs);
     const { error, response } = remoteErrors;
-    this.details = typeof error === 'string' ? remoteErrors : error;
+    this.details = typeof error === 'string' ? remoteErrors : error || remoteErrors;
     this.response = response || null;
     this.request = response ? response.request : null;
-    this.prevError = typeof error === 'string' ? remoteErrors : error;
+    this.prevError = typeof error === 'string' ? remoteErrors : error || remoteErrors;
   }
 
   getRequest() {

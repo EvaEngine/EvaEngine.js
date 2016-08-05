@@ -176,6 +176,7 @@ export const tracerToZipkins = (tracer) => {
 
 
 function TraceMiddleware(ns, config, logger, client) {
+  const enabled = config.get('trace.enable');
   return (name) => (req, res, next) => {
     const spanId = randomTraceId();
     const traceId = req.get('X-B3-TraceId') || spanId;
@@ -183,6 +184,12 @@ function TraceMiddleware(ns, config, logger, client) {
     const startedAt = process.hrtime();
     const timestamp = getMicroTimestamp();
     const serviceName = name || config.get('app.name');
+    //目前默认全部采样
+    let sampled = enabled ? 1 : 0;
+    //只有service为第二级, 且通过参数关闭时才禁止采样
+    if (sampled && parseInt(req.get('X-B3-Sampled'), 10) < 1 && parentId > 0) {
+      sampled = 0;
+    }
     const tracer = {
       serviceName,
       method: req.method,
@@ -191,20 +198,32 @@ function TraceMiddleware(ns, config, logger, client) {
       spanId,
       traceId,
       parentId,
+      sampled,
       timestamp,
       duration: null,
       statusCode: null,
       queries: [],
       debug: {}
     };
+
     res.set({
       'X-Service-Name': serviceName,
       'X-Requested-At': timestamp,
       'X-B3-SpanId': spanId,
       'X-B3-TraceId': traceId,
       'X-B3-ParentSpanId': parentId,
-      'X-B3-Sampled': 1
+      'X-B3-Sampled': enabled ? 1 : 0
     });
+
+    if (sampled < 1) {
+      onHeaders(res, () => {
+        const [seconds, nanoseconds] = process.hrtime(startedAt);
+        const duration = (seconds * 1e3 + nanoseconds * 1e-6);
+        res.set('X-Response-Milliseconds', parseInt(duration, 10));
+      });
+      next();
+      return;
+    }
 
     onHeaders(res, () => {
       const [seconds, nanoseconds] = process.hrtime(startedAt);
@@ -232,25 +251,23 @@ function TraceMiddleware(ns, config, logger, client) {
     });
 
     const recordZipkin = () => {
-      if (!config.get('trace.enable')) {
+      const api = config.get('trace.api');
+      if (!api) {
         return;
       }
-      const api = config.get('trace.api');
-      if (api) {
-        logger.debug('Tracer prepare to send for request %s', spanId);
-        const zipkins = tracerToZipkins(ns.get('tracer'));
-        if (!zipkins) {
-          logger.warn('Tracer not send by no data for request %s', spanId);
-          return;
-        }
-        client.request({
-          url: api,
-          method: 'POST',
-          json: zipkins
-        }).catch((e) => {
-          logger.error('Error happened on sending tracing data', e);
-        });
+      logger.debug('Tracer prepare to send for request %s', spanId);
+      const zipkins = tracerToZipkins(ns.get('tracer'));
+      if (!zipkins) {
+        logger.warn('Tracer not send by no data for request %s', spanId);
+        return;
       }
+      client.request({
+        url: api,
+        method: 'POST',
+        json: zipkins
+      }).catch((e) => {
+        logger.error('Error happened on sending tracing data', e);
+      });
     };
 
     res.on('finish', recordZipkin);

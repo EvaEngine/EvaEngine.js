@@ -30,8 +30,8 @@ export default class RestClient {
 
   populateTrace(params) {
     const {
-            traceId, spanId
-          } = this.ns.get('tracer');
+            traceId, spanId, sampled
+          } = this.ns.get('tracer') || {};
     if (!traceId || !spanId) {
       return params;
     }
@@ -41,12 +41,13 @@ export default class RestClient {
     }
     Object.assign(params.headers, {
       'X-B3-TraceId': traceId,
-      'X-B3-SpanId': spanId
+      'X-B3-SpanId': spanId,
+      'X-B3-Sampled': sampled
     });
     return params;
   }
 
-  recordDebug(headers) {
+  saveToTracer(headers) {
     if (!headers || Object.keys(headers).length < 1) {
       return;
     }
@@ -84,9 +85,10 @@ export default class RestClient {
     }
     try {
       const { headers, body } = await this.client.getInstance()(this.populateTrace(params));
-      this.recordDebug(headers);
+      this.saveToTracer(headers);
       return body;
     } catch (e) {
+      //FIXME TypeError无法被记录?
       const { statusCode } = e;
       if (statusCode && statusCode >= 400 && statusCode < 500) {
         throw new RestServiceLogicException(e);
