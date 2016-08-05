@@ -49,7 +49,7 @@ export default class Entities {
   }
 
   static addTracer(options = {}) {
-    const logger = DI.get('logger').getInstance();
+    const logger = DI.get('logger');
     return Object.assign(options, {
       benchmark: true,
       logging: (...args) => {

@@ -194,7 +194,8 @@ function TraceMiddleware(ns, config, logger, client) {
       timestamp,
       duration: null,
       statusCode: null,
-      queries: []
+      queries: [],
+      debug: {}
     };
     res.set({
       'X-Service-Name': serviceName,
@@ -211,25 +212,45 @@ function TraceMiddleware(ns, config, logger, client) {
       tracer.duration = parseInt(duration, 10);
       tracer.statusCode = res.statusCode;
       res.set('X-Response-Milliseconds', tracer.duration / 1000);
+
+      const useHeader = config.get('trace.header');
+      if (!useHeader) {
+        return;
+      }
+      const zipkins = tracerToZipkins(tracer);
+      if (!zipkins) {
+        logger.warn('Tracer not send by no data for request %s', spanId);
+      } else {
+        res.set(`X-Debug-${spanId}`, JSON.stringify(zipkins));
+      }
+
+      if (Object.keys(tracer.debug).length > 0) {
+        Object.entries(tracer.debug).forEach(([key, value]) => {
+          res.set(key.replace('x-debug', 'X-Debug'), value);
+        });
+      }
     });
 
     const recordZipkin = () => {
       if (!config.get('trace.enable')) {
         return;
       }
-      logger.debug('Tracer prepare to send for request %s', spanId, ns.get('tracer'));
-      const zipkins = tracerToZipkins(ns.get('tracer'));
-      if (!zipkins) {
-        logger.warn('Tracer not send by no data for request %s', spanId);
-        return;
+      const api = config.get('trace.api');
+      if (api) {
+        logger.debug('Tracer prepare to send for request %s', spanId);
+        const zipkins = tracerToZipkins(ns.get('tracer'));
+        if (!zipkins) {
+          logger.warn('Tracer not send by no data for request %s', spanId);
+          return;
+        }
+        client.request({
+          url: api,
+          method: 'POST',
+          json: zipkins
+        }).catch((e) => {
+          logger.error('Error happened on sending tracing data', e);
+        });
       }
-      client.request({
-        url: config.get('trace.zipkinApi'),
-        method: 'POST',
-        json: zipkins
-      }).catch((e) => {
-        logger.error('Error happened on sending tracing data', e);
-      });
     };
 
     res.on('finish', recordZipkin);

@@ -46,6 +46,22 @@ export default class RestClient {
     return params;
   }
 
+  recordDebug(headers) {
+    if (!headers || Object.keys(headers).length < 1) {
+      return;
+    }
+
+    const tracer = this.ns.get('tracer');
+    if (!tracer) {
+      return;
+    }
+    Object.entries(headers).forEach(([key, value]) => {
+      if (key.startsWith('x-debug-')) {
+        tracer.debug[key] = value;
+      }
+    });
+  }
+
   rawRequest(params) {
     if (this.baseUrl) {
       Object.assign(params, { url: this.baseUrl + (params.url || params.uri) });
@@ -55,10 +71,15 @@ export default class RestClient {
 
   async request(params) {
     if (this.baseUrl) {
-      Object.assign(params, { url: this.baseUrl + (params.url || params.uri) });
+      Object.assign(params, {
+        url: this.baseUrl + (params.url || params.uri),
+        resolveWithFullResponse: true
+      });
     }
     try {
-      return await this.client.getInstance()(this.populateTrace(params));
+      const { headers, body } = await this.client.getInstance()(this.populateTrace(params));
+      this.recordDebug(headers);
+      return body;
     } catch (e) {
       const { statusCode } = e;
       if (statusCode && statusCode >= 400 && statusCode < 500) {

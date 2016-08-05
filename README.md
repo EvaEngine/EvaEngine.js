@@ -7,10 +7,16 @@
 
 A micro service development engine for NodeJS.
 
-- Full DI support (Inject by ES7 decorators as well)
+- Full DI support (Injected by ES7 decorators as well)
 - ES7 `async` & `await` support
-- CLI mode support
+- CLI mode support (easily convert to schedules)
 - Better exceptions design
+- ORM support (Based on Sequelize)
+- Quick test by mocking request & response
+- Builtin cache layer
+- Builtin session / token authentications
+- Http client with fully debugging log
+- Distributed tracing log support (Zipkin compatible)
 - API document generator
 
 

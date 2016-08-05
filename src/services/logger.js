@@ -53,28 +53,42 @@ export default class Logger {
       return this.instance;
     }
     const logPath = this.logfile || this.config.get('logger.file');
-    this.instance = logPath && this.env.isProduction() ? new (winston.Logger)({
+    // winston.cli();
+    if (this.env.isProduction()) {
+      this.instance = logPath ? new (winston.Logger)({
+        transports: [
+          new (winston.transports.Console)({
+            name: 'global-console',
+            level: this.level,
+            label: this.label
+          }),
+          new (winston.transports.File)({
+            name: 'global-file',
+            level: this.level,
+            label: this.label,
+            filename: logPath
+          })
+        ]
+      }) : new (winston.Logger)({
+        transports: [
+          new (winston.transports.Console)({
+            name: 'global-console',
+            level: this.level,
+            label: this.label
+          })
+        ]
+      });
+      return this.instance;
+    }
+
+    this.instance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
           name: 'global-console',
           level: this.level,
           label: this.label,
-          colorize: true
-        }),
-        new (winston.transports.File)({
-          name: 'global-file',
-          level: this.level,
-          label: this.label,
-          filename: logPath
-        })
-      ]
-    }) : new (winston.Logger)({
-      transports: [
-        new (winston.transports.Console)({
-          name: 'global-console',
-          level: this.level,
-          label: this.label,
-          colorize: true
+          colorize: true,
+          prettyPrint: true
         })
       ]
     });
@@ -90,6 +104,14 @@ export default class Logger {
       traceId: this.namespace.get('traceId')
     });
     return args;
+  }
+
+  http(...args) {
+    return this.getInstance().http(...this.populateTraceId(args));
+  }
+
+  query(...args) {
+    return this.getInstance().query(...this.populateTraceId(args));
   }
 
   debug(...args) {

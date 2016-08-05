@@ -6,11 +6,13 @@ export default {
     logging: true
   },
   logger: {
-    file: false //set to false to disable logger
+    file: false //set to false to disable file logger
   },
   trace: {
-    enable: false,
-    zipkinApi: 'http://docker:9411/api/v1/spans'
+    enable: true,
+    header: true,
+    // api: false
+    api: 'http://docker:9411/api/v1/spans'
   },
   namespace: {
     enable: true,

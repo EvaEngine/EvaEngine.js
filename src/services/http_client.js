@@ -35,6 +35,15 @@ export const requestDebug = (logger, maxBodyLength = 20000) => {
 
   proto._initBeforeDebug = proto.init;
 
+  const ignoreDebug = (headers) => {
+    if (!headers || Object.keys(headers).length < 1) {
+      return {};
+    }
+    return Object.keys(headers)
+      .filter(key => !key.startsWith('x-debug'))
+      .reduce((res, key) => (res[key] = headers[key], res), {});
+  };
+
   proto.init = function () {
     if (this._debugId) {
       return;
@@ -60,7 +69,7 @@ export const requestDebug = (logger, maxBodyLength = 20000) => {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, {
+      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, ignoreDebug(res.headers), {
         body: res.body && maxBodyLength > 0 && res.body.length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
       });
     }).on('redirect', function () {
