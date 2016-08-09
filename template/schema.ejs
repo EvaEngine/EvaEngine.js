@@ -1,0 +1,18 @@
+export default (DataTypes) => ({
+  columns: {
+  <% _.forEach(columns, function(column, key) { %>
+    <%=key%>: {
+      allowNull: <%=column.allowNull%>,
+      primaryKey: <%=column.primaryKey%>,
+      type: <%=column.type%>,
+      defaultValue:  '<%=column.defaultValue%>',
+      comment: '<%=column.comment%>'
+    },
+  <% }); %>
+  },
+  table: {
+    tableName: '<%=table%>',
+    freezeTableName: true,
+    timestamps: false
+  }
+});

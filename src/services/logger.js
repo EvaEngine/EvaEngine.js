@@ -96,22 +96,14 @@ export default class Logger {
   }
 
   populateTraceId(args) {
-    if (!this.namespace.get('spanId')) {
+    if (!this.namespace.get('tracer')) {
       return args;
     }
     args.push({
-      spanId: this.namespace.get('spanId'),
-      traceId: this.namespace.get('traceId')
+      spanId: this.namespace.get('tracer').spanId,
+      traceId: this.namespace.get('tracer').traceId
     });
     return args;
-  }
-
-  http(...args) {
-    return this.getInstance().http(...this.populateTraceId(args));
-  }
-
-  query(...args) {
-    return this.getInstance().query(...this.populateTraceId(args));
   }
 
   debug(...args) {

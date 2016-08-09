@@ -1,0 +1,8 @@
+import schema from './schemas/<%=table%>';
+import merge from 'lodash/merge';
+
+module.exports = function (sequelize, DataTypes) {
+  const { columns, table } = schema(DataTypes);
+  const entity = sequelize.define('<%=table%>', merge(columns, {}), merge(table, {}));
+  return entity;
+};

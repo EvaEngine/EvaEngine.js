@@ -59,7 +59,7 @@ export default class Entities {
         }
         const [query, cost] = args;
         let pushed = false;
-        if (cost > 0) {
+        if (tracer && cost > 0) {
           tracer.queries.push({
             query,
             cost: cost * 1000,
