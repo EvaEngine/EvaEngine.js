@@ -5,7 +5,7 @@ import * as middlewares from './middlewares';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import * as utils from './utils';
-import Command from './command';
+import Command, * as commands from './commands';
 import Entities from './entities';
 import EvaEngine, * as engine from './engine';
 import constitute from 'constitute';
@@ -34,6 +34,7 @@ const core = {
   Entities,
   engine,
   express,
+  commands,
   dependencies: {
     constitute,
     sequelize,
@@ -41,6 +42,7 @@ const core = {
   },
   exceptions,
   middlewares,
+  sequelize,
   swagger,
   services,
   providers,
