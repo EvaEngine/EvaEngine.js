@@ -6,6 +6,7 @@ export default (DataTypes) => ({
       primaryKey: <%=column.primaryKey%>,
       type: <%=column.type%>,
       defaultValue:  '<%=column.defaultValue%>',
+      <% if(column.autoIncrement) { %>autoIncrement: true,<% } %>
       comment: '<%=column.comment%>'
     },
   <% }); %>

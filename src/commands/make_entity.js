@@ -131,6 +131,7 @@ export default class MakeEntityCommand extends Command {
         const columnName = rawColumn.Field;
         columns[columnName].type = MakeEntityCommand.typeMapping(columns[columnName].type);
         columns[columnName].comment = rawColumn.Comment;
+        columns[columnName].autoIncrement = rawColumn.Extra.startsWith('auto_increment') === true;
       });
 
       const entityFile = `${path}/${table}.js`;

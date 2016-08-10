@@ -127,10 +127,10 @@ export default class Entities {
     }, options, { bind }));
   }
 
-  getTransaction() {
-    return this.getInstance().transaction({
-      autocommit: false
-    });
+  getTransaction(options = {}) {
+    return this.getInstance().transaction(Object.assign({
+      autocommit: true
+    }, options));
   }
 
   /**
