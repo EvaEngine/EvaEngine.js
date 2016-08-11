@@ -23,6 +23,14 @@ export default class Redis {
     return this;
   }
 
+  isConnected() {
+    return redisClient !== null;
+  }
+
+  cleanup() {
+    return this.getInstance().end();
+  }
+
   /**
    * @returns {Ioredis}
    */
