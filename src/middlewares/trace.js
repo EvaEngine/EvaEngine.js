@@ -1,10 +1,10 @@
+import os from 'os';
+import onHeaders from 'on-headers';
+import { Dependencies } from 'constitute';
 import Namespace from '../services/namespace';
 import Config from '../services/config';
 import Logger from '../services/logger';
 import HttpClient from '../services/http_client';
-import { Dependencies } from 'constitute';
-import onHeaders from 'on-headers';
-import os from 'os';
 
 
 export const randomTraceId = (len = 16) => {

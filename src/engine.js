@@ -1,9 +1,9 @@
-import DI from './di';
 import express from 'express';
 import http from 'http';
 import path from 'path';
 import yargs from 'yargs';
 import later from 'later';
+import DI from './di';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import {

@@ -1,6 +1,6 @@
+import { Dependencies } from 'constitute';
 import HttpClient from './http_client';
 import Namespace from './namespace';
-import { Dependencies } from 'constitute';
 import { RestServiceLogicException, RestServiceIOException } from '../exceptions';
 
 @Dependencies(HttpClient, Namespace) //eslint-disable-line new-cap

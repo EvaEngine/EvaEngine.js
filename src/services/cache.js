@@ -1,8 +1,8 @@
-import Redis from './redis';
+import { Dependencies } from 'constitute';
 import { UnsupportedOperationException } from './../exceptions';
+import Redis from './redis';
 import DI from './../di';
 import Config from './config';
-import { Dependencies } from 'constitute';
 
 export class Store {
   has() {

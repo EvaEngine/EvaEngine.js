@@ -1,7 +1,7 @@
-import Config from './config';
-import Redis from './redis';
 import { Dependencies } from 'constitute';
 import jwt from 'jwt-simple';
+import Config from './config';
+import Redis from './redis';
 
 @Dependencies(Config, Redis) //eslint-disable-line new-cap
 export default class JsonWebToken {

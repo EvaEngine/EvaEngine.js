@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
-import DI from '../di';
 import util from 'util';
+import DI from '../di';
 
 export const getMicroTimestamp = () => {
   const d = new Date();

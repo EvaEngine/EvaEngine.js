@@ -1,8 +1,8 @@
-import Command from './interface';
 import _ from 'lodash';
 import Sequelize from 'sequelize';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
+import Command from './interface';
 import DI from '../di';
 
 export default class MakeEntityCommand extends Command {

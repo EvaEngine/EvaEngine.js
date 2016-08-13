@@ -1,8 +1,8 @@
 import merge from 'lodash/merge';
+import { Dependencies } from 'constitute';
 import Env from './env';
 import EngineConfig from '../config';
 import { RuntimeException } from '../exceptions';
-import { Dependencies } from 'constitute';
 
 let config = null;
 
@@ -44,7 +44,7 @@ export default class Config {
       configLocal = {};
     }
     /*eslint-enable global-require*/
-    config = merge(merge(merge(EngineConfig, configDefault), configEnv), configLocal);
+    config = merge(EngineConfig, configDefault, configEnv, configLocal);
     return key ? Config.search(key, config) : config;
   }
 

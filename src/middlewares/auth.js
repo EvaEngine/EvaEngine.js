@@ -1,11 +1,11 @@
+import moment from 'moment';
+import { Dependencies } from 'constitute';
 import wrapper from '../utils/wrapper';
 import {
   UnauthorizedException
 } from '../exceptions';
-import { Dependencies } from 'constitute';
 import Config from '../services/config';
 import JsonWebToken from '../services/jwt_token';
-import moment from 'moment';
 
 /**
  * @param _config {Config}

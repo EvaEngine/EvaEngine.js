@@ -1,5 +1,4 @@
 /*eslint new-cap: [1]*/
-
 import fs from 'fs';
 import Promise from 'bluebird';
 import doctrine from 'doctrine';
@@ -408,10 +407,12 @@ export class ExSwagger {
     if (swaggerUIPath) {
       this.swaggerUIPath = swaggerUIPath;
     } else {
-      const [nodeVersion] = process.version.slice(1, 2);
-      this.swaggerUIPath = nodeVersion <= 4 ?
-        `${__dirname}/../../node_modules/swagger-ui/dist` :
-        `${__dirname}/../../../swagger-ui/dist`; //for npm3
+      this.swaggerUIPath = `${__dirname}/../../node_modules/swagger-ui/dist`;
+      try {
+        fs.accessSync(this.swaggerUIPath, fs.F_OK);
+      } catch (e) {
+        this.swaggerUIPath = `${__dirname}/../../../swagger-ui/dist`; //For NPM v3.x
+      }
     }
     this.swaggerDocsPath = swaggerDocsPath;
   }

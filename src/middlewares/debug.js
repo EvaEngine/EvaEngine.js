@@ -1,7 +1,7 @@
 import morgan from 'morgan';
+import { Dependencies } from 'constitute';
 import Env from '../services/env';
 import Logger from '../services/logger';
-import { Dependencies } from 'constitute';
 
 /**
  * @param env {Env}

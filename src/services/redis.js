@@ -1,6 +1,6 @@
 import Ioredis from 'ioredis';
-import Config from './config';
 import { Dependencies } from 'constitute';
+import Config from './config';
 
 let redisClient = null;
 

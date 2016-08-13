@@ -1,6 +1,6 @@
-import Config from './config';
 import { Dependencies } from 'constitute';
 import { createNamespace, getNamespace, destroyNamespace, reset } from 'continuation-local-storage';
+import Config from './config';
 import { UnsupportedOperationException } from '../exceptions';
 
 const stores = {};

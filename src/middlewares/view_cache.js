@@ -1,9 +1,9 @@
-import Logger from '../services/logger';
-import Cache from '../services/cache';
 import { Dependencies } from 'constitute';
-import wrapper from '../utils/wrapper';
 import crypto from 'crypto';
 import util from 'util';
+import Logger from '../services/logger';
+import Cache from '../services/cache';
+import wrapper from '../utils/wrapper';
 import { RuntimeException, UnsupportedOperationException } from '../exceptions';
 
 export const defaultHashStrategy = (obj) => obj;

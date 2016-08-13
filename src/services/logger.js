@@ -1,8 +1,8 @@
+import { Dependencies } from 'constitute';
+import winston from 'winston';
 import Env from './env';
 import Config from './config';
 import Namespace from './namespace';
-import { Dependencies } from 'constitute';
-import winston from 'winston';
 
 @Dependencies(Env, Config, Namespace) //eslint-disable-line new-cap
 export default class Logger {

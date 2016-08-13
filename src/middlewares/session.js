@@ -1,9 +1,9 @@
 import session from 'express-session';
 import connectRedis from 'connect-redis';
+import { Dependencies } from 'constitute';
 import Config from '../services/config';
 import Redis from '../services/redis';
 import Namespace from '../services/namespace';
-import { Dependencies } from 'constitute';
 
 let middleware = null;
 

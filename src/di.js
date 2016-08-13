@@ -1,8 +1,8 @@
+import constitute from 'constitute';
 import {
   RuntimeException
 } from './exceptions';
 import { ServiceProvider } from './services/providers';
-import constitute from 'constitute';
 
 let container = new constitute.Container();
 let bound = {};
