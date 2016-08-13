@@ -144,11 +144,11 @@ export class FilterScaffold {
       mappingKey = FILTER_TYPE_STRING;
     }
     const {
-            format = null,
-            description = null,
-            defaultValue = null,
-            enumerate = null
-          } = options;
+      format = null,
+      description = null,
+      defaultValue = null,
+      enumerate = null
+    } = options;
     mappingKey = format || mappingKey;
     let { operators = null } = options;
     if (!operators) {
@@ -213,7 +213,7 @@ export class FilterScaffold {
         continue;
       }
 
-      if (conditions.hasOwnProperty(field) === false) {
+      if ({}.hasOwnProperty.call(conditions, field) === false) {
         if (!operator) {
           conditions[field] = value;
         } else {

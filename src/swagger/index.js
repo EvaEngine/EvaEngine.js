@@ -7,8 +7,8 @@ import glob from 'glob';
 import yaml from 'js-yaml';
 import Entitles from '../entities';
 import { RuntimeException, StandardException } from '../exceptions';
-require('acorn-es7-plugin')(acorn);
 
+require('acorn-es7-plugin')(acorn);
 
 Promise.promisifyAll(fs);
 

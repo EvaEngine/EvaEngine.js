@@ -218,7 +218,7 @@ function TraceMiddleware(ns, config, logger, client) {
     if (sampled < 1) {
       onHeaders(res, () => {
         const [seconds, nanoseconds] = process.hrtime(startedAt);
-        const duration = (seconds * 1e3 + nanoseconds * 1e-6);
+        const duration = ((seconds * 1e3) + (nanoseconds * 1e-6));
         res.set('X-Response-Milliseconds', parseInt(duration, 10));
       });
       next();
@@ -227,7 +227,7 @@ function TraceMiddleware(ns, config, logger, client) {
 
     onHeaders(res, () => {
       const [seconds, nanoseconds] = process.hrtime(startedAt);
-      const duration = (seconds * 1e3 + nanoseconds * 1e-6) * 1000;
+      const duration = ((seconds * 1e3) + (nanoseconds * 1e-6)) * 1000;
       tracer.duration = parseInt(duration, 10);
       tracer.statusCode = res.statusCode;
       res.set('X-Response-Milliseconds', tracer.duration / 1000);

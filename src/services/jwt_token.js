@@ -36,7 +36,7 @@ export default class JsonWebToken {
       return { uid: null, expiredAt: 0 };
     }
     const parsedToken = this.decode(tokenString);
-    if (!parsedToken || !parsedToken.hasOwnProperty('uid')) {
+    if (!parsedToken || !{}.hasOwnProperty.call(parsedToken, 'uid')) {
       return { uid: null, expiredAt: 0 };
     }
     const key = [this.getPrefix(), parsedToken.uid, tokenString.split('.').pop()].join(':');
@@ -63,7 +63,7 @@ export default class JsonWebToken {
 
   getRedisKey(tokenString, groupOnly = false) {
     const parsedToken = this.decode(tokenString);
-    if (!parsedToken || !parsedToken.hasOwnProperty('uid')) {
+    if (!parsedToken || !{}.hasOwnProperty.call(parsedToken, 'uid')) {
       return '';
     }
     return groupOnly === true ?

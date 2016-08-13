@@ -2,6 +2,9 @@
   "parser": "babel-eslint",
   "extends": "airbnb",
   "rules": {
+    "no-continue": [
+      0
+    ],
     "comma-dangle": [
       1,
       "never"

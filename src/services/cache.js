@@ -79,7 +79,7 @@ export class RedisStore extends Store {
   }
 
   namespace(namespace) {
-    if (this.namespaceHandler.hasOwnProperty(namespace)) {
+    if ({}.hasOwnProperty.call(this.namespaceHandler, namespace)) {
       return this.namespaceHandler[namespace];
     }
     this.namespaceHandler[namespace] = new RedisNamespaceStore(this.prefix, namespace, this.redis);

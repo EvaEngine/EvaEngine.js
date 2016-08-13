@@ -32,7 +32,7 @@ export default (str) => {
   let crc = 0;
   let x = 0;
   let y = 0;
-  crc = crc ^ (-1);
+  crc ^= -1;
   for (let i = 0, iTop = str.length; i < iTop; i++) {
     y = (crc ^ str.charCodeAt(i)) & 0xFF;
     x = `0x${table.substr(y * 9, 8)}`;

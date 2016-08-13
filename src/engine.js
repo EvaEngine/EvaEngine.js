@@ -163,7 +163,8 @@ export default class EvaEngine {
     }
     const command = this.commands[commandName];
 
-    if (!command.hasOwnProperty('getSpec') || !command.hasOwnProperty('getDescription')) {
+    if (!{}.hasOwnProperty.call(command, 'getSpec')
+      || !{}.hasOwnProperty.call(command, 'getDescription')) {
       throw new RuntimeException('Command require getSpec and getDescription static method');
     }
     const argv = yargs

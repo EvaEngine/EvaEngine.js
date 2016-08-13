@@ -124,7 +124,7 @@ export default class Namespace {
    * @returns {Store}
    */
   getStore() {
-    if (stores.hasOwnProperty(this.name)) {
+    if ({}.hasOwnProperty.call(stores, this.name)) {
       return stores[this.name];
     }
     stores[this.name] = this.config.enable === true ?

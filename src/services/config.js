@@ -68,7 +68,7 @@ export default class Config {
     const keys = keyString.split('.');
     let obj = target;
     for (const key of keys) {
-      if (obj.hasOwnProperty(key) === false) {
+      if ({}.hasOwnProperty.call(obj, key) === false) {
         throw new RuntimeException(`No config found by key ${keyString}`);
       }
       obj = obj[key];

@@ -160,7 +160,7 @@ export const paginationFilter = ({ offset, limit }, defaultLimit = 15, maxLimit 
   limitNumber = limitNumber < 1 ? defaultLimit : limitNumber;
 
   if (offsetNumber < 0) {
-    limitNumber = limitNumber + offsetNumber % limitNumber;
+    limitNumber += (offsetNumber % limitNumber);
     offsetNumber = 0;
   }
 
