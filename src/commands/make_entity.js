@@ -59,7 +59,7 @@ export default class MakeEntityCommand extends Command {
     }
 
     if (type.startsWith('datetime')) {
-      return 'DataTypes.DATETIME';
+      return 'DataTypes.DATE';
     }
 
     if (type.startsWith('date')) {
