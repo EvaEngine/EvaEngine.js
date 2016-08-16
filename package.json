@@ -103,16 +103,16 @@
     "babel-preset-es2015-node4": "^2.1.0",
     "babel-preset-stage-3": "^6.11.0",
     "cross-env": "^2.0.0",
-    "eslint": "^3.3.0",
-    "eslint-plugin-import": "^1.11.1",
+    "eslint": "^3.3.1",
+    "eslint-plugin-import": "^1.13.0",
     "eslint-config-airbnb": "^10.0.1",
     "eslint-plugin-jsx-a11y": "^2.1.0",
-    "eslint-plugin-react": "^6.0.0",
+    "eslint-plugin-react": "^6.1.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.1",
     "gulp-cli": "^1.2.1",
     "gulp-sourcemaps": "^1.6.0",
     "harmony-reflect": "^1.4.6",
-    "nyc": "^7.1.0"
+    "nyc": "^8.1.0"
   }
 }
