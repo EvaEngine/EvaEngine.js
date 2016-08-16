@@ -5,7 +5,6 @@ import Config from './config';
 import Namespace from './namespace';
 
 
-
 @Dependencies(Env, Config, Namespace) //eslint-disable-line new-cap
 export default class Logger {
   /**
