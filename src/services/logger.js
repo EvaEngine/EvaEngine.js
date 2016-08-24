@@ -60,11 +60,13 @@ export default class Logger {
         transports: [
           new (winston.transports.Console)({
             name: 'global-console',
+            timestamp: true,
             level: this.level,
             label: this.label
           }),
           new (winston.transports.File)({
             name: 'global-file',
+            json: false,
             level: this.level,
             label: this.label,
             filename: logPath
@@ -74,6 +76,7 @@ export default class Logger {
         transports: [
           new (winston.transports.Console)({
             name: 'global-console',
+            timestamp: true,
             level: this.level,
             label: this.label
           })
@@ -86,6 +89,7 @@ export default class Logger {
       transports: [
         new (winston.transports.Console)({
           name: 'global-console',
+          timestamp: true,
           level: this.level,
           label: this.label,
           colorize: true,
