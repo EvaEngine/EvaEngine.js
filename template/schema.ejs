@@ -1,15 +1,13 @@
 export default (DataTypes) => ({
-  columns: {
-  <% _.forEach(columns, function(column, key) { %>
+  columns: {<% _.forEach(columns, function(column, key) { %>
     <%=key%>: {
-      allowNull: <%=column.allowNull%>,
-      primaryKey: <%=column.primaryKey%>,
-      type: <%=column.type%>,
-      defaultValue:  '<%=column.defaultValue%>',
-      <% if(column.autoIncrement) { %>autoIncrement: true,<% } %>
+      allowNull: <%=column.allowNull%>,<% if(column.primaryKey) { %>
+      primaryKey: <%=column.primaryKey%>,<% } %>
+      type: <%=column.type%>,<% if(column.defaultValue !== null && column.defaultValue !== '') { %>
+      defaultValue:  '<%=column.defaultValue%>',<% } %><% if(column.autoIncrement) { %>
+      autoIncrement: true,<% } %>
       comment: '<%=column.comment%>'
-    },
-  <% }); %>
+    },<% }); %>
   },
   table: {
     tableName: '<%=table%>',
