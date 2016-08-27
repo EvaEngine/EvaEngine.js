@@ -54,9 +54,9 @@ export default class Entities {
       benchmark: true,
       logging: (...args) => {
         const tracer = DI.get('namespace').get('tracer');
-        if (!tracer) {
-          logger.warn('Trying to add tracer to Entities, but no tracer found, maybe Entities boot before tracer middleware called');
-        }
+        // if (!tracer) {
+        //   logger.warn('Trying to add tracer to Entities, but no tracer found, maybe Entities boot before tracer middleware called');
+        // }
         const [query, cost] = args;
         let pushed = false;
         if (tracer && cost > 0) {
