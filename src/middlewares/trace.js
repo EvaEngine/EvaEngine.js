@@ -1,23 +1,11 @@
 import os from 'os';
 import onHeaders from 'on-headers';
 import { Dependencies } from 'constitute';
+import { randomString } from '../utils/random';
 import Namespace from '../services/namespace';
 import Config from '../services/config';
 import Logger from '../services/logger';
 import HttpClient from '../services/http_client';
-
-
-export const randomTraceId = (len = 16) => {
-  const digits = '0123456789abcdefghijklmnopqrstuvwxyz';
-  let str = '';
-  for (let i = 0; i < len; i++) {
-    const rand = Math.floor(Math.random() * len);
-    if (rand !== 0 || str.length > 0) {
-      str += digits[rand];
-    }
-  }
-  return str;
-};
 
 export const getMicroTimestamp = () => {
   const d = new Date();
@@ -146,7 +134,7 @@ export const tracerToZipkins = (tracer) => {
     queries.forEach((element) => {
       const { query, cost, finishedAt } = element;
       zipkins.push({
-        id: randomTraceId(),
+        id: randomString(),
         parentId: id,
         traceId,
         name: 'sequelize',
@@ -178,7 +166,7 @@ export const tracerToZipkins = (tracer) => {
 function TraceMiddleware(ns, config, logger, client) {
   const enabled = config.get('trace.enable');
   return (name) => (req, res, next) => {
-    const spanId = randomTraceId();
+    const spanId = randomString();
     const traceId = req.get('X-B3-TraceId') || spanId;
     const parentId = req.get('X-B3-SpanId') || '';
     const startedAt = process.hrtime();
