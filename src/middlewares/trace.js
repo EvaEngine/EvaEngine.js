@@ -1,59 +1,12 @@
-import os from 'os';
 import onHeaders from 'on-headers';
 import { Dependencies } from 'constitute';
-import { randomString } from '../utils/random';
+import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils';
 import Namespace from '../services/namespace';
 import Config from '../services/config';
 import Logger from '../services/logger';
 import HttpClient from '../services/http_client';
 
-export const getMicroTimestamp = () => {
-  const d = new Date();
-  return d.getTime() * 1000;
-};
-
-export const getRequestFullUrl = (req) => {
-  const {
-          protocol,
-          originalUrl
-        } = req;
-  const host = req.get('host');
-  return `${protocol}://${host}${originalUrl}`;
-};
-
-let localIp = null;
-export const getLocalIp = () => {
-  if (localIp) {
-    return localIp;
-  }
-  const ifaces = os.networkInterfaces();
-  const addresses = [];
-
-  Object.keys(ifaces).forEach((ifname) => {
-    ifaces[ifname].forEach((iface) => {
-      if (iface.family !== 'IPv4' || iface.internal !== false) {
-        // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-        return;
-      }
-      addresses.push(iface.address);
-    });
-  });
-  localIp = addresses.length > 0 ? addresses[0] : '127.0.0.1';
-  return localIp;
-};
-
-// export const getRequestIp = req => req.headers['x-forwarded-for'] ||
-// req.connection.remoteAddress ||
-// req.socket.remoteAddress ||
-// req.connection.socket.remoteAddress;
-
-export const getPort = req => {
-  if (!req.headers || !req.headers.host) {
-    return -1;
-  }
-  const [, port] = req.headers.host.split(':');
-  return port || -1;
-};
+const hostIp = getHostIp();
 
 export const tracerToZipkins = (tracer) => {
   if (!tracer) {
@@ -76,7 +29,7 @@ export const tracerToZipkins = (tracer) => {
   const name = `${statusCode} ${method} ${url}`;
   const endpoint = {
     serviceName,
-    ipv4: getLocalIp(),
+    ipv4: hostIp,
     port
   };
   const zipkin = {
@@ -181,8 +134,8 @@ function TraceMiddleware(ns, config, logger, client) {
     const tracer = {
       serviceName,
       method: req.method,
-      url: getRequestFullUrl(req),
-      port: getPort(req),
+      url: getHostFullUrl(req),
+      port: getHostPort(req),
       spanId,
       traceId,
       parentId,

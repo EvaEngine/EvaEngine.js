@@ -3,11 +3,7 @@ import path from 'path';
 import Sequelize from 'sequelize';
 import util from 'util';
 import DI from '../di';
-
-export const getMicroTimestamp = () => {
-  const d = new Date();
-  return d.getTime() * 1000;
-};
+import { getMicroTimestamp } from '../utils';
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {

@@ -5,6 +5,10 @@ import DI from './../di';
 import Config from './config';
 
 export class Store {
+  getInstance() {
+    return this;
+  }
+
   has() {
     return false;
   }
@@ -38,6 +42,10 @@ export class RedisNamespaceStore extends Store {
     this.prefix = prefix;
     this.namespace = namespace;
     this.redis = redis;
+  }
+
+  getInstance() {
+    return this.redis;
   }
 
   has(key) {
