@@ -32,6 +32,67 @@ const transferProperties = (obj, snakeCase = false) => {
 //@formatter:off
 /**
  @swagger
+ Pagination_Snake:
+   type: object
+   properties:
+     total:
+       type: integer
+       description: 总数据量
+     offset:
+       type: integer
+       description: 偏移量
+     limit:
+       type: integer
+       description: 单页数据量
+     prev:
+       type: integer
+       description: 上页偏移量
+     next:
+       type: integer
+       description: 下页偏移量
+     prev_uri:
+       type: string
+       description: 上页Uri
+     next_uri:
+       type: string
+       description: 下页Uri
+     is_first:
+       type: boolean
+       description: 是否为首页
+     is_last:
+       type: boolean
+       description: 是否为末页
+     first_uri:
+       type: string
+       description: 首页Uri
+     last_uri:
+       type: string
+       description: 末页Uri
+   required:
+   - total
+   - offset
+   - limit
+   - prev
+   - next
+   - prev_uri
+   - next_uri
+   - is_first
+   - is_last
+   - first_uri
+   - last_uri
+   example:
+     total: 100
+     offset: 30
+     limit: 15
+     prev: 15
+     next: 45
+     prev_uri: http://localhost/v1/posts?offset=15&limit=15
+     next_uri: http://localhost/v1/posts?offset=30&limit=15
+     is_first: false
+     is_last: false
+     first_uri: http://localhost/v1/posts?offset=0&limit=15
+     last_uri: http://localhost/v1/posts?offset=90&limit=15
+ @swagger
  Pagination:
    type: object
    properties:

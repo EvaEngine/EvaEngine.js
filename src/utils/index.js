@@ -3,6 +3,7 @@ import test from './test';
 import { pagination, paginationFilter } from './pagination';
 import crc32 from './crc32';
 import { randomString } from './random';
+import { toCamelCase, toSnakeCase } from './case_converter';
 import { getHostFullUrl, getHostIp, getHostPort, getClientIp } from './host';
 import {
   getTimestamp, getMilliTimestamp,
@@ -11,6 +12,7 @@ import {
 import * as apiScaffold from './api_scaffold';
 
 export {
+  apiScaffold,
   crc32,
   test,
   wrapper,
@@ -25,5 +27,6 @@ export {
   getMilliTimestamp,
   getMicroTimestamp,
   getDatabaseDatetime,
-  apiScaffold
+  toCamelCase,
+  toSnakeCase
 };
