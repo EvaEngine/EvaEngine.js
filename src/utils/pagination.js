@@ -32,7 +32,7 @@ const transferProperties = (obj, snakeCase = false) => {
 //@formatter:off
 /**
  @swagger
- Pagination_Snake:
+ PaginationSnake:
    type: object
    properties:
      total:

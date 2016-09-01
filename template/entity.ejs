@@ -1,5 +1,5 @@
-import schema from './schemas/<%=table%>';
 import merge from 'lodash/merge';
+import schema from './schemas/<%=table%>';
 
 module.exports = function (sequelize, DataTypes) {
   const { columns, table } = schema(DataTypes);
