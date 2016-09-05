@@ -49,6 +49,7 @@ export class StandardException extends Error {
       throw new TypeError('Exception message not allow pure number or a file path');
     }
     super(msg);
+    Error.captureStackTrace(this, this.constructor);
     let fileName = __filename;
     if (['StandardException', 'Error'].includes(this.constructor.name) === false) {
       const lastArg = args.pop();
@@ -57,6 +58,7 @@ export class StandardException extends Error {
       }
       fileName = lastArg;
     }
+    this.message = msg;
     this.code = StandardException.generateCode(this.constructor.name, fileName) || -1;
     this.statusCode = statusCode || 500;
     this.details = [];

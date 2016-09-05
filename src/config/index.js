@@ -80,6 +80,13 @@ export default {
     schemes: [
       'http'
     ],
+    securityDefinitions: {
+      api_key: {
+        type: 'apiKey',
+        name: 'api_key',
+        in: 'query'
+      }
+    },
     paths: {},
     definitions: {}
   }
