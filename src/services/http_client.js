@@ -10,7 +10,7 @@ export const deepClone = (obj) =>
 
 let debugFlag = false;
 /* eslint-disable */
-export const requestDebug = (logger, maxBodyLength = 20000) => {
+export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEBUG_BODY || 3000) => {
   if (debugFlag === true) {
     return;
   }
@@ -53,7 +53,7 @@ export const requestDebug = (logger, maxBodyLength = 20000) => {
         headers: deepClone(this.headers)
       };
       if (this.body) {
-        data.body = maxBodyLength > 0 && this.body.length < maxBodyLength ? this.body.toString('utf8') : '______TOO_LONG_SKIPPED______';
+        data.body = maxBodyLength > 0 && this.body.toString().length < maxBodyLength ? this.body.toString('utf8') : '______TOO_LONG_SKIPPED______';
       }
       logger.verbose(`[REQUEST__${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, data.headers, { body: data.body || null });
     }).on('response', function (res) {
@@ -70,7 +70,7 @@ export const requestDebug = (logger, maxBodyLength = 20000) => {
       }
 
       logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, ignoreDebug(res.headers), {
-        body: res.body && maxBodyLength > 0 && res.body.length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
+        body: res.body && maxBodyLength > 0 && res.body.toString().length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
       });
     }).on('redirect', function () {
 

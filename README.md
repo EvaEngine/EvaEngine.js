@@ -98,3 +98,9 @@ npm link
 cd your_project
 npm link evaengine
 ```
+
+## Global Environment Variables
+
+- `NODE_ENV`
+- `LOG_LEVEL`
+- `MAX_REQUEST_DEBUG_BODY`
