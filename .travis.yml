@@ -2,10 +2,10 @@ language: node_js
 services:
   - redis-server
 node_js:
-   - "4.3.0"
+   - "4.5.0"
    - "6.3.0"
 script:
     - "npm run lint"
-    - "npm test"
+    - "npm run ava"
 after_success:
   - bash <(curl -s https://codecov.io/bash)
