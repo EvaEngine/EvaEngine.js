@@ -1,6 +1,7 @@
 import test from 'ava';
 import DI from '../../src/di';
 import * as providers from '../../src/services/providers';
+
 DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
 const cache = DI.get('cache');
 

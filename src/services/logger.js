@@ -54,7 +54,6 @@ export default class Logger {
       return this.instance;
     }
     const logPath = this.logfile || this.config.get('logger.file');
-    // winston.cli();
     if (this.env.isProduction()) {
       this.instance = logPath ? new (winston.Logger)({
         transports: [
@@ -85,7 +84,23 @@ export default class Logger {
       return this.instance;
     }
 
-    this.instance = new (winston.Logger)({
+    this.instance = logPath ? new (winston.Logger)({
+      transports: [
+        new (winston.transports.Console)({
+          name: 'global-console',
+          timestamp: true,
+          level: this.level,
+          label: this.label
+        }),
+        new (winston.transports.File)({
+          name: 'global-file',
+          json: false,
+          level: this.level,
+          label: this.label,
+          filename: logPath
+        })
+      ]
+    }) : new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
           name: 'global-console',

@@ -102,5 +102,7 @@ npm link evaengine
 ## Global Environment Variables
 
 - `NODE_ENV`
+- `PORT`
 - `LOG_LEVEL`
+- `CLI_NAME`
 - `MAX_REQUEST_DEBUG_BODY`

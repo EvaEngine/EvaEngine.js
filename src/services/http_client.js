@@ -7,9 +7,11 @@ import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions
 export const deepClone = (obj) =>
   JSON.parse(JSON.stringify(obj));
 
+const TOO_LONG_BODY = '____TLDR____';
 
 let debugFlag = false;
 /* eslint-disable */
+//Mod version of https://github.com/request/request-debug
 export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEBUG_BODY || 3000) => {
   if (debugFlag === true) {
     return;
@@ -53,40 +55,39 @@ export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEB
         headers: deepClone(this.headers)
       };
       if (this.body) {
-        data.body = maxBodyLength > 0 && this.body.toString().length < maxBodyLength ? this.body.toString('utf8') : '______TOO_LONG_SKIPPED______';
+        data.body = maxBodyLength > 0 && this.body.toString().length < maxBodyLength ? this.body.toString('utf8') : TOO_LONG_BODY;
       }
-      logger.verbose(`[REQUEST__${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, data.headers, { body: data.body || null });
-    }).on('response', function (res) {
 
+      logger.verbose('[HTTP_REQUEST_%s] [%s %s] [REQ_HEADERS: %s] [REQ_BODY: %s]', this._debugId,
+        this.method.toUpperCase(), this.uri.href, JSON.stringify(data.headers), data.body || ''
+      );
+    }).on('response', function (res) {
       if (this.callback) {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, res.headers, { body: null });
+      logger.verbose('[HTTP_RESPONSE_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
+        this.method.toUpperCase(), this.uri.href, res.statusCode, JSON.stringify(ignoreDebug(res.headers)),
+        res.body && maxBodyLength > 0 && res.body.toString().length > maxBodyLength ? TOO_LONG_BODY : res.body || '');
     }).on('complete', function (res) {
-
       if (!this.callback) {
         return;
       }
 
-      logger.verbose(`[RESPONSE_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, res.statusCode, ignoreDebug(res.headers), {
-        body: res.body && maxBodyLength > 0 && res.body.toString().length > maxBodyLength ? '______TOO_LONG_SKIPPED______' : res.body || null
-      });
+      logger.verbose('[HTTP_RESPONSE_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
+        this.method.toUpperCase(), this.uri.href, res.statusCode, JSON.stringify(ignoreDebug(res.headers)),
+        res.body && maxBodyLength > 0 && res.body.toString().length > maxBodyLength ? TOO_LONG_BODY : res.body || ''
+      );
     }).on('redirect', function () {
 
-      logger.verbose(`[REDIRECT_${this._debugId}]`, `${this.method.toUpperCase()} ${this.uri.href}`, this.response.statusCode, this.response.headers, { body: null });
+      logger.verbose('[HTTP_REDIRECT_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
+        this.method.toUpperCase(), this.uri.href, this.response.statusCode, JSON.stringify(ignoreDebug(this.response.headers)), '');
     });
     this._debugId = ++debugId;
     return proto._initBeforeDebug.apply(this, arguments);
   };
 
   debugFlag = true;
-  // if (!request.stopDebugging) {
-  //   request.stopDebugging = () => {
-  //     proto.init = proto._initBeforeDebug;
-  //     delete proto._initBeforeDebug;
-  //   };
-  // }
 };
 /* eslint-enable */
 
