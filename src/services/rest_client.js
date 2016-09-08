@@ -76,15 +76,18 @@ export default class RestClient {
   async request(params) {
     if (this.baseUrl) {
       Object.assign(params, {
-        url: this.baseUrl + (params.url || params.uri),
-        resolveWithFullResponse: true
+        url: this.baseUrl + (params.url || params.uri)
       });
       if (params.uri) {
         delete params.uri; //eslint-disable-line no-param-reassign
       }
     }
     try {
-      const { headers, body } = await this.client.getInstance()(this.populateTrace(params));
+      const { headers, body } = await this.client.getInstance()(
+        Object.assign(this.populateTrace(params), {
+          resolveWithFullResponse: true
+        })
+      );
       this.saveToTracer(headers);
       return body;
     } catch (e) {
