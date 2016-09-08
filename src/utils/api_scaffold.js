@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import merge from 'lodash/merge';
+import snakeCase from 'lodash/snakeCase';
+import camelCase from 'lodash/camelCase';
 import { InvalidArgumentException } from '../exceptions';
 
 const SNAKE_CASE = 'snake';
@@ -41,7 +43,7 @@ export class OrderScaffold {
     const queryCase = this.queryCase;
     const orders = {};
     fields.forEach((field) => {
-      const ascKey = queryCase === SNAKE_CASE ? _.snakeCase(field) : _.camelCase(field);
+      const ascKey = queryCase === SNAKE_CASE ? snakeCase(field) : camelCase(field);
       const descKey = `-${ascKey}`;
       orders[ascKey] = [field, ORDER_ASC];
       orders[descKey] = [field, ORDER_DESC];
@@ -186,9 +188,9 @@ export class FilterScaffold {
     }
 
     if (this.fieldCase === CAMEL_CASE) {
-      field = _.camelCase(field);
+      field = camelCase(field);
     } else {
-      field = _.snakeCase(field);
+      field = snakeCase(field);
     }
     return [field, operator];
   }
@@ -233,6 +235,6 @@ export class FilterScaffold {
   }
 
   getConditionsByString(queryString, baseWhere = {}) {
-    return _.merge(baseWhere, JSON.parse(queryString));
+    return merge(baseWhere, JSON.parse(queryString));
   }
 }

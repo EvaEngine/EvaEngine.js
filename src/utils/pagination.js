@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import snakeCase from 'lodash/snakeCase';
+import transform from 'lodash/transform';
 
 const toUrl = (scheme, host, path, query = {}) => {
   let queryString = Object.keys(query)
@@ -20,10 +21,10 @@ const toPositiveInteger = (number) => {
   return integer >= 0 ? integer : 0;
 };
 
-const transferProperties = (obj, snakeCase = false) => {
-  if (snakeCase === true) {
-    return _.transform(obj, (result, value, key) => {
-      result[_.snakeCase(key)] = value; //eslint-disable-line no-param-reassign
+const transferProperties = (obj, useSnake = false) => {
+  if (useSnake === true) {
+    return transform(obj, (result, value, key) => {
+      result[snakeCase(key)] = value; //eslint-disable-line no-param-reassign
     });
   }
   return obj;
@@ -160,7 +161,7 @@ export const pagination = ({
   limit,
   offset,
   req,
-  snakeCase
+  snakeCase: useSnake
 }) => {
   const totalNumber = toPositiveInteger(total);
   let offsetNumber = parseInt(offset, 10);
@@ -187,7 +188,7 @@ export const pagination = ({
       nextUri,
       firstUri,
       lastUri
-    }, snakeCase);
+    }, useSnake);
   }
 
   const isFirst = offset <= 0;
@@ -210,7 +211,7 @@ export const pagination = ({
     nextUri,
     firstUri,
     lastUri
-  }, snakeCase);
+  }, useSnake);
 };
 
 export const paginationFilter = ({ offset, limit }, defaultLimit = 15, maxLimit = 100) => {
