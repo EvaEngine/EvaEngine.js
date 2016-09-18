@@ -109,3 +109,10 @@ npm link evaengine
 - `LOG_LEVEL`
 - `CLI_NAME`
 - `MAX_REQUEST_DEBUG_BODY`
+
+
+## Generate Entities
+
+```
+./node_modules/.bin/engine make:entity
+```

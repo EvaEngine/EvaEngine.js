@@ -1,4 +1,4 @@
-import template from 'lodash/template';
+import _ from 'lodash';
 import Sequelize from 'sequelize';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
@@ -140,7 +140,7 @@ export default class MakeEntityCommand extends Command {
         fs.accessSync(entityFile);
         logger.info('Entity file %s generate skipped, already exists by %s', table, entityFile);
       } catch (e) {
-        fs.writeFileSync(entityFile, template(entityTemplate)({ table }));
+        fs.writeFileSync(entityFile, _.template(entityTemplate)({ table }));
         logger.info('Entity file %s generated as %s', table, entityFile);
       }
 
@@ -150,7 +150,7 @@ export default class MakeEntityCommand extends Command {
       } catch (e) {
         logger.info('Schema file %s generated as %s', table, schemaFile);
       }
-      fs.writeFileSync(schemaFile, template(schemaTemplate)({
+      fs.writeFileSync(schemaFile, _.template(schemaTemplate)({
         columns,
         table,
         timestamp: parseInt(timestamp, 10) > 0
