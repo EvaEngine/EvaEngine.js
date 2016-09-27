@@ -66,17 +66,20 @@ export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEB
         return;
       }
 
+      const bodyLength = res.headers['content-length'] || (res.body ? res.body.toString().length : 0);
       logger.verbose('[HTTP_RESPONSE_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
         this.method.toUpperCase(), this.uri.href, res.statusCode, JSON.stringify(ignoreDebug(res.headers)),
-        res.body && maxBodyLength > 0 && res.body.toString().length > maxBodyLength ? TOO_LONG_BODY : res.body || '');
+        bodyLength > maxBodyLength ? TOO_LONG_BODY : res.body || ''
+      );
     }).on('complete', function (res) {
       if (!this.callback) {
         return;
       }
 
+      const bodyLength = res.headers['content-length'] || (res.body ? res.body.toString().length : 0);
       logger.verbose('[HTTP_RESPONSE_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
         this.method.toUpperCase(), this.uri.href, res.statusCode, JSON.stringify(ignoreDebug(res.headers)),
-        res.body && maxBodyLength > 0 && res.body.toString().length > maxBodyLength ? TOO_LONG_BODY : res.body || ''
+        bodyLength > maxBodyLength ? TOO_LONG_BODY : res.body || ''
       );
     }).on('redirect', function () {
 

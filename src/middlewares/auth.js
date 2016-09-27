@@ -23,6 +23,7 @@ function AuthMiddleware(_config, token) {
         uid: config.token.faker.uid,
         token: config.token.faker.key
       };
+      res.set('X-Uid', config.token.faker.uid);
       return next();
     }
     if (jwToken) {
@@ -44,6 +45,7 @@ function AuthMiddleware(_config, token) {
         uid,
         token: jwToken
       };
+      res.set('X-Uid', uid);
       return next();
     }
 
@@ -53,6 +55,7 @@ function AuthMiddleware(_config, token) {
         uid: req.session.uid,
         token: ''
       };
+      res.set('X-Uid', req.session.uid);
       return next();
     }
     throw new UnauthorizedException('No authority token found');
