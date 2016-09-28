@@ -107,6 +107,7 @@ export default class EvaEngine {
     this.namespace = namespace || DI.get('namespace');
     this.logger.info('Engine started, Meta:', this.meta);
     this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
+    later.date.localTime();
   }
 
   /**
@@ -471,6 +472,7 @@ export default class EvaEngine {
     }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
+    this.logger.info('Cron job using %s Timezone', later.date.isUTC ? 'UTC' : 'Local');
 
     const [commandName, ...options] = commandString.split(' ');
     if (Object.keys(this.commands).includes(commandName) === false) {
@@ -479,13 +481,15 @@ export default class EvaEngine {
     const argv = yargs(options ? options.join(' ') : '').argv;
     const command = new this.commands[commandName](argv);
     let i = 1;
+    const schedule = later.parse.cron(sequence, useSeconds);
+    this.logger.debug('Cron job %s %s parsed as %s', sequence, commandString, schedule);
     later.setInterval(async() => {
       this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
       //Let job crash if any exception happen
       await command.run();
       this.logger.info('Round %d | Cron job %s finished', i, commandName);
       i++;
-    }, later.parse.cron(sequence, useSeconds)); //第二个参数为True表示支持秒
+    }, schedule); //第二个参数为True表示支持秒
     this.logger.info('Cron job %s registered by [ %s ]', commandString, sequence);
   }
 }
