@@ -92,8 +92,8 @@ export class ExSwagger {
     for (const filepath of files) {
       const source = await fs.readFileAsync(filepath);
       acorn.parse(source, {
-        ecmaVersion: 7,
-        plugins: { asyncawait: true },
+        ecmaVersion: 6,
+        // plugins: { asyncawait: true },
         allowImportExportEverywhere: true,
         onComment: comments
       });
@@ -378,6 +378,7 @@ export class ExSwagger {
     swaggerDocsPath = `${compileDistPath}/docs.json`,
     sourceFilesPath = `${sourceRootPath}/**/*.js`,
     exceptionInterface = StandardException,
+    extraSourcePaths = [`${__dirname}/../utils/**/*.js`],
     exceptionPaths
   }) {
     this.logger = logger ||
@@ -396,7 +397,6 @@ export class ExSwagger {
     this.models = models ? models.getAll() : null;
     this.modelBlacklist = modelBlacklist;
 
-    const extraSourcePaths = [`${__dirname}/../utils/**/*.js`];
     this.sourceFilesPath = Array.isArray(sourceFilesPath)
       ? extraSourcePaths.concat(sourceFilesPath) :
       extraSourcePaths.concat([sourceFilesPath]);

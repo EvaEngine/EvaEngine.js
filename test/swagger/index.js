@@ -1,10 +1,10 @@
 import test from 'ava';
 import path from 'path';
 import fs from 'fs';
+import Sequelize from 'sequelize';
 import { ExSwagger } from '../../src/swagger';
 import * as exceptions from '../../src/exceptions';
 import Entities from './../../src/entities';
-import Sequelize from 'sequelize';
 
 test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
@@ -50,6 +50,7 @@ test('Generate json file', async(t) => {
   const compileDistPath = `${__dirname}/_example/exports`;
   const exSwagger = new ExSwagger({
     compileDistPath,
+    extraSourcePaths: [`${__dirname}/../../../lib/utils/**/*.js`],
     models: new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize()),
     swaggerDocsTemplate: { definitions: {}, paths: {} },
     sourceRootPath: `${__dirname}/_example`
