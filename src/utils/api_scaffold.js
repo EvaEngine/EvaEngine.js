@@ -66,7 +66,7 @@ export class OrderScaffold {
     const queryArray = queryString.split(',');
     const orders = this.getAvailableOrders();
     const orderArray = [];
-    queryArray.forEach(query => {
+    queryArray.forEach((query) => {
       if (Object.keys(orders).includes(query) === true) {
         orderArray.push(orders[query]);
       }

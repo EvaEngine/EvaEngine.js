@@ -118,7 +118,7 @@ export const tracerToZipkins = (tracer) => {
 
 function TraceMiddleware(ns, config, logger, client) {
   const enabled = config.get('trace.enable');
-  return (name) => (req, res, next) => {
+  return name => (req, res, next) => {
     const spanId = randomString();
     const traceId = req.get('X-B3-TraceId') || spanId;
     const parentId = req.get('X-B3-SpanId') || '';

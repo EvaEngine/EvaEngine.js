@@ -18,7 +18,7 @@ const convertCase = (oldObject, converterFunction) => {
     newObject = oldObject.map(element => convertCase(element, converterFunction));
   } else {
     newObject = {};
-    Object.keys(oldObject).forEach(oldKey => {
+    Object.keys(oldObject).forEach((oldKey) => {
       const newKey = converterFunction(oldKey);
       newObject[newKey] = convertCase(oldObject[oldKey], converterFunction);
     });

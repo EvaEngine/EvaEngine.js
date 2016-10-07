@@ -444,7 +444,7 @@ export default class EvaEngine {
   }
 
   static getVersion() {
-    return require(`${__dirname}/../package.json`).version; //eslint-disable-line global-require
+    return require(`${__dirname}/../package.json`).version; //eslint-disable-line
   }
 
   async runCLI(inputCommandName) {
@@ -488,7 +488,7 @@ export default class EvaEngine {
       //Let job crash if any exception happen
       await command.run();
       this.logger.info('Round %d | Cron job %s finished', i, commandName);
-      i++;
+      i += 1;
     }, schedule); //第二个参数为True表示支持秒
     this.logger.info('Cron job %s registered by [ %s ]', commandString, sequence);
   }

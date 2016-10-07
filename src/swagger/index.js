@@ -8,8 +8,6 @@ import yaml from 'js-yaml';
 import Entitles from '../entities';
 import { RuntimeException, StandardException } from '../exceptions';
 
-require('acorn-es7-plugin')(acorn);
-
 Promise.promisifyAll(fs);
 
 export const TYPE_PATH = 'path';
@@ -99,7 +97,7 @@ export class ExSwagger {
       });
     }
     //Annotations MUST start with double stars
-    return comments.filter((v) => v.type === 'Block' && v.value.startsWith('*\n'));
+    return comments.filter(v => v.type === 'Block' && v.value.startsWith('*\n'));
   }
 
   static annotationsToFragments(annotations) {
@@ -118,7 +116,7 @@ export class ExSwagger {
         continue;
       }
       let fragment = [];
-      fragment = jsDocs.filter(tag => {
+      fragment = jsDocs.filter((tag) => {
         if (
           tag.title
           && (tag.title === 'swagger' || tag.title === 'throws')
@@ -209,7 +207,7 @@ export class ExSwagger {
       return exceptions;
     }
     for (const file of files) {
-      const exceptionsInFile = require(file); //eslint-disable-line global-require
+      const exceptionsInFile = require(file); //eslint-disable-line
       Object.keys(exceptionsInFile).forEach((exceptionName) => {
         const exceptionClass = exceptionsInFile[exceptionName];
         const exception = new exceptionClass(exceptionName); //eslint-disable-line new-cap

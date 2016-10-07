@@ -4,7 +4,7 @@ import Config from './config';
 import Logger from './logger';
 import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions';
 
-export const deepClone = (obj) =>
+export const deepClone = obj =>
   JSON.parse(JSON.stringify(obj));
 
 const TOO_LONG_BODY = '____TLDR____';

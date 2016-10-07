@@ -32,6 +32,7 @@ export default class Config {
     const pathEnv = `${configPath}/config.${env}`;
     const pathLocal = `${configPath}/config.local.${env}`;
     /*eslint-disable global-require*/
+    /*eslint-disable import/no-dynamic-require*/
     const configDefault = require(pathDefault);
     this.mergedFiles.push(pathDefault);
     const configEnv = require(pathEnv);
@@ -43,6 +44,7 @@ export default class Config {
     } catch (e) {
       configLocal = {};
     }
+    /*eslint-enable import/no-dynamic-require*/
     /*eslint-enable global-require*/
     config = merge(EngineConfig, configDefault, configEnv, configLocal);
     return key ? Config.search(key, config) : config;

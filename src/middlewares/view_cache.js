@@ -6,7 +6,7 @@ import Cache from '../services/cache';
 import wrapper from '../utils/wrapper';
 import { RuntimeException, UnsupportedOperationException } from '../exceptions';
 
-export const defaultHashStrategy = (obj) => obj;
+export const defaultHashStrategy = obj => obj;
 
 export const defaultHeadersFilter = (res) => {
   const headers = [];
