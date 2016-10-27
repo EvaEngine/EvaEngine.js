@@ -22,6 +22,8 @@ test('Make entity mapping', (t) => {
 
   t.is(MakeEntityCommand.typeMapping('text'), 'DataTypes.TEXT');
 
+  t.is(MakeEntityCommand.typeMapping('year'), 'DataTypes.INTEGER(4)');
+
   t.is(MakeEntityCommand.typeMapping('datetime'), 'DataTypes.DATE');
 
   t.is(MakeEntityCommand.typeMapping('date'), 'DataTypes.DATEONLY');

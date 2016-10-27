@@ -58,6 +58,10 @@ export default class MakeEntityCommand extends Command {
       return 'DataTypes.TEXT';
     }
 
+    if (type.startsWith('year')) {
+      return 'DataTypes.INTEGER(4)';
+    }
+
     if (type.startsWith('datetime')) {
       return 'DataTypes.DATE';
     }
