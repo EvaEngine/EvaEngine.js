@@ -44,6 +44,7 @@ let middlewareProviders = [
   MiddlewareProviders.AuthMiddlewareProvider,
   MiddlewareProviders.DebugMiddlewareProvider,
   MiddlewareProviders.ViewCacheMiddlewareProvider,
+  MiddlewareProviders.ValidatorMiddlewareProvider,
   MiddlewareProviders.TraceMiddlewareProvider
 ];
 

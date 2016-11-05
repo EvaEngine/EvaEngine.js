@@ -112,6 +112,21 @@ export class InvalidArgumentException extends LogicException {
 
 export class FormInvalidateException extends InvalidArgumentException {
   constructor(...args) {
+    let superArgs = args;
+    let joiError = {};
+    if (args.length > 0 && typeof args[0] === 'object' && args[0].isJoi === true) {
+      joiError = args.shift();
+      if (args.length === 0) {
+        superArgs = joiError.details && joiError.details.length > 0 ? [joiError.details[0].message] : ['Form validation failed'];
+      }
+    }
+    super(...superArgs);
+    this.details = joiError.details;
+  }
+}
+
+export class ModelInvalidateException extends InvalidArgumentException {
+  constructor(...args) {
     let formErrors = {};
     let superArgs = args;
     if (args.length > 0 && typeof args[0] === 'object') {

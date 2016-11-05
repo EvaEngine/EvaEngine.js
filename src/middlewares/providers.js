@@ -3,6 +3,7 @@ import AuthMiddleware from '../middlewares/auth';
 import DebugMiddleware from '../middlewares/debug';
 import TraceMiddleware from '../middlewares/trace';
 import ViewCacheMiddleware from '../middlewares/view_cache';
+import ValidatorMiddleware from '../middlewares/validator';
 import DI from '../di';
 import { ServiceProvider } from '../services/providers';
 
@@ -53,5 +54,15 @@ export class TraceMiddlewareProvider extends ServiceProvider {
 
   register() {
     DI.bindMethod(this.name, TraceMiddleware);
+  }
+}
+
+export class ValidatorMiddlewareProvider extends ServiceProvider {
+  get name() {
+    return 'validator';
+  }
+
+  register() {
+    DI.bindMethod(this.name, ValidatorMiddleware);
   }
 }
