@@ -1,6 +1,7 @@
 import constitute from 'constitute';
 import mysql from 'mysql';
 import sequelize from 'sequelize';
+import Joi from 'joi';
 import EvaEngine, * as engine from './engine';
 import * as swagger from './swagger';
 import * as exceptions from './exceptions';
@@ -36,6 +37,7 @@ const core = {
   express,
   commands,
   dependencies: {
+    Joi,
     constitute,
     sequelize,
     mysql
@@ -43,6 +45,7 @@ const core = {
   exceptions,
   middlewares,
   sequelize,
+  Joi,
   swagger,
   services,
   providers,
