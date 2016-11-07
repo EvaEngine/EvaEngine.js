@@ -4,7 +4,7 @@ import util from 'util';
 import Logger from '../services/logger';
 import Cache from '../services/cache';
 import wrapper from '../utils/wrapper';
-import { RuntimeException, UnsupportedOperationException } from '../exceptions';
+import { RuntimeException, OperationUnsupportedException } from '../exceptions';
 
 export const defaultHashStrategy = obj => obj;
 
@@ -35,7 +35,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
     throw new RuntimeException(`View cache middleware require route for ${originalUrl}`);
   }
   if (method.toLowerCase() !== 'get') {
-    throw new UnsupportedOperationException(
+    throw new RuntimeException(
       `View cache middleware only support GET method of http request for ${originalUrl}`
     );
   }
