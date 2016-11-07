@@ -126,7 +126,6 @@ export class ValidatorBaseProvider extends ServiceProvider {
   }
 
   register() {
-    console.log('rrrrrrrrrr11111111111111')
     DI.bindClass(this.name, ValidatorBase);
   }
 }
