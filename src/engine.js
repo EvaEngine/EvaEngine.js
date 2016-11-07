@@ -36,6 +36,7 @@ let serviceProvidersForWeb = [
   ServiceProviders.CacheProvider,
   ServiceProviders.HttpClientProvider,
   ServiceProviders.RestClientProvider,
+  ServiceProviders.ValidatorBaseProvider,
   ServiceProviders.JsonWebTokenProvider
 ];
 

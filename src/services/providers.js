@@ -7,6 +7,7 @@ import Logger from './logger';
 import Redis from './redis';
 import RestClient from './rest_client';
 import Namespace from './namespace';
+import ValidatorBase from './joi';
 import DI from '../di';
 
 export class ServiceProvider {
@@ -116,5 +117,16 @@ export class NamespaceProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, Namespace);
+  }
+}
+
+export class ValidatorBaseProvider extends ServiceProvider {
+  get name() {
+    return 'validator_base';
+  }
+
+  register() {
+    console.log('rrrrrrrrrr11111111111111')
+    DI.bindClass(this.name, ValidatorBase);
   }
 }

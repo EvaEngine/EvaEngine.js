@@ -7,6 +7,7 @@ import Logger from './logger';
 import Redis from './redis';
 import RestClient from './rest_client';
 import Namespace from './namespace';
+import ValidatorBase from './joi';
 
 export {
   Cache,
@@ -17,5 +18,6 @@ export {
   Logger,
   Redis,
   RestClient,
-  Namespace
+  Namespace,
+  ValidatorBase
 };

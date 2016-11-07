@@ -201,10 +201,24 @@ export class UnauthorizedException extends LogicException {
   }
 }
 
+export class OperationNotPermittedException extends LogicException {
+  constructor(...args) {
+    super(...args);
+    this.statusCode = 403;
+  }
+}
+
 export class ResourceNotFoundException extends LogicException {
   constructor(...args) {
     super(...args);
     this.statusCode = 404;
+  }
+}
+
+export class OperationUnsupportedException extends LogicException {
+  constructor(...args) {
+    super(...args);
+    this.statusCode = 405;
   }
 }
 
@@ -221,9 +235,6 @@ export class RuntimeException extends StandardException {
     super(...args);
     this.statusCode = 500;
   }
-}
-
-export class UnsupportedOperationException extends RuntimeException {
 }
 
 export class IOException extends RuntimeException {

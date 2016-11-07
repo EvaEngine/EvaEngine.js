@@ -28,17 +28,23 @@ export default class DI {
   }
 
   static bindClass(...args) {
-    bound[args[0]] = args[1];
+    if (typeof args[0] === 'string') {
+      bound[args[0]] = args[1];
+    }
     return container.bindClass(...args);
   }
 
   static bindValue(...args) {
-    bound[args[0]] = args[1];
+    if (typeof args[0] === 'string') {
+      bound[args[0]] = args[1];
+    }
     return container.bindValue(...args);
   }
 
   static bindMethod(...args) {
-    bound[args[0]] = args[1];
+    if (typeof args[0] === 'string') {
+      bound[args[0]] = args[1];
+    }
     return container.bindMethod(...args);
   }
 
