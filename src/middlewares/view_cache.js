@@ -4,7 +4,7 @@ import util from 'util';
 import Logger from '../services/logger';
 import Cache from '../services/cache';
 import wrapper from '../utils/wrapper';
-import { RuntimeException, OperationUnsupportedException } from '../exceptions';
+import { RuntimeException } from '../exceptions';
 
 export const defaultHashStrategy = obj => obj;
 
