@@ -28,7 +28,8 @@ let baseServiceProviders = [
   ServiceProviders.EnvProvider,
   ServiceProviders.ConfigProvider,
   ServiceProviders.LoggerProvider,
-  ServiceProviders.NamespaceProvider
+  ServiceProviders.NamespaceProvider,
+  ServiceProviders.EventManagerProvider
 ];
 
 let serviceProvidersForWeb = [

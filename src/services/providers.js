@@ -8,6 +8,7 @@ import Redis from './redis';
 import RestClient from './rest_client';
 import Namespace from './namespace';
 import ValidatorBase from './joi';
+import EventManager from './event_manager';
 import DI from '../di';
 
 export class ServiceProvider {
@@ -127,5 +128,15 @@ export class ValidatorBaseProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, ValidatorBase);
+  }
+}
+
+export class EventManagerProvider extends ServiceProvider {
+  get name() {
+    return 'event_manager';
+  }
+
+  register() {
+    DI.bindClass(this.name, EventManager);
   }
 }

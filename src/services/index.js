@@ -8,6 +8,7 @@ import Redis from './redis';
 import RestClient from './rest_client';
 import Namespace from './namespace';
 import ValidatorBase from './joi';
+import EventManager from './event_manager';
 
 export {
   Cache,
@@ -19,5 +20,6 @@ export {
   Redis,
   RestClient,
   Namespace,
-  ValidatorBase
+  ValidatorBase,
+  EventManager
 };

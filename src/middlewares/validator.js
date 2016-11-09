@@ -22,13 +22,16 @@ const validate = (data, schema, options) =>
 function ValidatorMiddleware(validatorBase) {
   return (getSchema, options, validator) =>
     wrapper(async(req, res, next) => { //eslint-disable-line no-unused-vars
-      const { query, body } = getSchema(validator || validatorBase.getJoi());
+      const { query, body, path } = getSchema(validator || validatorBase.getJoi());
       try {
         if (query) {
           await validate(req.query, query, options);
         }
         if (body) {
           await validate(req.body, body, options);
+        }
+        if (path) {
+          await validate(req.params, path, options);
         }
         return next();
       } catch (e) {
