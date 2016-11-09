@@ -10,19 +10,19 @@ export class Store {
   }
 
   has() {
-    return false;
+    return Promise.resolve(false);
   }
 
   get() {
-    return null;
+    return Promise.resolve(null);
   }
 
   set() {
-    return true;
+    return Promise.resolve(this);
   }
 
   flush() {
-    return true;
+    return Promise.resolve(true);
   }
 
   tags() {
@@ -31,6 +31,10 @@ export class Store {
 }
 
 export class NullStore extends Store {
+  namespace() {
+    return this;
+  }
+
   tags() {
     return this;
   }
