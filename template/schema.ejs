@@ -4,7 +4,7 @@ export default (DataTypes) => ({
       allowNull: <%=column.allowNull%>,<% if(column.primaryKey) { %>
       primaryKey: <%=column.primaryKey%>,<% } %>
       type: <%=column.type%>,<% if(column.defaultValue !== null && column.defaultValue !== '') { %>
-      defaultValue:  '<%=column.defaultValue%>',<% } %><% if(column.autoIncrement) { %>
+      defaultValue: '<%=column.defaultValue%>',<% } %><% if(column.autoIncrement) { %>
       autoIncrement: true,<% } %>
       comment: '<%=column.comment%>'
     },<% }); %>
