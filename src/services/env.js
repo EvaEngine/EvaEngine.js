@@ -12,7 +12,7 @@ export default class Env {
       return env;
     }
 
-    env = [TYPES.PRODUCTION, TYPES.TEST, TYPES.PRODUCTION].indexOf(process.env.NODE_ENV) > -1
+    env = [TYPES.PRODUCTION, TYPES.TEST, TYPES.DEVELOPMENT].indexOf(process.env.NODE_ENV) > -1
       ? process.env.NODE_ENV : TYPES.DEVELOPMENT;
     return env;
   }
