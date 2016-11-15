@@ -132,7 +132,7 @@ export class ModelInvalidateException extends InvalidArgumentException {
     if (args.length > 0 && typeof args[0] === 'object') {
       formErrors = args.shift();
       if (args.length === 0) {
-        superArgs = ['Form validation failed'];
+        superArgs = ['Model validation failed'];
       }
     }
     super(...superArgs);
@@ -295,4 +295,11 @@ export class RestServiceIOException extends HttpRequestIOException {
 }
 
 export class DatabaseIOException extends IOException {
+  constructor(...args) {
+    //Input is still an DatabaseIOException (When transaction passing over models), just throw it
+    if (args.length > 0 && args[0] instanceof DatabaseIOException) {
+      throw args[0];
+    }
+    super(...args);
+  }
 }
