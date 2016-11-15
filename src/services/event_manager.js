@@ -1,6 +1,8 @@
+import { Dependencies } from 'constitute';
 import EventEmitter from 'events';
 import camelCase from 'lodash/camelCase';
 import { RuntimeException } from '../exceptions';
+import Logger from './logger';
 
 /**
  * A strict version of EventEmitter
@@ -8,8 +10,10 @@ import { RuntimeException } from '../exceptions';
  * 2. unregistered event not allow to emit
  * 3. all events register and trigger will be recorded
  */
+@Dependencies(Logger) //eslint-disable-line new-cap
 export default class EventManager {
-  constructor() {
+  constructor(logger) {
+    this.logger = logger;
     this.emitter = new EventEmitter();
     this.events = new Set();
   }
@@ -46,7 +50,6 @@ export default class EventManager {
       events[[prefix, action, 'after'].join(':')] = camelCase(['after', action].join('_'));
     }
 
-    //TODO: 日志
     //TODO: 用Set保存注册的事件
     for (const [eventName, callback] of Object.entries(events)) {
       this.events.add(eventName);
@@ -59,6 +62,8 @@ export default class EventManager {
     if (eventsCount + Object.keys(events).length !== this.events.size) {
       throw new RuntimeException('Repeated event name has been registered, please check');
     }
+
+    this.logger.debug('Registered events', this.emitter.eventNames());
     return true;
   }
 
