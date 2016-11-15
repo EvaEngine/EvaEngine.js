@@ -2,7 +2,7 @@ import wrapper from './wrapper';
 import test from './test';
 import { pagination, paginationFilter } from './pagination';
 import crc32 from './crc32';
-import { randomString } from './random';
+import { randomNumber, randomString } from './random';
 import { toCamelCase, toSnakeCase } from './case_converter';
 import { getHostFullUrl, getHostIp, getHostPort, getClientIp } from './host';
 import {
@@ -16,6 +16,7 @@ export {
   crc32,
   test,
   wrapper,
+  randomNumber,
   randomString,
   pagination,
   paginationFilter,

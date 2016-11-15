@@ -10,8 +10,14 @@ const randomString = (len = 16) => {
   return str;
 };
 
-export default randomString;
+const randomNumber = (min, max) => {
+  if (max) {
+    return parseInt((Math.random() * ((max - min) + 1)) + min, 10);
+  }
+  return parseInt((Math.random() * min) + 1, 10);
+};
 
 export {
+  randomNumber,
   randomString
 };
