@@ -79,7 +79,7 @@ function ViewCacheMiddleware(cache, logger) {
         hashStrategy: defaultHashStrategy,
         namespace: 'view'
       }, options);
-    return wrapper(async(req, res, next) => {
+    return wrapper(async (req, res, next) => {
       const cacheKey = requestToCacheKey(req, hashStrategy);
       const {
               headers: cachedHeaders = [],

@@ -15,7 +15,7 @@ import JsonWebToken from '../services/jwt_token';
  */
 function AuthMiddleware(_config, token) {
   const config = _config.get();
-  return () => wrapper(async(req, res, next) => {
+  return () => wrapper(async (req, res, next) => {
     const jwToken = req.header('X-Token') || req.query.api_key;
     if (config.token.faker.enable === true && jwToken === config.token.faker.key) {
       req.auth = { //eslint-disable-line no-param-reassign

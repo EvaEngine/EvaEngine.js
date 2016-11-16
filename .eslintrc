@@ -15,6 +15,12 @@
     "spaced-comment": [
       0,
       "always"
+    ],
+    "no-restricted-syntax": [
+      "error",
+      "ForInStatement",
+      "LabeledStatement",
+      "WithStatement"
     ]
   }
 }

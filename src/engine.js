@@ -486,7 +486,7 @@ export default class EvaEngine {
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
     this.logger.debug('Cron job %s %s parsed as %s', sequence, commandString, schedule);
-    later.setInterval(async() => {
+    later.setInterval(async () => {
       this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
       //Let job crash if any exception happen
       await command.run();

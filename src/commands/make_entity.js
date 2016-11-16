@@ -124,7 +124,7 @@ export default class MakeEntityCommand extends Command {
 
     logger.info('Start generate DB schemas to dir %s', path);
 
-    const tableHandler = async(table) => {
+    const tableHandler = async (table) => {
       const columns = await query.describeTable(table);
 
       const rawColumns = await sequelize.query(`SHOW FULL COLUMNS FROM ${table}`, {

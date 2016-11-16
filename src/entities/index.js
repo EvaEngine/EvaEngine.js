@@ -123,6 +123,45 @@ export default class Entities {
     }, options, { bind }));
   }
 
+  uniqueInsert({ tableName, input, uniqueCondition, transaction }, options = {}) {
+    const columns = Object.keys(input);
+    const columnString = '`' + columns.join('`, `') + '`';
+    const valueString = Object.entries(input).map(([key, value]) => {
+      return `$${key} \`${key}\``;
+    }).join(' , ');
+    const uniqueString = typeof uniqueCondition === 'string' ? uniqueCondition :
+    `SELECT * FROM ${tableName} WHERE ` +
+    this.getInstance().dialect.QueryGenerator.getWhereConditions(uniqueCondition);
+
+    /*
+     Original Example:
+     entities.getInstance().query(`INSERT INTO ${tableName}
+     (userId, status)
+     (
+     SELECT *
+     FROM (SELECT $userId userId, $status status) AS tmp
+     WHERE NOT EXISTS (
+     SELECT id FROM ${auditTable} WHERE userId = $userId AND status = 'pending'
+     ) LIMIT 1
+     )`, { bind, transaction, type: entities.getSequelize().QueryTypes.INSERT });
+     */
+
+    const sql = `INSERT INTO ${tableName} 
+      (${columnString}) 
+      (
+        SELECT *
+        FROM (SELECT ${valueString}) AS tmp
+        WHERE NOT EXISTS (
+          ${uniqueString}
+        ) LIMIT 1
+      )`;
+    return this.getInstance().query(sql, Object.assign({
+      bind: input,
+      transaction,
+      type: Sequelize.QueryTypes.INSERT
+    }, options));
+  }
+
   getTransaction(options = {}) {
     return this.getInstance().transaction(Object.assign({
       autocommit: true

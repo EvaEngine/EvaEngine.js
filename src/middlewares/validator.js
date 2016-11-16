@@ -21,7 +21,7 @@ const validate = (data, schema, options) =>
  */
 function ValidatorMiddleware(validatorBase) {
   return (getSchema, options, validator) =>
-    wrapper(async(req, res, next) => { //eslint-disable-line no-unused-vars
+    wrapper(async (req, res, next) => { //eslint-disable-line no-unused-vars
       const { query, body, path } = getSchema(validator || validatorBase.getJoi());
       try {
         if (query) {

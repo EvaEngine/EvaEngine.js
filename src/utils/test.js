@@ -2,7 +2,7 @@ import httpMocker from 'node-mocks-http';
 import EventEmitter from 'events';
 import DI from '../di';
 
-module.exports.truncateAll = async(entities) => {
+module.exports.truncateAll = async (entities) => {
   const names = [];
   const allEntities = entities.getAll();
   Object.values(allEntities).forEach((entity) => {
