@@ -21,6 +21,14 @@
       "ForInStatement",
       "LabeledStatement",
       "WithStatement"
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "ignore",
+        "asyncArrow": "ignore"
+      }
     ]
   }
 }

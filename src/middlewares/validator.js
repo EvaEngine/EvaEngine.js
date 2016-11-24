@@ -6,7 +6,9 @@ import ValidatorBase from '../services/joi';
 
 const validate = (data, schema, options) =>
   new Promise((resolve, reject) => {
-    Joi.validate(data, schema, Object.assign({ abortEarly: false }, options), (err, value) => {
+    Joi.validate(data, schema, Object.assign(
+      { abortEarly: false, allowUnknown: true }, options
+    ), (err, value) => {
       if (err) {
         reject(err);
       } else {
@@ -21,7 +23,7 @@ const validate = (data, schema, options) =>
  */
 function ValidatorMiddleware(validatorBase) {
   return (getSchema, options, validator) =>
-    wrapper(async (req, res, next) => { //eslint-disable-line no-unused-vars
+    wrapper(async(req, res, next) => { //eslint-disable-line no-unused-vars
       const { query, body, path } = getSchema(validator || validatorBase.getJoi());
       try {
         if (query) {
