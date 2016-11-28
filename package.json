@@ -105,7 +105,7 @@
     "babel-preset-es2015-node4": "^2.1.0",
     "babel-preset-stage-3": "^6.17.0",
     "cross-env": "^3.1.1",
-    "eslint": "^3.10.2",
+    "eslint": "^3.11.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.2",
@@ -117,6 +117,6 @@
     "harmony-reflect": "^1.5.0",
     "is-type-of": "^1.0.0",
     "nock": "^9.0.0",
-    "nyc": "^10.0.0"
+    "nyc": "^9.0.1"
   }
 }
