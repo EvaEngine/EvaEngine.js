@@ -121,4 +121,32 @@ export default class HttpClient {
       throw new HttpRequestIOException(e);
     }
   }
+
+  dumpRequest(req, asString = false) {
+    const getBody = (r) => {
+      if (r._json) { //eslint-disable-line no-underscore-dangle
+        return r.body;
+      }
+      return r.form(r.formData).body;
+    };
+    const dump = {
+      method: req.method,
+      protocol: req.uri.protocol === 'https:' ? 'https' : 'http',
+      url: req.uri.href,
+      headers: req.headers,
+      body: req.req && (req._json || req.formData) //eslint-disable-line no-underscore-dangle
+        ? getBody(req) : null
+    };
+    return asString === true ? JSON.stringify(dump) : dump;
+  }
+
+  dumpResponse(res, asString = false) {
+    const dump = {
+      statusCode: res.statusCode,
+      statusMessage: res.statusMessage,
+      headers: res.headers,
+      body: res.body
+    };
+    return asString === true ? JSON.stringify(dump) : dump;
+  }
 }

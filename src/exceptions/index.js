@@ -1,5 +1,6 @@
 import appRoot from 'app-root-path';
 import path from 'path';
+import { IncomingMessage } from 'http';
 import crc32 from '../utils/crc32';
 
 
@@ -142,20 +143,30 @@ export class ModelInvalidateException extends InvalidArgumentException {
 
 export class HttpRequestLogicException extends InvalidArgumentException {
   constructor(...args) {
-    let remoteErrors = {};
+    let errorOrResponse = {};
     let superArgs = args;
     if (args.length > 0 && typeof args[0] === 'object') {
-      remoteErrors = args.shift();
+      errorOrResponse = args.shift();
       if (args.length === 0) {
         superArgs = ['Remote Logic errors'];
       }
     }
     super(...superArgs);
-    this.details = remoteErrors;
-    const { response } = remoteErrors;
-    this.response = response || null;
-    this.request = response ? response.request : null;
-    this.prevError = remoteErrors;
+
+    if (errorOrResponse instanceof HttpRequestLogicException) {
+      throw errorOrResponse;
+    }
+    if (errorOrResponse instanceof Error && errorOrResponse.name === 'StatusCodeError') {
+      this.details = errorOrResponse;
+      const { response } = errorOrResponse;
+      this.response = response || null;
+      this.request = response ? response.request : null;
+      this.prevError = errorOrResponse;
+    }
+    if (errorOrResponse instanceof IncomingMessage) {
+      this.response = errorOrResponse || null;
+      this.request = errorOrResponse ? errorOrResponse.request : null;
+    }
   }
 
   getRequest() {
