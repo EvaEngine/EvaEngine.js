@@ -167,6 +167,16 @@ export class HttpRequestLogicException extends InvalidArgumentException {
       this.response = errorOrResponse || null;
       this.request = errorOrResponse ? errorOrResponse.request : null;
     }
+
+    this.requestParams = null;
+    this.responseParams = null;
+    this.businessCode = null;
+  }
+
+  setResponse(response) {
+    this.response = response || null;
+    this.request = response ? response.request : null;
+    return this;
   }
 
   getRequest() {
@@ -175,6 +185,33 @@ export class HttpRequestLogicException extends InvalidArgumentException {
 
   getResponse() {
     return this.response;
+  }
+
+  setRequestParams(params) {
+    this.requestParams = params;
+    return this;
+  }
+
+  getRequestParams() {
+    return this.requestParams;
+  }
+
+  setResponseParams(params) {
+    this.responseParams = params;
+    return this;
+  }
+
+  getResponseParams() {
+    return this.responseParams;
+  }
+
+  setBusinessCode(code) {
+    this.businessCode = code;
+    return this;
+  }
+
+  getBusinessCode() {
+    return this.businessCode;
   }
 }
 
