@@ -6,6 +6,6 @@ node_js:
    - "7.1.0"
 script:
     - "npm run lint"
-    - "npm test"
+    - "npm run ava"
 after_success:
   - bash <(curl -s https://codecov.io/bash)

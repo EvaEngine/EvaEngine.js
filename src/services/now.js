@@ -1,6 +1,5 @@
 import { Dependencies } from 'constitute';
 import moment from 'moment';
-import assert from 'assert';
 import { getTimestamp, getDatabaseDatetime } from '../utils/datetime';
 import Logger from './logger';
 
@@ -22,7 +21,7 @@ export default class Now {
     } else {
       this.now = moment(now).unix();
     }
-    this.logger.warn('Now has been force changed to %s', moment(this.now));
+    this.logger.warn('Now has been force changed to %s', moment.unix(this.now));
     return this;
   }
 
