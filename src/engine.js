@@ -29,6 +29,7 @@ let baseServiceProviders = [
   ServiceProviders.ConfigProvider,
   ServiceProviders.LoggerProvider,
   ServiceProviders.NamespaceProvider,
+  ServiceProviders.NowProvider,
   ServiceProviders.EventManagerProvider
 ];
 
