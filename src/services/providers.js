@@ -7,6 +7,7 @@ import Logger from './logger';
 import Redis from './redis';
 import RestClient from './rest_client';
 import Namespace from './namespace';
+import Now from './now';
 import ValidatorBase from './joi';
 import EventManager from './event_manager';
 import DI from '../di';
@@ -138,5 +139,15 @@ export class EventManagerProvider extends ServiceProvider {
 
   register() {
     DI.bindClass(this.name, EventManager);
+  }
+}
+
+export class NowProvider extends ServiceProvider {
+  get name() {
+    return 'now';
+  }
+
+  register() {
+    DI.bindClass(this.name, Now);
   }
 }

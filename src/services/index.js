@@ -7,6 +7,7 @@ import Logger from './logger';
 import Redis from './redis';
 import RestClient from './rest_client';
 import Namespace from './namespace';
+import Now from './now';
 import ValidatorBase from './joi';
 import EventManager from './event_manager';
 
@@ -20,6 +21,7 @@ export {
   Redis,
   RestClient,
   Namespace,
+  Now,
   ValidatorBase,
   EventManager
 };
