@@ -35,7 +35,7 @@ export default class Now {
   }
 
   getMoment() {
-    return moment.unix(this.now) || moment();
+    return this.now ? moment.unix(this.now) : moment();
   }
 
   getDatabaseDatetime() {
