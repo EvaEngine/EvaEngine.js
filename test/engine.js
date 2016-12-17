@@ -29,7 +29,7 @@ test('bootstrap', (t) => {
     projectRoot,
     port: 3000
   });
-  t.is(Object.keys(DI.getBound()).length, 5);
+  t.is(Object.keys(DI.getBound()).length, 6);
   engine.bootstrap();
   t.true(Object.keys(DI.getBound()).length > 10);
 });

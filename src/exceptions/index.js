@@ -1,5 +1,6 @@
 import appRoot from 'app-root-path';
 import path from 'path';
+import { format } from 'util';
 import { IncomingMessage } from 'http';
 import crc32 from '../utils/crc32';
 
@@ -18,6 +19,17 @@ if (!('toJSON' in Error.prototype)) {
   });
 }
 
+let i18nHandler = format;
+
+/**
+ * Exception interface
+ * Support usages:
+ * throw new Exception();
+ * throw new Exception('Something');
+ * throw new Exception(new Error());
+ * throw new Exception(new Exception());
+ * throw (new Exception()).i18n('some %d', 123)
+ */
 export class StandardException extends Error {
 
   static hash(str, padstr = '0000000000') {
@@ -42,51 +54,107 @@ export class StandardException extends Error {
     return stackOut;
   }
 
-  constructor(...args) {
-    //unique args
-    const params = Array.from(new Set(args));
-    const [msg, statusCode] = params;
-    if (typeof msg === 'number' || (params.length === 1 && msg.startsWith(path.sep) === true)) {
-      throw new TypeError('Exception message not allow pure number or a file path');
+  static setI18nHandler(handler) {
+    i18nHandler = handler;
+  }
+
+  get statusCode() {
+    return 500;
+  }
+
+  /**
+   * @param {Error|String} exceptionOrMsg
+   */
+  constructor(exceptionOrMsg) {
+    const throwingNothing = !exceptionOrMsg;
+    const throwingString = typeof exceptionOrMsg === 'string';
+    const throwingSelf = exceptionOrMsg instanceof StandardException;
+    const throwingError = exceptionOrMsg instanceof Error;
+    const throwingUnknown = throwingNothing + throwingString + throwingSelf + throwingError === 0;
+
+    if (throwingUnknown === true) {
+      throw new TypeError('Unexpected params for exception');
     }
-    super(msg);
+
+    if (throwingSelf === true) {
+      throw exceptionOrMsg;
+    }
+
+    let message = 'Something wrong';
+    if (throwingString === true) {
+      message = exceptionOrMsg;
+    }
+    if (throwingError === true) {
+      message = exceptionOrMsg.message;
+    }
+    super(message);
+    if (throwingNothing === true) {
+      message = this.constructor.name;
+    }
+    this.message = message;
+
     Error.captureStackTrace(this, this.constructor);
-    let fileName = __filename;
-    if (['StandardException', 'Error'].includes(this.constructor.name) === false) {
-      const lastArg = args.pop();
-      if (!lastArg || lastArg.includes(path.sep) === false) {
-        throw new TypeError(`Exception ${this.constructor.name} require __filename input`);
-      }
-      fileName = lastArg;
-    }
-    this.message = msg;
-    this.code = StandardException.generateCode(this.constructor.name, fileName) || -1;
-    this.statusCode = statusCode || 500;
     this.details = [];
     this.prevError = {};
+    this.code = null;
+    this.filename = __filename;
+  }
+
+  i18n(...args) {
+    this.message = i18nHandler(...args);
+    return this;
+  }
+
+  setMessage(message) {
+    this.message = message;
+    return this;
+  }
+
+  setCode(code) {
+    this.code = parseInt(code, 10);
+    return this;
   }
 
   getCode() {
+    if (this.code) {
+      return this.code;
+    }
+    this.code = StandardException.generateCode(this.constructor.name, this.filename) || -1;
     return this.code;
-  }
-
-  setStatusCode(statusCode) {
-    this.statusCode = statusCode;
   }
 
   getStatusCode() {
     return this.statusCode;
   }
 
+  setFileName(filename) {
+    this.filename = filename;
+    return this;
+  }
+
+  getFileName() {
+    return this.filename;
+  }
+
+  setDetails(details) {
+    this.details = details;
+    return this;
+  }
+
   getDetails() {
     return this.details;
+  }
+
+  setPrevError(prevError) {
+    this.prevError = prevError;
+    return this;
   }
 
   getPrevError() {
     return this.prevError;
   }
 
-  toJSON(env) {
+  toJSON() {
     return {
       code: this.getCode(),
       name: this.constructor.name,
@@ -94,17 +162,15 @@ export class StandardException extends Error {
       prevError: this.getPrevError(),
       errors: Array.isArray(this.getDetails()) ?
         this.getDetails() : [this.getDetails()],
-      stack: env.isDevelopment() ? StandardException.stackBeautifier(this.stack) : [],
-      fullStack: env.isDevelopment() ? this.stack.split('\n') : []
+      stack: StandardException.stackBeautifier(this.stack),
+      fullStack: this.stack.split('\n')
     };
   }
 }
 
 export class LogicException extends StandardException {
-  constructor(...args) {
-    args.push(__filename);
-    super(...args);
-    this.statusCode = 400;
+  get statusCode() {
+    return 400;
   }
 }
 
@@ -142,20 +208,8 @@ export class ModelInvalidateException extends InvalidArgumentException {
 }
 
 export class HttpRequestLogicException extends InvalidArgumentException {
-  constructor(...args) {
-    let errorOrResponse = {};
-    let superArgs = args;
-    if (args.length > 0 && typeof args[0] === 'object') {
-      errorOrResponse = args.shift();
-      if (args.length === 0) {
-        superArgs = ['Remote Logic errors'];
-      }
-    }
-    super(...superArgs);
-
-    if (errorOrResponse instanceof HttpRequestLogicException) {
-      throw errorOrResponse;
-    }
+  constructor(errorOrResponse) {
+    super();
     if (errorOrResponse instanceof Error && errorOrResponse.name === 'StatusCodeError') {
       this.details = errorOrResponse;
       const { response } = errorOrResponse;
@@ -167,7 +221,6 @@ export class HttpRequestLogicException extends InvalidArgumentException {
       this.response = errorOrResponse || null;
       this.request = errorOrResponse ? errorOrResponse.request : null;
     }
-
     this.requestParams = null;
     this.responseParams = null;
     this.businessCode = null;
@@ -215,95 +268,62 @@ export class HttpRequestLogicException extends InvalidArgumentException {
   }
 }
 
-export class RestServiceLogicException extends InvalidArgumentException {
-  constructor(...args) {
-    let remoteErrors = {};
-    let superArgs = args;
-    if (args.length > 0 && typeof args[0] === 'object') {
-      remoteErrors = args.shift();
-      if (args.length === 0) {
-        superArgs = ['Remote Logic errors'];
-      }
-    }
-    super(...superArgs);
-    const { error, response } = remoteErrors;
-    this.details = typeof error === 'object' ? error : remoteErrors;
-    this.response = response || null;
-    this.request = response ? response.request : null;
-    this.prevError = typeof error === 'object' ? error : remoteErrors;
-  }
-
-  getRequest() {
-    return this.request;
-  }
-
-  getResponse() {
-    return this.response;
-  }
+export class RestServiceLogicException extends HttpRequestLogicException {
 }
 
 export class UnauthorizedException extends LogicException {
-  constructor(...args) {
-    super(...args);
-    this.statusCode = 401;
+  get statusCode() {
+    return 401;
   }
 }
 
 export class OperationNotPermittedException extends LogicException {
-  constructor(...args) {
-    super(...args);
-    this.statusCode = 403;
+  get statusCode() {
+    return 403;
   }
 }
 
 export class ResourceNotFoundException extends LogicException {
-  constructor(...args) {
-    super(...args);
-    this.statusCode = 404;
+  get statusCode() {
+    return 404;
   }
 }
 
 export class OperationUnsupportedException extends LogicException {
-  constructor(...args) {
-    super(...args);
-    this.statusCode = 405;
+  get statusCode() {
+    return 405;
   }
 }
 
 export class ResourceConflictedException extends LogicException {
-  constructor(...args) {
-    super(...args);
-    this.statusCode = 409;
+  get statusCode() {
+    return 409;
   }
 }
 
 export class RuntimeException extends StandardException {
-  constructor(...args) {
-    args.push(__filename);
-    super(...args);
-    this.statusCode = 500;
-  }
 }
 
 export class IOException extends RuntimeException {
 }
 
 export class HttpRequestIOException extends IOException {
-  constructor(...args) {
-    let remoteErrors = {};
-    let superArgs = args;
-    if (args.length > 0 && typeof args[0] === 'object') {
-      remoteErrors = args.shift();
-      if (args.length === 0) {
-        superArgs = ['Remote IO errors'];
-      }
+  constructor(errorOrResponse) {
+    super();
+    if (errorOrResponse instanceof Error && errorOrResponse.name === 'StatusCodeError') {
+      this.details = errorOrResponse;
+      const { response } = errorOrResponse;
+      this.response = response || null;
+      this.request = response ? response.request : null;
+      this.prevError = errorOrResponse;
     }
-    super(...superArgs);
-    this.details = remoteErrors;
-    const { response } = remoteErrors;
-    this.response = response || null;
-    this.request = response ? response.request : null;
-    this.prevError = remoteErrors;
+    if (errorOrResponse instanceof IncomingMessage) {
+      this.response = errorOrResponse || null;
+      this.request = errorOrResponse ? errorOrResponse.request : null;
+    }
+    this.requestParams = null;
+    this.responseParams = null;
+    this.businessCode = null;
   }
 
   getRequest() {
@@ -316,38 +336,7 @@ export class HttpRequestIOException extends IOException {
 }
 
 export class RestServiceIOException extends HttpRequestIOException {
-  constructor(...args) {
-    let remoteErrors = {};
-    let superArgs = args;
-    if (args.length > 0 && typeof args[0] === 'object') {
-      remoteErrors = args.shift();
-      if (args.length === 0) {
-        superArgs = ['Remote IO errors'];
-      }
-    }
-    super(...superArgs);
-    const { error, response } = remoteErrors;
-    this.details = typeof error === 'string' ? remoteErrors : error || remoteErrors;
-    this.response = response || null;
-    this.request = response ? response.request : null;
-    this.prevError = typeof error === 'string' ? remoteErrors : error || remoteErrors;
-  }
-
-  getRequest() {
-    return this.request;
-  }
-
-  getResponse() {
-    return this.response;
-  }
 }
 
 export class DatabaseIOException extends IOException {
-  constructor(...args) {
-    //Input is still an DatabaseIOException (When transaction passing over models), just throw it
-    if (args.length > 0 && args[0] instanceof DatabaseIOException) {
-      throw args[0];
-    }
-    super(...args);
-  }
 }

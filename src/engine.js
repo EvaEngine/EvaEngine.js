@@ -68,6 +68,7 @@ export default class EvaEngine {
    * @param {string} sourceRoot
    * @param {Config} config
    * @param {Logger} logger
+   * @param {string} namespace
    * @param {number} port
    * @param {string} mode
    */
@@ -320,7 +321,7 @@ export default class EvaEngine {
         let exception = err;
         if (exception.message === 'invalid json') {
           //Special handle for Body parser
-          exception = new InvalidArgumentException('Invalid JSON');
+          exception = new InvalidArgumentException('Invalid JSON in req body');
         }
         if (!(exception instanceof StandardException)) {
           this.logger.error(exception);
@@ -328,6 +329,8 @@ export default class EvaEngine {
             code: -1,
             name: 'BuiltinError',
             message: err.message,
+            spanId: req.header('X-B3-SpanId'),
+            traceId: req.header('X-B3-TraceId'),
             prevError: {},
             errors: [],
             stack: env.isDevelopment() ?
@@ -340,7 +343,15 @@ export default class EvaEngine {
         } else {
           this.logger.warn(exception.message);
         }
-        return res.status(exception.getStatusCode()).json(exception.toJSON(env));
+        return res
+          .status(exception.getStatusCode())
+          .json(Object.assign(
+            exception.toJSON(),
+            env.isDevelopment() ? {} : {
+              stack: [],
+              fullStack: []
+            }
+          ));
       });
   }
 
@@ -487,7 +498,7 @@ export default class EvaEngine {
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
     this.logger.debug('Cron job %s %s parsed as %s', sequence, commandString, schedule);
-    later.setInterval(async () => {
+    later.setInterval(async() => {
       this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
       //Let job crash if any exception happen
       await command.run();
