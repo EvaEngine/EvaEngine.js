@@ -26,7 +26,16 @@ test('Throw input', (t) => {
   t.throws(() => {
     new RuntimeException(new LogicException());
   }, LogicException);
+});
 
+test('Factory', (t) => {
+  const e = StandardException.factory({
+    code: 123,
+    statusCode: 409,
+    name: 'ResourceConflictedException',
+    message: 'foo'
+  });
+  t.true(e instanceof ResourceConflictedException);
 });
 
 test('Throw i18n', (t) => {

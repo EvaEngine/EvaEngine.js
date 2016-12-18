@@ -24,6 +24,9 @@ if (!('toJSON' in Error.prototype)) {
 
 let i18nHandler = format;
 
+let factory = () => {
+};
+
 /**
  * Exception interface
  * Support usages:
@@ -82,7 +85,8 @@ export class StandardException extends Error {
    * Deserialize an exception from a JSON object
    * @param {object} json
    */
-  static factory() {
+  static factory(json = {}) {
+    return factory(json);
   }
 
   /**
@@ -201,6 +205,7 @@ export class StandardException extends Error {
 
   toJSON() {
     return {
+      statusCode: this.statusCode,
       code: this.getCode(),
       name: this.constructor.name,
       message: this.message,
@@ -313,14 +318,9 @@ export class HttpRequestLogicException extends InvalidArgumentException {
 export class RestServiceLogicException extends HttpRequestLogicException {
   constructor(exceptionOrMsg) {
     super(exceptionOrMsg);
-    if (this.throwingError && this.response) {
-      this.parsingRestServiceException(this.response);
+    if (this.throwingError && this.response && this.response.body) {
+      this.prevError = factory(this.response.body);
     }
-  }
-
-  parsingRestServiceException(response) {
-    this.prevError = StandardException.factory(response.body);
-    return this;
   }
 }
 
@@ -386,11 +386,53 @@ export class HttpRequestIOException extends IOException {
 export class RestServiceIOException extends HttpRequestIOException {
   constructor(exceptionOrMsg) {
     super(exceptionOrMsg);
-    if (this.throwingError) {
-      this.details = exceptionOrMsg.errors;
+    if (this.throwingError && this.response && this.response.body) {
+      this.prevError = factory(this.response.body);
     }
   }
 }
 
 export class DatabaseIOException extends IOException {
 }
+
+const exceptions = {
+  StandardException,
+  LogicException,
+  InvalidArgumentException,
+  FormInvalidateException,
+  ModelInvalidateException,
+  HttpRequestLogicException,
+  RestServiceLogicException,
+  UnauthorizedException,
+  OperationUnsupportedException,
+  OperationNotPermittedException,
+  ResourceNotFoundException,
+  ResourceConflictedException,
+  RuntimeException,
+  IOException,
+  HttpRequestIOException,
+  RestServiceIOException,
+  DatabaseIOException
+};
+
+factory = (json) => {
+  const { code, name, statusCode, message, prevError, errors, fullStack = [] } = json;
+  if (!code || !name || !statusCode || !message) {
+    return {};
+  }
+
+  let e = null;
+  if (Object.keys(exceptions).includes(name)) {
+    e = new exceptions[name]; //eslint-disable-line
+  } else if (statusCode < 500) {
+    e = new LogicException(message);
+  } else {
+    e = new RuntimeException(message);
+  }
+
+  e.setCode(code)
+    .setDetails(errors)
+    .setPrevError(prevError);
+  e.stack = fullStack.join('\n');
+  return e;
+};

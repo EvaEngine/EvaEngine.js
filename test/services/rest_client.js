@@ -18,15 +18,21 @@ test('Rest client request success', async(t) => {
 });
 
 test('Http client failed by 4XX', async(t) => {
-  t.plan(1);
+  t.plan(2);
   nock('http://example.com')
     .get('/foo')
-    .reply(400, 'bar');
+    .reply(400, {
+      name: 'InvalidArgumentException',
+      code: 123,
+      statusCode: 400,
+      message: 'InvalidArgumentException'
+    });
 
   try {
     await client.request({ url: 'http://example.com/foo' });
   } catch (e) {
     t.true(e instanceof exceptions.RestServiceLogicException);
+    t.true(e.getPrevError() instanceof exceptions.InvalidArgumentException);
   }
 });
 
