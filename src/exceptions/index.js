@@ -142,16 +142,35 @@ export class StandardException extends Error {
     this.prevError = {};
     this.code = null;
     this.filename = __filename;
+    this.translated = false;
   }
 
   i18n(...args) {
     this.message = format(...args);
     this.humanMessage = i18nHandler(...args);
+    if (this.message !== this.humanMessage) {
+      this.translated = true;
+    }
     return this;
   }
 
   getHumanMessage() {
-    return this.humanMessage;
+    if (this.translated) {
+      return this.humanMessage;
+    }
+    let message = i18nHandler(this.message);
+    if (message !== this.message) {
+      this.humanMessage = message;
+      this.translated = true;
+      return this.humanMessage;
+    }
+    message = i18nHandler(this.constructor.name);
+    if (message !== this.constructor.name) {
+      this.humanMessage = message;
+      this.translated = true;
+      return this.humanMessage;
+    }
+    return this.message;
   }
 
   setMessage(message) {
@@ -209,7 +228,7 @@ export class StandardException extends Error {
       code: this.getCode(),
       name: this.constructor.name,
       message: this.message,
-      humanMessage: this.humanMessage,
+      humanMessage: this.getHumanMessage(),
       filename: this.getFileName(),
       prevError: this.getPrevError(),
       errors: Array.isArray(this.getDetails()) ?

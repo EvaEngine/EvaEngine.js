@@ -325,9 +325,9 @@ export default class EvaEngine {
         if (exception instanceof RuntimeException) {
           //TODO: report to sentry
           //TODO: with req & res
-          this.logger.error(req, res, exception);
+          this.logger.error(exception);
         } else {
-          this.logger.warn(req, res, exception);
+          this.logger.warn(exception);
         }
         return res
           .status(exception.getStatusCode())
