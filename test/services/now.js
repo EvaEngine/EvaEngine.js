@@ -31,8 +31,8 @@ test('Change now by string', (t) => {
 
 
 test('Change now by other', (t) => {
-  now.setNow(new Date(2016, 11, 9));
-  t.is(now.getDatabaseDatetime(), '2016-12-09 00:00:00');
-  t.is(now.getTimestamp(), 1481212800);
-  t.is(now.getMoment().unix(), 1481212800);
+  now.setNow(new Date(Date.UTC(2016, 11, 9)));
+  t.is(now.getDatabaseDatetime(), '2016-12-09 08:00:00');
+  t.is(now.getTimestamp(), 1481241600);
+  t.is(now.getMoment().unix(), 1481241600);
 });
