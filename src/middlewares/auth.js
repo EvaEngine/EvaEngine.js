@@ -1,10 +1,10 @@
-import moment from 'moment';
 import { Dependencies } from 'constitute';
 import wrapper from '../utils/wrapper';
 import {
   UnauthorizedException
 } from '../exceptions';
 import Config from '../services/config';
+import Now from '../services/now';
 import JsonWebToken from '../services/jwt_token';
 
 /**
@@ -13,7 +13,7 @@ import JsonWebToken from '../services/jwt_token';
  * @returns {function()}
  * @constructor
  */
-function AuthMiddleware(_config, token) {
+function AuthMiddleware(_config, token, now) {
   const config = _config.get();
   return () => wrapper(async (req, res, next) => {
     const jwToken = req.header('X-Token') || req.query.api_key;
@@ -41,7 +41,7 @@ function AuthMiddleware(_config, token) {
       if (!uid) {
         throw new UnauthorizedException('User info not found in token');
       }
-      if (expiredAt < moment().unix()) {
+      if (expiredAt < now.getTimestamp()) {
         throw new UnauthorizedException('Token expired');
       }
       req.auth = { //eslint-disable-line no-param-reassign
@@ -65,5 +65,5 @@ function AuthMiddleware(_config, token) {
     throw new UnauthorizedException('No authority token found');
   });
 }
-Dependencies(Config, JsonWebToken)(AuthMiddleware); //eslint-disable-line new-cap
+Dependencies(Config, JsonWebToken, Now)(AuthMiddleware); //eslint-disable-line new-cap
 export default AuthMiddleware;

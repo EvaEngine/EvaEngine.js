@@ -1,5 +1,5 @@
 import { Dependencies } from 'constitute';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { getTimestamp, getDatabaseDatetime } from '../utils/datetime';
 import Logger from './logger';
 

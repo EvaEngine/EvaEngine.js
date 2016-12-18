@@ -1,15 +1,14 @@
 import test from 'ava';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import DI from '../../src/di';
 import * as providers from '../../src/services/providers';
 
 DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
 const now = DI.get('now');
 
-const tz = moment().utcOffset();
 test.before(() => {
-  process.env.TZ = 'Asia/Shanghai';
-  moment().utcOffset('+08:00');
+  moment.tz.setDefault('Asia/Shanghai');
+  // moment.tz.setDefault('America/Los_Angeles');
 });
 
 test.afterEach(() => {
@@ -36,8 +35,4 @@ test('Change now by other', (t) => {
   t.is(now.getDatabaseDatetime(), '2016-12-09 00:00:00');
   t.is(now.getTimestamp(), 1481212800);
   t.is(now.getMoment().unix(), 1481212800);
-});
-
-test.after(() => {
-  moment().utcOffset(tz);
 });

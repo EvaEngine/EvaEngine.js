@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export const getTimestamp = () =>
   Math.floor(Date.now() / 1000);
