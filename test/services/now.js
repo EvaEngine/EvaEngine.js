@@ -8,6 +8,7 @@ const now = DI.get('now');
 
 const tz = moment().utcOffset();
 test.before(() => {
+  process.env.TZ = 'Asia/Shanghai';
   moment().utcOffset('+08:00');
 });
 

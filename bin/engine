@@ -10,10 +10,6 @@ engine.registerCommands([
 ]);
 
 const logger = DI.get('logger');
-global.p = (...args) => {
-  logger.debug(...args);
-};
-
 co(function* () {
   try {
     yield engine.runCLI();
