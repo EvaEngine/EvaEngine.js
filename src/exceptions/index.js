@@ -1,10 +1,12 @@
 import appRoot from 'app-root-path';
 import path from 'path';
 import { format } from 'util';
-import { IncomingMessage } from 'http';
 import crc32 from '../utils/crc32';
 
 
+/**
+ * Make Error be able to work with JSON.stringify()
+ */
 if (!('toJSON' in Error.prototype)) {
   Object.defineProperty(Error.prototype, 'toJSON', { //eslint-disable-line
     value: function () { //eslint-disable-line
@@ -19,6 +21,7 @@ if (!('toJSON' in Error.prototype)) {
   });
 }
 
+
 let i18nHandler = format;
 
 /**
@@ -32,17 +35,34 @@ let i18nHandler = format;
  */
 export class StandardException extends Error {
 
+  /**
+   * Generate string hash by crc32
+   * @param {string} str
+   * @param {string} padstr
+   * @returns {string}
+   */
   static hash(str, padstr = '0000000000') {
     const crcstr = crc32(str).toString();
     return padstr.substring(0, padstr.length - crcstr.length) + crcstr;
   }
 
-  static generateCode(className, fileName = __dirname) {
+  /**
+   * Hash an exception into an 18 bits code
+   * @param {string} className
+   * @param {string} fileName
+   * @returns {Number}
+   */
+  static generateCode(className, fileName = __filename) {
     const namespace = fileName.replace(appRoot.path, '').split(path.sep).join('/');
-    const group = crc32(namespace).toString().substring(0, 5);
+    const group = fileName === __filename ? '11111' : crc32(namespace).toString().substring(0, 5);
     return parseInt(`${group}000${StandardException.hash(className)}`, 10);
   }
 
+  /**
+   * Remove useless info from error stack
+   * @param {string} stack
+   * @returns {Array}
+   */
   static stackBeautifier(stack) {
     const lines = stack.split('\n');
     const stackOut = [];
@@ -58,12 +78,29 @@ export class StandardException extends Error {
     i18nHandler = handler;
   }
 
+  /**
+   * Deserialize an exception from a JSON object
+   * @param {object} json
+   */
+  static factory() {
+  }
+
+  /**
+   * Http status code
+   * @returns {number}
+   */
   get statusCode() {
     return 500;
   }
 
   /**
-   * @param {Error|String} exceptionOrMsg
+   * If throw a StandardException, keep throw to above
+   * If throw a Error, set Error message to exception message, set Error to details
+   * If throw a String, set String to exception message
+   * If throw a null or undefined, set exception name as exception message
+   * Otherwise, throw a TypeError
+   *
+   * @param {StandardException|Error|String} exceptionOrMsg
    */
   constructor(exceptionOrMsg) {
     const throwingNothing = !exceptionOrMsg;
@@ -88,21 +125,29 @@ export class StandardException extends Error {
       message = exceptionOrMsg.message;
     }
     super(message);
+
     if (throwingNothing === true) {
       message = this.constructor.name;
     }
     this.message = message;
+    this.humanMessage = message;
+    this.throwingError = throwingError;
 
     Error.captureStackTrace(this, this.constructor);
-    this.details = [];
+    this.details = throwingError ? exceptionOrMsg : [];
     this.prevError = {};
     this.code = null;
     this.filename = __filename;
   }
 
   i18n(...args) {
-    this.message = i18nHandler(...args);
+    this.message = format(...args);
+    this.humanMessage = i18nHandler(...args);
     return this;
+  }
+
+  getHumanMessage() {
+    return this.humanMessage;
   }
 
   setMessage(message) {
@@ -142,7 +187,7 @@ export class StandardException extends Error {
   }
 
   getDetails() {
-    return this.details;
+    return Array.isArray(this.details) ? this.details : [this.details];
   }
 
   setPrevError(prevError) {
@@ -159,6 +204,8 @@ export class StandardException extends Error {
       code: this.getCode(),
       name: this.constructor.name,
       message: this.message,
+      humanMessage: this.humanMessage,
+      filename: this.getFileName(),
       prevError: this.getPrevError(),
       errors: Array.isArray(this.getDetails()) ?
         this.getDetails() : [this.getDetails()],
@@ -178,48 +225,37 @@ export class InvalidArgumentException extends LogicException {
 }
 
 export class FormInvalidateException extends InvalidArgumentException {
-  constructor(...args) {
-    let superArgs = args;
-    let joiError = {};
-    if (args.length > 0 && typeof args[0] === 'object' && args[0].isJoi === true) {
-      joiError = args.shift();
-      if (args.length === 0) {
-        superArgs = joiError.details && joiError.details.length > 0 ? [joiError.details[0].message] : ['Form validation failed'];
-      }
+  constructor(exceptionOrMsg) {
+    super(exceptionOrMsg);
+    if (this.throwingError && exceptionOrMsg.isJoi === true) {
+      this.message = exceptionOrMsg.details[0].message;
+      this.details = exceptionOrMsg.details;
     }
-    super(...superArgs);
-    this.details = joiError.details;
   }
 }
 
 export class ModelInvalidateException extends InvalidArgumentException {
-  constructor(...args) {
-    let formErrors = {};
-    let superArgs = args;
-    if (args.length > 0 && typeof args[0] === 'object') {
-      formErrors = args.shift();
-      if (args.length === 0) {
-        superArgs = ['Model validation failed'];
-      }
+  constructor(exceptionOrMsg) {
+    super(exceptionOrMsg);
+    if (this.throwingError) {
+      this.details = exceptionOrMsg.errors;
     }
-    super(...superArgs);
-    this.details = formErrors.errors;
   }
 }
 
 export class HttpRequestLogicException extends InvalidArgumentException {
-  constructor(errorOrResponse) {
-    super();
-    if (errorOrResponse instanceof Error && errorOrResponse.name === 'StatusCodeError') {
-      this.details = errorOrResponse;
-      const { response } = errorOrResponse;
+  /**
+   * Support request promise error
+   * https://github.com/request/promise-core/blob/master/lib/errors.js
+   * @param exceptionOrMsg
+   */
+  constructor(exceptionOrMsg) {
+    super(exceptionOrMsg);
+    if (this.throwingError && ['StatusCodeError', 'RequestError', 'TransformError'].includes(exceptionOrMsg.name)) {
+      this.details = exceptionOrMsg;
+      const { response } = exceptionOrMsg;
       this.response = response || null;
       this.request = response ? response.request : null;
-      this.prevError = errorOrResponse;
-    }
-    if (errorOrResponse instanceof IncomingMessage) {
-      this.response = errorOrResponse || null;
-      this.request = errorOrResponse ? errorOrResponse.request : null;
     }
     this.requestParams = null;
     this.responseParams = null;
@@ -233,10 +269,16 @@ export class HttpRequestLogicException extends InvalidArgumentException {
   }
 
   getRequest() {
+    if (!this.request) {
+      throw new Error('No request set into exception');
+    }
     return this.request;
   }
 
   getResponse() {
+    if (!this.response) {
+      throw new Error('No response set into exception');
+    }
     return this.response;
   }
 
@@ -269,6 +311,17 @@ export class HttpRequestLogicException extends InvalidArgumentException {
 }
 
 export class RestServiceLogicException extends HttpRequestLogicException {
+  constructor(exceptionOrMsg) {
+    super(exceptionOrMsg);
+    if (this.throwingError && this.response) {
+      this.parsingRestServiceException(this.response);
+    }
+  }
+
+  parsingRestServiceException(response) {
+    this.prevError = StandardException.factory(response.body);
+    return this;
+  }
 }
 
 export class UnauthorizedException extends LogicException {
@@ -308,18 +361,13 @@ export class IOException extends RuntimeException {
 }
 
 export class HttpRequestIOException extends IOException {
-  constructor(errorOrResponse) {
-    super();
-    if (errorOrResponse instanceof Error && errorOrResponse.name === 'StatusCodeError') {
-      this.details = errorOrResponse;
-      const { response } = errorOrResponse;
+  constructor(exceptionOrMsg) {
+    super(exceptionOrMsg);
+    if (this.throwingError && ['StatusCodeError', 'RequestError', 'TransformError'].includes(exceptionOrMsg.name)) {
+      this.details = exceptionOrMsg;
+      const { response } = exceptionOrMsg;
       this.response = response || null;
       this.request = response ? response.request : null;
-      this.prevError = errorOrResponse;
-    }
-    if (errorOrResponse instanceof IncomingMessage) {
-      this.response = errorOrResponse || null;
-      this.request = errorOrResponse ? errorOrResponse.request : null;
     }
     this.requestParams = null;
     this.responseParams = null;
@@ -336,6 +384,12 @@ export class HttpRequestIOException extends IOException {
 }
 
 export class RestServiceIOException extends HttpRequestIOException {
+  constructor(exceptionOrMsg) {
+    super(exceptionOrMsg);
+    if (this.throwingError) {
+      this.details = exceptionOrMsg.errors;
+    }
+  }
 }
 
 export class DatabaseIOException extends IOException {

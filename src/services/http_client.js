@@ -1,5 +1,5 @@
 import { Dependencies } from 'constitute';
-import request from 'request-promise';
+import request from 'request-promise-native';
 import Config from './config';
 import Logger from './logger';
 import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions';

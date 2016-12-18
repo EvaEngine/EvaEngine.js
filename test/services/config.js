@@ -1,5 +1,5 @@
 import test from 'ava';
-import Config from '../../src/di';
+import Config from '../../src/services/config';
 import Env from '../../src/services/env';
 
 test('merge 3 levels files', (t) => {

@@ -4,6 +4,7 @@ import EvaEngine from '../src/engine';
 import { mockRequest, mockResponse, mockInstance } from '../src/utils/test';
 import { RuntimeException, LogicException } from '../src/exceptions';
 
+
 test('Default errorHandler', (t) => {
   const projectRoot = path.normalize(`${__dirname}/_demo_project`);
   const engine = new EvaEngine({
@@ -24,15 +25,9 @@ test('Error handler for not expect error', (t) => {
   errorHandler(new Error('Not expected error'), mockRequest(), res, () => {
   });
   t.is(res.statusCode, 500);
-  t.deepEqual(JSON.parse(res._getData()), {
-    code: -1,
-    name: 'BuiltinError',
-    message: 'Not expected error',
-    prevError: {},
-    errors: [],
-    stack: [],
-    fullStack: []
-  });
+  const err = JSON.parse(res._getData());
+  t.is(err.name, 'RuntimeException');
+  t.is(err.message, 'Not expected error');
 });
 
 test('Error handler for RuntimeException', (t) => {
@@ -47,15 +42,9 @@ test('Error handler for RuntimeException', (t) => {
   errorHandler(new RuntimeException('Runtime'), mockRequest(), res, () => {
   });
   t.is(res.statusCode, 500);
-  t.deepEqual(JSON.parse(res._getData()), {
-    code: 385400002849395800,
-    name: 'RuntimeException',
-    message: 'Runtime',
-    prevError: {},
-    errors: [],
-    stack: [],
-    fullStack: []
-  });
+  const err = JSON.parse(res._getData());
+  t.is(err.name, 'RuntimeException');
+  t.is(err.message, 'Runtime');
 });
 
 test('Error handler for LogicException', (t) => {
@@ -70,13 +59,7 @@ test('Error handler for LogicException', (t) => {
   errorHandler(new LogicException('Logic'), mockRequest(), res, () => {
   });
   t.is(res.statusCode, 400);
-  t.deepEqual(JSON.parse(res._getData()), {
-    code: 385400003318127170,
-    name: 'LogicException',
-    message: 'Logic',
-    prevError: {},
-    errors: [],
-    stack: [],
-    fullStack: []
-  });
+  const err = JSON.parse(res._getData());
+  t.is(err.name, 'LogicException');
+  t.is(err.message, 'Logic');
 });

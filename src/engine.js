@@ -7,7 +7,7 @@ import DI from './di';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import {
-  StandardException, InvalidArgumentException, RuntimeException
+  StandardException, RuntimeException
 } from './exceptions';
 
 export const MODES = {
@@ -319,35 +319,23 @@ export default class EvaEngine {
     return this.defaultErrorHandler ||
       ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
-        if (exception.message === 'invalid json') {
-          //Special handle for Body parser
-          exception = new InvalidArgumentException('Invalid JSON in req body');
-        }
-        if (!(exception instanceof StandardException)) {
-          this.logger.error(exception);
-          return res.status(500).json({
-            code: -1,
-            name: 'BuiltinError',
-            message: err.message,
-            spanId: req.header('X-B3-SpanId'),
-            traceId: req.header('X-B3-TraceId'),
-            prevError: {},
-            errors: [],
-            stack: env.isDevelopment() ?
-              StandardException.stackBeautifier(exception.stack) : [],
-            fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
-          });
+        if (err instanceof Error && !(err instanceof StandardException)) {
+          exception = new RuntimeException(err);
         }
         if (exception instanceof RuntimeException) {
-          this.logger.error(exception);
+          //TODO: report to sentry
+          //TODO: with req & res
+          this.logger.error(req, res, exception);
         } else {
-          this.logger.warn(exception.message);
+          this.logger.warn(req, res, exception);
         }
         return res
           .status(exception.getStatusCode())
           .json(Object.assign(
             exception.toJSON(),
             env.isDevelopment() ? {} : {
+              prevError: {},
+              filename: '',
               stack: [],
               fullStack: []
             }
