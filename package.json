@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -60,10 +60,10 @@
     ]
   },
   "dependencies": {
-    "acorn": "^4.0.0",
+    "acorn": "^4.0.4",
     "app-root-path": "^2.0.1",
-    "bluebird": "^3.4.6",
-    "connect-redis": "^3.1.0",
+    "bluebird": "^3.4.7",
+    "connect-redis": "^3.2.0",
     "constitute": "^1.6.2",
     "continuation-local-storage": "^3.2.0",
     "doctrine": "^2.0.0",
@@ -71,14 +71,14 @@
     "express-session": "^1.14.1",
     "glob": "^7.1.0",
     "ioredis": "^2.4.3",
-    "joi": "^10.0.6",
+    "joi": "^10.1.0",
     "js-yaml": "^3.7.0",
     "jwt-simple": "^0.5.1",
     "later": "^1.2.0",
-    "lodash": "^4.17.2",
+    "lodash": "^4.17.3",
     "mkdirp": "^0.5.1",
     "moment": "^2.17.1",
-    "moment-timezone": "^0.5.10",
+    "moment-timezone": "^0.5.11",
     "morgan": "^1.7.0",
     "mysql": "^2.11.1",
     "node-mocks-http": "^1.5.5",
@@ -86,7 +86,7 @@
     "pug": "^2.0.0-beta6",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3",
-    "sequelize": "^3.27.0",
+    "sequelize": "^3.28.0",
     "swagger-ui": "^2.2.6",
     "winston": "^2.2.0",
     "yargs": "^6.5.0"
