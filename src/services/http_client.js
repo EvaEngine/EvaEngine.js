@@ -132,7 +132,7 @@ export default class HttpClient {
     const dump = {
       method: req.method,
       protocol: req.uri && req.uri.protocol === 'https:' ? 'https' : 'http',
-      url: req.url ? req.uri.href : null,
+      url: req.uri ? req.uri.href : null,
       headers: req.headers,
       body: req.req && (req._json || req.formData) //eslint-disable-line no-underscore-dangle
         ? getBody(req) : null
