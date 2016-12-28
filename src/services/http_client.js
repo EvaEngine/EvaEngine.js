@@ -1,5 +1,5 @@
 import { Dependencies } from 'constitute';
-import request from 'request-promise';
+import request from 'request-promise-native';
 import Config from './config';
 import Logger from './logger';
 import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions';
@@ -131,8 +131,8 @@ export default class HttpClient {
     };
     const dump = {
       method: req.method,
-      protocol: req.uri.protocol === 'https:' ? 'https' : 'http',
-      url: req.uri.href,
+      protocol: req.uri && req.uri.protocol === 'https:' ? 'https' : 'http',
+      url: req.uri ? req.uri.href : null,
       headers: req.headers,
       body: req.req && (req._json || req.formData) //eslint-disable-line no-underscore-dangle
         ? getBody(req) : null

@@ -30,8 +30,8 @@ export default class RestClient {
 
   populateTrace(params) {
     const {
-            traceId, spanId, sampled
-          } = this.ns.get('tracer') || {};
+      traceId, spanId, sampled
+    } = this.ns.get('tracer') || {};
     if (!traceId || !spanId) {
       return params;
     }
@@ -85,6 +85,7 @@ export default class RestClient {
     try {
       const { headers, body } = await this.client.getInstance()(
         Object.assign(this.populateTrace(params), {
+          json: true,
           resolveWithFullResponse: true
         })
       );

@@ -7,7 +7,7 @@ import DI from './di';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import {
-  StandardException, InvalidArgumentException, RuntimeException
+  StandardException, RuntimeException
 } from './exceptions';
 
 export const MODES = {
@@ -68,6 +68,7 @@ export default class EvaEngine {
    * @param {string} sourceRoot
    * @param {Config} config
    * @param {Logger} logger
+   * @param {string} namespace
    * @param {number} port
    * @param {string} mode
    */
@@ -318,29 +319,27 @@ export default class EvaEngine {
     return this.defaultErrorHandler ||
       ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
-        if (exception.message === 'invalid json') {
-          //Special handle for Body parser
-          exception = new InvalidArgumentException('Invalid JSON');
-        }
-        if (!(exception instanceof StandardException)) {
-          this.logger.error(exception);
-          return res.status(500).json({
-            code: -1,
-            name: 'BuiltinError',
-            message: err.message,
-            prevError: {},
-            errors: [],
-            stack: env.isDevelopment() ?
-              StandardException.stackBeautifier(exception.stack) : [],
-            fullStack: env.isDevelopment() ? exception.stack.split('\n') : []
-          });
+        if (err instanceof Error && !(err instanceof StandardException)) {
+          exception = new RuntimeException(err);
         }
         if (exception instanceof RuntimeException) {
+          //TODO: report to sentry
+          //TODO: with req & res
           this.logger.error(exception);
         } else {
-          this.logger.warn(exception.message);
+          this.logger.warn(exception);
         }
-        return res.status(exception.getStatusCode()).json(exception.toJSON(env));
+        return res
+          .status(exception.getStatusCode())
+          .json(Object.assign(
+            exception.toJSON(),
+            env.isDevelopment() ? {} : {
+              prevError: {},
+              filename: '',
+              stack: [],
+              fullStack: []
+            }
+          ));
       });
   }
 
@@ -487,7 +486,7 @@ export default class EvaEngine {
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
     this.logger.debug('Cron job %s %s parsed as %s', sequence, commandString, schedule);
-    later.setInterval(async () => {
+    later.setInterval(async() => {
       this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
       //Let job crash if any exception happen
       await command.run();

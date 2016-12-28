@@ -82,7 +82,7 @@ test('Use 2XX as logic error', async(t) => {
     .reply(200, 'bar');
 
   const response = await client.request({ url: 'http://example.com/foo', resolveWithFullResponse: true });
-  const e = new exceptions.HttpRequestLogicException(response, 'Some logic error');
+  const e = (new exceptions.HttpRequestLogicException('Some logic error')).setResponse(response);
   const { statusCode, headers, body } = client.dumpResponse(e.getResponse());
   t.is(statusCode, 200);
   t.is(body, 'bar');

@@ -1,6 +1,7 @@
 const gulp = require('gulp');
 const path = require('path');
 const babel = require('gulp-babel');
+const fs = require('fs');
 const sourceMaps = require('gulp-sourcemaps');
 
 const paths = {
@@ -9,20 +10,14 @@ const paths = {
   sourceRoot: path.join(__dirname, 'src')
 };
 
-gulp.task('babel', () => {
-  return gulp.src(paths.es6).pipe(sourceMaps.init()).pipe(babel({
-    presets: ['stage-3', 'es2015-node4'],
-    plugins: [
-      "transform-decorators-legacy",
-      [
-        'babel-plugin-transform-builtin-extend',
-        {
-          globals: ['Error']
-        }
-      ]
-    ]
-  })).pipe(sourceMaps.write('.', {
-    includeContent: false,
-    sourceRoot: paths.sourceRoot
-  })).pipe(gulp.dest(paths.es5));
+gulp.task('build', () => {
+  return gulp
+    .src(paths.es6)
+    .pipe(sourceMaps.init())
+    .pipe(babel(JSON.parse(fs.readFileSync(__dirname + '/.babelrc'))))
+    .pipe(sourceMaps.write('.', {
+      includeContent: false,
+      sourceRoot: paths.sourceRoot
+    }))
+    .pipe(gulp.dest(paths.es5));
 });

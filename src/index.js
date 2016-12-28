@@ -21,9 +21,9 @@ const providers = {
 const wrapper = utils.wrapper;
 
 const {
-        DI,
-        express
-      } = engine;
+  DI,
+  express
+} = engine;
 
 /**
  * @typedef {Object} engineCore
