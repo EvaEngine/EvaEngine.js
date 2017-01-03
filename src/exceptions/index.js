@@ -400,6 +400,33 @@ export class HttpRequestIOException extends IOException {
   getResponse() {
     return this.response;
   }
+
+  setRequestParams(params) {
+    this.requestParams = params;
+    return this;
+  }
+
+  getRequestParams() {
+    return this.requestParams;
+  }
+
+  setResponseParams(params) {
+    this.responseParams = params;
+    return this;
+  }
+
+  getResponseParams() {
+    return this.responseParams;
+  }
+
+  setBusinessCode(code) {
+    this.businessCode = code;
+    return this;
+  }
+
+  getBusinessCode() {
+    return this.businessCode;
+  }
 }
 
 export class RestServiceIOException extends HttpRequestIOException {
