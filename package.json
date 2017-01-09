@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -110,7 +110,7 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-cli": "^1.2.2",
-    "gulp-sourcemaps": "^2.2.2",
+    "gulp-sourcemaps": "^2.2.3",
     "is-type-of": "^1.0.0",
     "nock": "^9.0.0",
     "nyc": "^10.0.0"
