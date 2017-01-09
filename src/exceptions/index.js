@@ -254,6 +254,9 @@ export class FormInvalidateException extends InvalidArgumentException {
     if (this.throwingError && exceptionOrMsg.isJoi === true) {
       this.message = exceptionOrMsg.details[0].message;
       this.details = exceptionOrMsg.details;
+
+      this.i18n(this.message);
+      this.translated = true;
     }
   }
 }

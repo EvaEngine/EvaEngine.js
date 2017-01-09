@@ -50,7 +50,7 @@ export default class JsonWebToken {
     return JSON.parse(storedToken);
   }
 
-  async clear(tokenString) {
+  clear(tokenString) {
     if (!tokenString) {
       return true;
     }
@@ -58,7 +58,7 @@ export default class JsonWebToken {
     if (!key) {
       return true;
     }
-    return await this.redis.del(key);
+    return this.redis.del(key);
   }
 
   getRedisKey(tokenString, groupOnly = false) {

@@ -29,6 +29,9 @@
         "named": "ignore",
         "asyncArrow": "ignore"
       }
-    ]
+    ],
+    "no-await-in-loop": [
+      0
+    ],
   }
 }
