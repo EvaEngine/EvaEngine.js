@@ -1,5 +1,5 @@
-export default (DataTypes) => ({
-  columns: {<% _.forEach(columns, function(column, key) { %>
+export default DataTypes => ({
+  columns: {<% let i = 0; const length = Object.keys(columns).length; _.forEach(columns, function(column, key) { %>
     <%=key%>: {
       allowNull: <%=column.allowNull%>,<% if(column.primaryKey) { %>
       primaryKey: <%=column.primaryKey%>,<% } %>
@@ -7,7 +7,7 @@ export default (DataTypes) => ({
       defaultValue: '<%=column.defaultValue%>',<% } %><% if(column.autoIncrement) { %>
       autoIncrement: true,<% } %>
       comment: '<%=column.comment%>'
-    },<% }); %>
+    }<% i++; if (i < length){ %>,<%}%><% }); %>
   },
   table: {
     tableName: '<%=table%>',

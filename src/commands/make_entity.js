@@ -42,7 +42,7 @@ export default class MakeEntityCommand extends Command {
       return 'DataTypes.BIGINT';
     }
     if (type.startsWith('enum')) {
-      return type.replace('enum', 'DataTypes.ENUM');
+      return type.replace('enum', 'DataTypes.ENUM').replace(/,/g, ', ');
     }
 
     if (type.match(/^string|varchar|varying|nvarchar/)) {
