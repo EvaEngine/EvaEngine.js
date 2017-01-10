@@ -152,9 +152,9 @@ export default class Entities {
         SELECT *
         FROM (SELECT ${valueString}) AS tmp
         WHERE NOT EXISTS (
-          ${uniqueString}
+          ${uniqueString} FOR UPDATE
         ) LIMIT 1
-      )`;
+      )`; //add FOR UPDATE to use eXclusive Lock
     return this.getInstance().query(sql, Object.assign({
       bind: input,
       transaction,
