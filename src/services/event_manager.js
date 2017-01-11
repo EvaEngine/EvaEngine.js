@@ -31,7 +31,7 @@ export default class EventManager {
    * Allow to register a class such like
    * class Foo { get prefix(){ return 'foo'} get actions() { return ['bar']} }
    * @param ListenerClass
-   * @returns {boolean}
+   * @returns {EventManager}
    */
   addListener(ListenerClass) {
     if (typeof ListenerClass !== 'function') {
@@ -64,7 +64,7 @@ export default class EventManager {
     }
 
     this.logger.debug('Registered events', this.emitter.eventNames());
-    return true;
+    return this;
   }
 
   emit(eventName, callback) {
