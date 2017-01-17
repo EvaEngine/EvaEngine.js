@@ -63,7 +63,7 @@ export default class Entities {
           });
           pushed = true;
         }
-        logger.verbose(...args, pushed ? '| Pushed to tracer' : '');
+        logger.verbose(...args, !pushed ? '| Tracer' : '');
       }
     });
   }

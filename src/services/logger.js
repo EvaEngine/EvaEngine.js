@@ -92,10 +92,13 @@ export default class Logger {
     if (!this.namespace.get('tracer')) {
       return args;
     }
-    args.push({
-      spanId: this.namespace.get('tracer').spanId,
-      traceId: this.namespace.get('tracer').traceId
-    });
+    const { spanId, traceId } = this.namespace.get('tracer') || {};
+    if (spanId) {
+      args.push(spanId);
+    }
+    if (spanId !== traceId) {
+      args.push(traceId);
+    }
     return args;
   }
 
