@@ -30,6 +30,9 @@
   "bin": {
     "engine": "./bin/engine"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "author": "AlloVince",
   "ava": {
     "files": [
@@ -113,6 +116,7 @@
     "gulp-sourcemaps": "^2.4.0",
     "is-type-of": "^1.0.0",
     "nock": "^9.0.0",
-    "nyc": "^10.0.0"
+    "nyc": "^10.0.0",
+    "pre-commit": "^1.2.2"
   }
 }
