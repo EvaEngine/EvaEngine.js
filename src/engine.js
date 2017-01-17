@@ -325,9 +325,10 @@ export default class EvaEngine {
         if (exception instanceof RuntimeException) {
           //TODO: report to sentry
           //TODO: with req & res
-          this.logger.error(exception);
+          this.logger.error(req.method, req.originalUrl || req.url, '|', exception);
         } else {
-          this.logger.warn(exception.getImportance() > 0 ? exception : exception.message);
+          this.logger.warn(req.method, req.originalUrl || req.url, '|',
+            exception.getImportance() > 0 ? exception : exception.message);
         }
         return res
           .status(exception.getStatusCode())

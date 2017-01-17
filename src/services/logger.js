@@ -55,17 +55,27 @@ export default class Logger {
       return this.instance;
     }
     const logPath = this.logfile || this.config.get('logger.file');
+    this.instance = this.factory(logPath);
+    return this.instance;
+  }
+
+  /**
+   * @param logPath
+   * @param key
+   * @returns {winston.Logger}
+   */
+  factory(logPath, key = 'global') {
     const timestamp = () => moment().format();
-    this.instance = logPath ? new (winston.Logger)({
+    return logPath ? new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
-          name: 'global-console',
+          name: `${key}-console`,
           timestamp,
           level: this.level,
           label: this.label
         }),
         new (winston.transports.File)({
-          name: 'global-file',
+          name: `${key}-file`,
           timestamp,
           json: false,
           level: this.level,
@@ -76,7 +86,7 @@ export default class Logger {
     }) : new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
-          name: 'global-console',
+          name: `${key}-console`,
           timestamp,
           level: this.level,
           label: this.label,
@@ -85,7 +95,6 @@ export default class Logger {
         })
       ]
     });
-    return this.instance;
   }
 
   populateTraceId(args) {
