@@ -56,37 +56,6 @@ export default class Logger {
     }
     const logPath = this.logfile || this.config.get('logger.file');
     const timestamp = () => moment().format();
-    if (this.env.isProduction()) {
-      this.instance = logPath ? new (winston.Logger)({
-        transports: [
-          new (winston.transports.Console)({
-            name: 'global-console',
-            timestamp,
-            level: this.level,
-            label: this.label
-          }),
-          new (winston.transports.File)({
-            name: 'global-file',
-            timestamp,
-            json: false,
-            level: this.level,
-            label: this.label,
-            filename: logPath
-          })
-        ]
-      }) : new (winston.Logger)({
-        transports: [
-          new (winston.transports.Console)({
-            name: 'global-console',
-            timestamp,
-            level: this.level,
-            label: this.label
-          })
-        ]
-      });
-      return this.instance;
-    }
-
     this.instance = logPath ? new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
@@ -111,8 +80,8 @@ export default class Logger {
           timestamp,
           level: this.level,
           label: this.label,
-          colorize: true,
-          prettyPrint: true
+          colorize: !this.env.isProduction(),
+          prettyPrint: !this.env.isProduction()
         })
       ]
     });

@@ -63,7 +63,7 @@ export default class EventManager {
       throw new RuntimeException('Repeated event name has been registered, please check');
     }
 
-    this.logger.debug('Registered events', this.emitter.eventNames());
+    // this.logger.debug('Registered events', this.emitter.eventNames());
     return this;
   }
 
