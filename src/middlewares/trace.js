@@ -217,7 +217,7 @@ function TraceMiddleware(ns, config, logger, client) {
     ns.bindEmitter(req);
     ns.bindEmitter(res);
     ns.run(() => {
-      logger.debug('Tracer settled for request %s, tracer: %j', spanId, tracer);
+      // logger.debug('Tracer settled for request %s, tracer: %j', spanId, tracer);
       ns.set('tracer', tracer);
       next();
     });

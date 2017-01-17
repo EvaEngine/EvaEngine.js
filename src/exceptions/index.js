@@ -143,6 +143,7 @@ export class StandardException extends Error {
     this.code = null;
     this.filename = __filename;
     this.translated = false;
+    this.importance = 0;
   }
 
   i18n(...args) {
@@ -193,6 +194,15 @@ export class StandardException extends Error {
 
   getStatusCode() {
     return this.statusCode;
+  }
+
+  setImportance(importance) {
+    this.importance = parseInt(importance, 10);
+    return this;
+  }
+
+  getImportance() {
+    return this.importance;
   }
 
   setFileName(filename) {

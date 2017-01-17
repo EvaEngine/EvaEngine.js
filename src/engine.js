@@ -327,7 +327,7 @@ export default class EvaEngine {
           //TODO: with req & res
           this.logger.error(exception);
         } else {
-          this.logger.warn(exception);
+          this.logger.warn(exception.getImportance() > 0 ? exception : exception.message);
         }
         return res
           .status(exception.getStatusCode())
