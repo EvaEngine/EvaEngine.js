@@ -137,7 +137,8 @@ export class StandardException extends Error {
     this.humanMessage = message;
     this.throwingError = throwingError;
 
-    Error.captureStackTrace(this, this.constructor);
+    //if input is an error, stack should be input error's stack
+    Error.captureStackTrace(throwingError ? exceptionOrMsg : this, this.constructor);
     this.details = throwingError ? exceptionOrMsg : [];
     this.prevError = {};
     this.code = null;

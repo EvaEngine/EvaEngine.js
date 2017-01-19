@@ -62,23 +62,24 @@ export default class Logger {
   /**
    * @param logPath
    * @param key
+   * @param level
    * @returns {winston.Logger}
    */
-  factory(logPath, key = 'global') {
+  factory(logPath, key = 'global', level = this.level) {
     const timestamp = () => moment().format();
     return logPath ? new (winston.Logger)({
       transports: [
         new (winston.transports.Console)({
           name: `${key}-console`,
           timestamp,
-          level: this.level,
+          level,
           label: this.label
         }),
         new (winston.transports.File)({
           name: `${key}-file`,
           timestamp,
           json: false,
-          level: this.level,
+          level,
           label: this.label,
           filename: logPath
         })
@@ -88,7 +89,7 @@ export default class Logger {
         new (winston.transports.Console)({
           name: `${key}-console`,
           timestamp,
-          level: this.level,
+          level,
           label: this.label,
           colorize: !this.env.isProduction(),
           prettyPrint: !this.env.isProduction()
