@@ -137,14 +137,16 @@ export class StandardException extends Error {
     this.humanMessage = message;
     this.throwingError = throwingError;
 
-    //if input is an error, stack should be input error's stack
-    Error.captureStackTrace(throwingError ? exceptionOrMsg : this, this.constructor);
+    Error.captureStackTrace(this, this.constructor);
     this.details = throwingError ? exceptionOrMsg : [];
     this.prevError = {};
     this.code = null;
     this.filename = __filename;
     this.translated = false;
     this.importance = 0;
+    if (throwingError === true) {
+      this.setPrevError(exceptionOrMsg);
+    }
   }
 
   i18n(...args) {
