@@ -8,10 +8,6 @@ export const TYPES = {
 
 export default class Env {
   get() {
-    if (env) {
-      return env;
-    }
-
     env = [TYPES.PRODUCTION, TYPES.TEST, TYPES.DEVELOPMENT].indexOf(process.env.NODE_ENV) > -1
       ? process.env.NODE_ENV : TYPES.DEVELOPMENT;
     return env;
