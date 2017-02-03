@@ -27,11 +27,6 @@ Sequelize.prototype.validateIsUnique = (col, msg) => {
   };
 };
 
-const entities = {};
-/**
- * @type {null|Sequelize}
- */
-let sequelize = null;
 
 export default class Entities {
   /**
@@ -42,6 +37,8 @@ export default class Entities {
   constructor(entitiesPath, sequelizeInstance = null) {
     this.entitiesPath = entitiesPath;
     this.sequelize = sequelizeInstance;
+    this.entities = {};
+    this.scanned = false;
   }
 
   static addTracer(options = {}) {
@@ -69,25 +66,24 @@ export default class Entities {
   }
 
   init() {
-    if (sequelize) {
-      return;
+    if (this.sequelize && this.scanned) {
+      return this.sequelize;
     }
 
+    const logger = DI.get('logger').getInstance();
     if (!this.sequelize) {
       const config = DI.get('config').get();
-      const logger = DI.get('logger').getInstance();
       const ns = DI.get('namespace');
       if (ns.isEnabled()) {
         //Inject sequelize inner namespace, refer: http://docs.sequelizejs.com/en/latest/docs/transactions/
         Sequelize.cls = ns.use().getContext();
       }
 
-      sequelize = new Sequelize(config.db.database, null, null,
+      this.sequelize = new Sequelize(config.db.database, null, null,
         Object.assign({}, config.sequelize, config.db, Entities.addTracer())
       );
-      logger.debug('Builtin sequelize inited');
     } else {
-      sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
+      this.sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
     }
 
     fs
@@ -98,16 +94,19 @@ export default class Entities {
           (['js', 'es6'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
       })
       .forEach((file) => {
-        const model = sequelize.import(path.join(this.entitiesPath, file));
-        entities[model.name] = model;
+        const model = this.sequelize.import(path.join(this.entitiesPath, file));
+        this.entities[model.name] = model;
       });
 
-    Object.values(entities).forEach((model) => {
+    Object.values(this.entities).forEach((model) => {
       if ('associate' in model) {
-        model.associate(entities);
+        model.associate(this.entities);
       }
     });
+    this.scanned = true;
 
+    //TODO: mask password in logging
+    logger.debug('Entities init by scanned %s, Replication: %j', this.entitiesPath, this.sequelize.options.replication);
   }
 
   /**
@@ -180,7 +179,7 @@ export default class Entities {
    */
   getInstance() {
     this.init();
-    return sequelize;
+    return this.sequelize;
   }
 
   /**
@@ -189,7 +188,7 @@ export default class Entities {
    */
   get(name) {
     this.init();
-    return entities[name];
+    return this.entities[name];
   }
 
   /**
@@ -197,6 +196,6 @@ export default class Entities {
    */
   getAll() {
     this.init();
-    return entities;
+    return this.entities;
   }
 };
