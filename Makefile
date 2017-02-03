@@ -6,8 +6,6 @@ build:
 	npm install
 
 publish:
-	npm config set registry ""
-	npm config set registry ""
+	npm config delete registry
 	npm publish
-	npm config set registry "https://registry.npm.taobao.org"
 	npm config set registry "https://registry.npm.taobao.org"
