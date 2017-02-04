@@ -17,6 +17,7 @@ test('Make entity mapping', (t) => {
   t.is(MakeEntityCommand.typeMapping("enum('foo')"), "DataTypes.ENUM('foo')");
 
   t.is(MakeEntityCommand.typeMapping('varchar'), 'DataTypes.STRING');
+  t.is(MakeEntityCommand.typeMapping('varchar(255)'), 'DataTypes.STRING(255)');
 
   t.is(MakeEntityCommand.typeMapping('char(5)'), 'DataTypes.CHAR(5)');
 

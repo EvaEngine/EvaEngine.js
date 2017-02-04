@@ -46,7 +46,8 @@ export default class MakeEntityCommand extends Command {
     }
 
     if (type.match(/^string|varchar|varying|nvarchar/)) {
-      return 'DataTypes.STRING';
+      const length = type.match(/\(\d+\)/) || '';
+      return length ? `DataTypes.STRING${length}` : 'DataTypes.STRING';
     }
 
     if (type.startsWith('char')) {
@@ -124,7 +125,7 @@ export default class MakeEntityCommand extends Command {
 
     logger.info('Start generate DB schemas to dir %s', path);
 
-    const tableHandler = async (table) => {
+    const tableHandler = async(table) => {
       const columns = await query.describeTable(table);
 
       const rawColumns = await sequelize.query(`SHOW FULL COLUMNS FROM ${table}`, {

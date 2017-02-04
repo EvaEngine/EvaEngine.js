@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import assert from 'assert';
 import Sequelize from 'sequelize';
 import util from 'util';
 import DI from '../di';
@@ -30,7 +31,6 @@ Sequelize.prototype.validateIsUnique = (col, msg) => {
 
 export default class Entities {
   /**
-   *
    * @param {string} entitiesPath
    * @param {Sequelize|Function} sequelizeInstance
    */
@@ -41,6 +41,11 @@ export default class Entities {
     this.scanned = false;
   }
 
+  /**
+   * Add tracer info to end of SQL query logging
+   * @param options
+   * @returns {*}
+   */
   static addTracer(options = {}) {
     const logger = DI.get('logger');
     return Object.assign(options, {
@@ -65,7 +70,45 @@ export default class Entities {
     });
   }
 
-  init() {
+  /**
+   * Scan all entity schemas under a special path
+   * @param entitiesPath
+   * @param withAssociate
+   * @returns {Entities}
+   */
+  scan(entitiesPath, withAssociate = true) {
+    assert(this.sequelize && this.sequelize instanceof Sequelize, 'Scan entities require a sequelize instance');
+
+    fs
+      .readdirSync(entitiesPath)
+      .filter((file) => {
+        const fileArray = file.split('.');
+        return (file.indexOf('.') !== 0) &&
+          (['js', 'es6'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
+      })
+      .forEach((file) => {
+        const entity = this.sequelize.import(path.join(entitiesPath, file));
+        this.entities[entity.name] = entity;
+      });
+
+    if (!withAssociate) {
+      return this;
+    }
+
+    Object.values(this.entities).forEach((entity) => {
+      if ('associate' in entity) {
+        entity.associate(this.entities);
+      }
+    });
+    return this;
+  }
+
+  /**
+   * Init sequelize instance from DI config
+   * @param withAssociate
+   * @returns {*}
+   */
+  init(withAssociate = true) {
     if (this.sequelize && this.scanned) {
       return this.sequelize;
     }
@@ -86,27 +129,12 @@ export default class Entities {
       this.sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
     }
 
-    fs
-      .readdirSync(this.entitiesPath)
-      .filter((file) => {
-        const fileArray = file.split('.');
-        return (file.indexOf('.') !== 0) &&
-          (['js', 'es6'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
-      })
-      .forEach((file) => {
-        const model = this.sequelize.import(path.join(this.entitiesPath, file));
-        this.entities[model.name] = model;
-      });
-
-    Object.values(this.entities).forEach((model) => {
-      if ('associate' in model) {
-        model.associate(this.entities);
-      }
-    });
+    this.scan(this.entitiesPath, withAssociate);
     this.scanned = true;
 
     //TODO: mask password in logging
     logger.debug('Entities init by scanned %s, Replication: %j', this.entitiesPath, this.sequelize.options.replication);
+    return this;
   }
 
   /**
@@ -122,6 +150,14 @@ export default class Entities {
     }, options, { bind }));
   }
 
+  /**
+   * A shortcut to prevent repeat insert
+   * @param tableName
+   * @param input
+   * @param uniqueCondition
+   * @param transaction
+   * @param options
+   */
   uniqueInsert({ tableName, input, uniqueCondition, transaction }, options = {}) {
     const columns = Object.keys(input);
     const columnString = '`' + columns.join('`, `') + '`';
@@ -161,6 +197,10 @@ export default class Entities {
     }, options));
   }
 
+  /**
+   * A short cut to start a database transaction
+   * @param options
+   */
   getTransaction(options = {}) {
     return this.getInstance().transaction(Object.assign({
       autocommit: true
