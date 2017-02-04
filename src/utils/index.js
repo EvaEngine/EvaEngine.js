@@ -1,3 +1,4 @@
+import merge from 'lodash/merge';
 import wrapper from './wrapper';
 import test from './test';
 import { pagination, paginationFilter } from './pagination';
@@ -14,12 +15,6 @@ import * as apiScaffold from './api_scaffold';
 export {
   apiScaffold,
   crc32,
-  test,
-  wrapper,
-  randomNumber,
-  randomString,
-  pagination,
-  paginationFilter,
   getHostFullUrl,
   getHostIp,
   getHostPort,
@@ -28,6 +23,13 @@ export {
   getMilliTimestamp,
   getMicroTimestamp,
   getDatabaseDatetime,
+  merge,
+  pagination,
+  paginationFilter,
+  randomNumber,
+  randomString,
+  test,
   toCamelCase,
-  toSnakeCase
+  toSnakeCase,
+  wrapper
 };

@@ -125,6 +125,24 @@ export default class MakeEntityCommand extends Command {
     return finalType;
   }
 
+  static async getIndexes(tableName, sequelize) {
+    let rawIndexes = await sequelize.query(
+      `SHOW INDEX FROM ${tableName}`,
+      {
+        type: sequelize.QueryTypes.SELECT,
+        raw: true
+      });
+    if (!rawIndexes) {
+      return [];
+    }
+    rawIndexes = _.groupBy(rawIndexes, 'Key_name');
+    return Object.entries(rawIndexes).filter(([key]) => key !== 'PRIMARY').map(([name, columns]) => {
+      const index = columns[0].Non_unique !== 1 ? { name, unique: true } : { name };
+      index.fields = columns.map(c => c.Column_name);
+      return index;
+    });
+  }
+
   async run() {
     const config = DI.get('config').get();
     const logger = DI.get('logger');
@@ -147,7 +165,6 @@ export default class MakeEntityCommand extends Command {
 
     const tableHandler = async(table) => {
       const columns = await query.describeTable(table);
-
       const rawColumns = await sequelize.query(`SHOW FULL COLUMNS FROM ${table}`, {
         type: sequelize.QueryTypes.SELECT,
         raw: true
@@ -159,10 +176,12 @@ export default class MakeEntityCommand extends Command {
           MakeEntityCommand.typeMapping(columns[columnName].type),
           rawColumn
         );
+        columns[columnName].unique = rawColumn.Key === 'UNI';
         columns[columnName].comment = rawColumn.Comment;
         columns[columnName].autoIncrement = rawColumn.Extra.startsWith('auto_increment') === true;
       });
 
+      const indexes = await MakeEntityCommand.getIndexes(table, sequelize);
       const entityFile = `${path}/${table}.js`;
       const schemaFile = `${schemaPath}/${table}.js`;
       try {
@@ -182,6 +201,7 @@ export default class MakeEntityCommand extends Command {
       fs.writeFileSync(schemaFile, _.template(schemaTemplate)({
         columns,
         table,
+        indexes,
         timestamp: parseInt(timestamp, 10) > 0
       }));
     };

@@ -5,13 +5,24 @@ export default DataTypes => ({
       primaryKey: <%=column.primaryKey%>,<% } %>
       type: <%=column.type%>,<% if(column.defaultValue !== null && column.defaultValue !== '') { %>
       defaultValue: '<%=column.defaultValue%>',<% } %><% if(column.autoIncrement) { %>
-      autoIncrement: true,<% } %>
+      autoIncrement: true,<% } %><% if(column.unique) { %>
+      unique: true,<% } %>
       comment: '<%=column.comment%>'
     }<% i++; if (i < length){ %>,<%}%><% }); %>
   },
   table: {
     tableName: '<%=table%>',
-    freezeTableName: true,
+    freezeTableName: true,<%if(indexes.length > 0) { %>
+    indexes: [<%
+let j = 0;
+for (const index of indexes) { %>
+      {
+        name: '<%=index.name%>',<% if(index.unique) { %>
+        unique: true,<%}%>
+        fields: ['<%=index.fields.join("', '")%>']
+      }<% j++; if (j < indexes.length){ %>,<%}%><%
+} %>
+    ],<% } %>
     timestamps: <%=timestamp%>
   }
 });

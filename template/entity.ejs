@@ -1,8 +1,8 @@
-import merge from 'lodash/merge';
+import { utils } from 'evaengine';
 import schema from './schemas/<%=table%>';
 
 module.exports = function (sequelize, DataTypes) {
   const { columns, table } = schema(DataTypes);
-  const entity = sequelize.define('<%=table%>', merge(columns, {}), merge(table, {}));
+  const entity = sequelize.define('<%=table%>', utils.merge(columns, {}), utils.merge(table, {}));
   return entity;
 };
