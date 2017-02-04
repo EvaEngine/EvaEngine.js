@@ -115,4 +115,5 @@ npm link evaengine
 
 ```
 ./node_modules/.bin/engine make:entity
+./node_modules/.bin/engine make:dbview
 ```
