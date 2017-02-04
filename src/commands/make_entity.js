@@ -84,7 +84,8 @@ export default class MakeEntityCommand extends Command {
     }
 
     if (type.startsWith('decimal')) {
-      return 'DataTypes.DECIMAL';
+      const [, length, bits] = /\((\d+),(\d+)\)/g.exec(type) || [];
+      return length ? `DataTypes.DECIMAL(${length}, ${bits})` : 'DataTypes.DECIMAL';
     }
 
     if (type.match(/^uuid|uniqueidentifier/)) {
@@ -103,6 +104,21 @@ export default class MakeEntityCommand extends Command {
     }
 
     return type;
+  }
+
+  static typeAdditional(_type, sequlizeType) {
+    const type = _type.toLowerCase();
+    // console.log(_type, sequlizeType)
+    let finalType = sequlizeType;
+
+    if (type.match(/unsigned/)) {
+      finalType += '.UNSIGNED';
+    }
+
+    if (type.match(/zerofill/)) {
+      finalType += '.ZEROFILL';
+    }
+    return finalType;
   }
 
   async run() {
@@ -134,7 +150,10 @@ export default class MakeEntityCommand extends Command {
       });
       Object.values(rawColumns).forEach((rawColumn) => {
         const columnName = rawColumn.Field;
-        columns[columnName].type = MakeEntityCommand.typeMapping(columns[columnName].type);
+        columns[columnName].type = MakeEntityCommand.typeAdditional(
+          columns[columnName].type,
+          MakeEntityCommand.typeMapping(columns[columnName].type)
+        );
         columns[columnName].comment = rawColumn.Comment;
         columns[columnName].autoIncrement = rawColumn.Extra.startsWith('auto_increment') === true;
       });

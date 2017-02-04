@@ -34,6 +34,7 @@ test('Make entity mapping', (t) => {
   t.is(MakeEntityCommand.typeMapping('float'), 'DataTypes.FLOAT');
 
   t.is(MakeEntityCommand.typeMapping('decimal'), 'DataTypes.DECIMAL');
+  t.is(MakeEntityCommand.typeMapping('decimal(1,2)'), 'DataTypes.DECIMAL(1, 2)');
 
   t.is(MakeEntityCommand.typeMapping('float8'), 'DataTypes.DOUBLE');
 
