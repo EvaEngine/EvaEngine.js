@@ -1,5 +1,5 @@
 import test from 'ava';
-import MakeEntityCommand from './../../src/commands/make_entity';
+import { MakeEntityCommand } from './../../src/commands/make_entity';
 import DI from '../../src/di';
 import * as providers from '../../src/services/providers';
 

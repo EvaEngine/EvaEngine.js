@@ -4,8 +4,71 @@ import fs from 'fs';
 import mkdirp from 'mkdirp';
 import Command from './interface';
 import DI from '../di';
+import Entities from '../entities';
 
-export default class MakeEntityCommand extends Command {
+
+export class MakeDbViewCommand extends Command {
+  static getName() {
+    return 'make:dbview';
+  }
+
+  static getDescription() {
+    return 'Generate db views';
+  }
+
+  static getSpec() {
+    return {
+      entity_path: {
+        required: false,
+        description: 'Entity path'
+      },
+      dir: {
+        required: false,
+        description: 'Where view.sql to be generated'
+      }
+    };
+  }
+
+  getSql(tableName, attributes) {
+    const attrs = attributes.map((attr) => {
+      const { fieldName } = attr;
+      if (fieldName.endsWith('At')) {
+        return ` FROM_UNIXTIME(IF(${fieldName} > 0, ${fieldName}, NULL)) AS ${fieldName}`;
+      }
+      return ` ${fieldName} AS ${fieldName}`;
+    });
+    return `DROP VIEW IF EXISTS view_${tableName};
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW view_${tableName}
+    AS SELECT
+      ${attrs.join(',\n      ')}
+    FROM ${tableName};
+
+`;
+  }
+
+  async run() {
+    const logger = DI.get('logger');
+    const { dir, entity_path: entityPath = `${process.cwd()}/build/entities` } = this.getArgv();
+    const path = dir ? `${process.cwd()}/${dir}` : `${process.cwd()}/sql`;
+    const file = [path, 'views.sql'].join('/');
+    logger.info('Scan entity files under %s', entityPath);
+    const entities = new Entities(entityPath);
+
+    logger.info('Start generate db views to %s', file);
+    mkdirp.sync(path);
+    const models = Object.values(entities.getInstance().models);
+    const sql = [];
+    models.forEach((model) => {
+      logger.info(`Creating ${model.getTableName()} view`);
+      sql.push(this.getSql(model.getTableName(), Object.values(model.attributes)));
+    });
+
+    fs.writeFileSync(file, sql.join(''));
+    logger.info('Views created');
+  }
+}
+
+export class MakeEntityCommand extends Command {
   static getName() {
     return 'make:entity';
   }

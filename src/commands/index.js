@@ -1,8 +1,9 @@
 import Command from './interface';
-import MakeEntityCommand from './make_entity';
+import { MakeEntityCommand, MakeDbViewCommand } from './make_entity';
 
 export default Command;
 
 export {
-  MakeEntityCommand
+  MakeEntityCommand,
+  MakeDbViewCommand
 };
