@@ -10,7 +10,7 @@ import { getMicroTimestamp } from '../utils';
 Sequelize.prototype.validateIsUnique = (col, msg) => {
   const conditions = { where: {} };
   const message = msg || `${col} must be unique`;
-  return function (value, next) {
+  return function v(value, next) {
     const self = this;
     this.Model.describe().then((schema) => {
       conditions.where[col] = value;
@@ -21,9 +21,12 @@ Sequelize.prototype.validateIsUnique = (col, msg) => {
           conditions.where[pk] = { $ne: self[pk] };
         });
     }).then(() =>
-      self.Model.count(conditions).then((found) =>
-        (found !== 0) ? next(message) : next()
-      )
+      self.Model.count(conditions).then((found) => {
+        if (found !== 0) {
+          return next(message);
+        }
+        return next();
+      })
     ).catch(next);
   };
 };
@@ -52,9 +55,6 @@ export default class Entities {
       benchmark: true,
       logging: (...args) => {
         const tracer = DI.get('namespace').get('tracer');
-        // if (!tracer) {
-        //   logger.warn('Trying to add tracer to Entities, but no tracer found, maybe Entities boot before tracer middleware called');
-        // }
         const [query, cost] = args;
         let pushed = false;
         if (tracer && cost > 0) {
@@ -160,13 +160,10 @@ export default class Entities {
    */
   uniqueInsert({ tableName, input, uniqueCondition, transaction }, options = {}) {
     const columns = Object.keys(input);
-    const columnString = '`' + columns.join('`, `') + '`';
-    const valueString = Object.entries(input).map(([key, value]) => {
-      return `$${key} \`${key}\``;
-    }).join(' , ');
+    const columnString = ['`', columns.join('`, `'), '`'].join('');
+    const valueString = Object.entries(input).map(([key]) => `$${key} \`${key}\``).join(' , ');
     const uniqueString = typeof uniqueCondition === 'string' ? uniqueCondition :
-    `SELECT * FROM ${tableName} WHERE ` +
-    this.getInstance().dialect.QueryGenerator.getWhereConditions(uniqueCondition);
+      [`SELECT * FROM ${tableName} WHERE `, this.getInstance().dialect.QueryGenerator.getWhereConditions(uniqueCondition)].join('');
 
     /*
      Original Example:
@@ -238,4 +235,4 @@ export default class Entities {
     this.init();
     return this.entities;
   }
-};
+}
