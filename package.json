@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -28,7 +28,8 @@
   ],
   "main": "index.js",
   "bin": {
-    "engine": "./bin/engine"
+    "engine": "./bin/engine",
+    "engine-babel": "./bin/engine-babel"
   },
   "pre-commit": [
     "lint"

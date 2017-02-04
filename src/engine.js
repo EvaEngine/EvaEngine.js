@@ -183,6 +183,7 @@ export default class EvaEngine {
           alias: '?'
         }
       }, command.getSpec()))
+      .help()
       .count('verbose')
       .argv;
 
