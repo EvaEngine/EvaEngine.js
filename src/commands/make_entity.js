@@ -106,7 +106,7 @@ export default class MakeEntityCommand extends Command {
     return type;
   }
 
-  static typeAdditional(_type, sequlizeType) {
+  static typeAdditional(_type, sequlizeType, rawColumn) {
     const type = _type.toLowerCase();
     // console.log(_type, sequlizeType)
     let finalType = sequlizeType;
@@ -117,6 +117,10 @@ export default class MakeEntityCommand extends Command {
 
     if (type.match(/zerofill/)) {
       finalType += '.ZEROFILL';
+    }
+
+    if (rawColumn.Collation === 'utf8_bin') {
+      finalType += '.BINARY';
     }
     return finalType;
   }
@@ -152,7 +156,8 @@ export default class MakeEntityCommand extends Command {
         const columnName = rawColumn.Field;
         columns[columnName].type = MakeEntityCommand.typeAdditional(
           columns[columnName].type,
-          MakeEntityCommand.typeMapping(columns[columnName].type)
+          MakeEntityCommand.typeMapping(columns[columnName].type),
+          rawColumn
         );
         columns[columnName].comment = rawColumn.Comment;
         columns[columnName].autoIncrement = rawColumn.Extra.startsWith('auto_increment') === true;
