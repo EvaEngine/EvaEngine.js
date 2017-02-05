@@ -1,14 +1,11 @@
 /*eslint new-cap: [1]*/
 import fs from 'fs';
-import Promise from 'bluebird';
 import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
 import Entitles from '../entities';
 import { RuntimeException, StandardException } from '../exceptions';
-
-Promise.promisifyAll(fs);
 
 export const TYPE_PATH = 'path';
 export const TYPE_DEFINITION = 'definition';
@@ -88,7 +85,7 @@ export class ExSwagger {
   static async filesToAnnotations(files) {
     const comments = [];
     for (const filepath of files) {
-      const source = await fs.readFileAsync(filepath);
+      const source = await fs.readFileSync(filepath);
       acorn.parse(source, {
         ecmaVersion: 6,
         // plugins: { asyncawait: true },
@@ -273,7 +270,7 @@ export class ExSwagger {
       ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : new Map();
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
     this.logger.debug('Export to', dist);
-    await fs.writeFileAsync(dist, JSON.stringify(swaggerDocs));
+    await fs.writeFileSync(dist, JSON.stringify(swaggerDocs));
     return swaggerDocs;
   }
 
@@ -356,7 +353,7 @@ export class ExSwagger {
 
   async getSwaggerIndexHtml() {
     const uiPath = this.getSwaggerUIPath();
-    const content = await fs.readFileAsync(`${uiPath}/index.html`);
+    const content = await fs.readFileSync(`${uiPath}/index.html`);
     return content.toString().replace('http://petstore.swagger.io/v2/swagger.json',
       this.swaggerDocsPath.replace(this.compileDistPath, ''));
   }

@@ -66,7 +66,6 @@
   "dependencies": {
     "acorn": "^4.0.8",
     "app-root-path": "^2.0.1",
-    "bluebird": "^3.4.7",
     "connect-redis": "^3.2.0",
     "constitute": "^1.6.2",
     "continuation-local-storage": "^3.2.0",
