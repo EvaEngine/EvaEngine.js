@@ -232,17 +232,11 @@ export class Fragment {
       });
     }
 
-    let value = {};
     let elementType = FRAGMENT_TYPE_UNKNOWN;
-    try {
-      value = yaml.load(description);
-      const key = Object.keys(value)[0];
-      if (title === 'swagger') {
-        elementType = key.startsWith('/') ? FRAGMENT_TYPE_PATH : FRAGMENT_TYPE_DEFINITION;
-      }
-    } catch (e) {
-      //NOTE: Swagger docs 解析错误也不会报错
-      this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
+    const value = yaml.load(description);
+    const key = Object.keys(value)[0];
+    if (title === 'swagger') {
+      elementType = key.startsWith('/') ? FRAGMENT_TYPE_PATH : FRAGMENT_TYPE_DEFINITION;
     }
     return new Fragment({
       type: elementType,
@@ -293,7 +287,11 @@ export class Annotation {
       && (jsDoc.title === 'swagger' || jsDoc.title === 'throws')
       && jsDoc.description
     ).forEach((jsDoc) => {
-      fragments.push(Fragment.factory(jsDoc, this));
+      try {
+        fragments.push(Fragment.factory(jsDoc, this));
+      } catch (e) {
+        this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
+      }
     });
 
     fragments.forEach((fragment) => {
@@ -323,7 +321,7 @@ export class Annotation {
   }) {
     assert(type && type === 'Block', 'Annotation type must be Block');
     assert(value && typeof value === 'string', 'Annotation value must be Block');
-    assert(file && start && end, 'Annotation must have file && start && end');
+    assert(file, 'Annotation must have file');
     this.value = value;
     this.file = file;
     this.start = start;
@@ -626,6 +624,10 @@ export class ExSwagger {
     this.logger = logger ||
       {
         debug: () => {
+        },
+        warn: () => {
+        },
+        error: () => {
         }
       };
 
