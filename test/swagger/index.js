@@ -10,13 +10,13 @@ test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
   t.true(files.includes(`${__dirname}${path.sep}_example${path.sep}controller.js`));
 });
-test('Could parse annotions', async(t) => {
-  const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
+test('Could parse annotations', async(t) => {
+  const annotations = await ExSwagger.filesToAnnotationsContainers([`${__dirname}/_example/controller.js`]);
   t.is(annotations.length, 6);
 });
 test('Could parse swagger docs', async(t) => {
-  const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
-  const docs = ExSwagger.annotationsToFragments(annotations);
+  const annotations = await ExSwagger.filesToAnnotationsContainers([`${__dirname}/_example/controller.js`]);
+  const docs = ExSwagger.annotationsContainersToFragments(annotations);
   t.is(docs.length, 4);
   t.is('definition', docs[0][0].type);
   t.true(typeof docs[0][0].value === 'object');
