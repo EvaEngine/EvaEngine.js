@@ -2,17 +2,16 @@
 import fs from 'fs';
 import { format } from 'util';
 import assert from 'assert';
+import merge from 'lodash/merge';
 import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
 import SwaggerParser from 'swagger-parser';
 import Entitles from '../entities';
-
 import { RuntimeException, StandardException } from '../exceptions';
 
-
-export class AnnotationContainEmptyFragmentException extends StandardException {
+export class AcornParsingException extends StandardException {
 }
 export class YamlParsingException extends StandardException {
   /**
@@ -50,6 +49,7 @@ export class YamlParsingException extends StandardException {
 //Swagger Data Types: http://swagger.io/specification/
 export const MODEL_TO_FRAGMENT_TYPES_MAPPING = {
   BIGINT: 'integer',
+  ENUM: 'string',
   INTEGER: 'integer',
   FLOAT: 'number',
   DOUBLE: 'number',
@@ -93,6 +93,167 @@ export class Fragment {
       FRAGMENT_TYPE_EXCEPTION, FRAGMENT_TYPE_UNKNOWN];
   }
 
+  isPath() {
+    return this.type === FRAGMENT_TYPE_PATH;
+  }
+
+  isDefinition() {
+    return this.type === FRAGMENT_TYPE_DEFINITION;
+  }
+
+  isUnknown() {
+    return this.type === FRAGMENT_TYPE_UNKNOWN;
+  }
+
+  isException() {
+    return this.type === FRAGMENT_TYPE_EXCEPTION;
+  }
+
+  /**
+   * @param {Fragment} fragment
+   * @returns {Fragment}
+   */
+  setParentFragment(fragment) {
+    assert(fragment && fragment instanceof Fragment, 'Parent fragment must be instance of Fragment');
+    this.parent = fragment;
+    return this;
+  }
+
+  /**
+   * @returns {null|Fragment}
+   */
+  getParentFragment() {
+    return this.parent;
+  }
+
+  correctSwaggerPath(swaggerDoc = {}) {
+    return swaggerDoc;
+  }
+
+  toSwaggerDoc(exceptions = {}) {
+    if (this.isPath()) {
+      const path = Object.keys(this.value)[0];
+      const method = Object.keys(this.value[path])[0];
+      return {
+        paths: {
+          [path]: {
+            [method]: this.correctSwaggerPath(this.value[path][method])
+          }
+        }
+      };
+    }
+
+    if (this.isDefinition()) {
+      const key = Object.keys(this.value)[0];
+      return {
+        definitions: {
+          [key]: this.value[key]
+        }
+      };
+    }
+
+    if (!this.isUnknown()) {
+      return {};
+    }
+
+    if (this.isException()) {
+      if (!this.getParentFragment()) {
+        return {};
+      }
+      const key = this.value;
+      const exception = exceptions[key];
+      if (!exception) {
+        return {};
+      }
+
+      const path = Object.keys(this.getParentFragment().value)[0];
+      const method = Object.keys(this.getParentFragment().value[path])[0];
+      return {
+        definitions: {
+          [key]: Fragment.exceptionMapping(exception)
+        },
+        paths: {
+          [path]: {
+            [method]: {
+              responses: {
+                [exception.getStatusCode()]: {
+                  description: this.description,
+                  schema: {
+                    $ref: `#/definitions/${key}`
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+    }
+
+    return {};
+  }
+
+  static exceptionMapping(exception) {
+    return {
+      properties: {
+        code: {
+          type: 'integer',
+          format: 'int64'
+        },
+        message: {
+          type: 'string'
+        }
+      },
+      required: [
+        'code',
+        'message'
+      ],
+      example: {
+        code: exception.getCode(),
+        message: exception.message
+      }
+    };
+  }
+
+  /**
+   * @param jsdoc
+   * @param {Annotation} annotation
+   * @returns {Fragment}
+   */
+  static factory(jsdoc, annotation) {
+    const { title, description, type } = jsdoc;
+    if (title === 'throws') {
+      return new Fragment({
+        type: FRAGMENT_TYPE_EXCEPTION,
+        description,
+        value: type ? type.name : FRAGMENT_TYPE_UNKNOWN,
+        file: annotation.file,
+        start: annotation.start,
+        end: annotation.end
+      });
+    }
+
+    let value = {};
+    let elementType = FRAGMENT_TYPE_UNKNOWN;
+    try {
+      value = yaml.load(description);
+      const key = Object.keys(value)[0];
+      if (title === 'swagger') {
+        elementType = key.startsWith('/') ? FRAGMENT_TYPE_PATH : FRAGMENT_TYPE_DEFINITION;
+      }
+    } catch (e) {
+      //NOTE: Swagger docs 解析错误也不会报错
+      this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
+    }
+    return new Fragment({
+      type: elementType,
+      description,
+      value,
+      file: annotation.file,
+      start: annotation.start,
+      end: annotation.end
+    });
+  }
+
   constructor({ type, description, value, file, start, end }) {
     assert(type && description && value && file && start && end, 'Fragment require type && description && value && file && start && end');
     assert(this.getTypes().includes(type), 'Fragment types not match input');
@@ -102,62 +263,47 @@ export class Fragment {
     this.file = file;
     this.start = start;
     this.end = end;
+    this.parent = null;
   }
 }
 
 export class Annotation {
-
   /**
    * @returns {Array<Fragment>}
    */
   getFragments() {
+    if (this.fragments) {
+      return this.fragments;
+    }
     //支持两种注解:
     //1. 所有行首必定为 space*
     //2. 所有行首必定不为 space*
     const unwrap = this.value.startsWith('*\n *');
     const { tags: jsDocs = [] } = doctrine.parse(this.value, { unwrap });
     if (jsDocs.length < 1) {
-      // throw new AnnotationContainEmptyFragmentException(this.toString());
       return [];
     }
 
-    const jsDocToFragment = (jsdoc) => {
-      const { title, description, type } = jsdoc;
-      if (title !== 'swagger') {
-        return new Fragment({
-          type: FRAGMENT_TYPE_EXCEPTION,
-          description,
-          value: type ? type.name : FRAGMENT_TYPE_UNKNOWN,
-          file: this.file,
-          start: this.start,
-          end: this.end
-        });
-      }
-
-      let value = {};
-      let elementType = FRAGMENT_TYPE_UNKNOWN;
-      try {
-        value = yaml.load(description);
-        const key = Object.keys(value)[0];
-        elementType = key.startsWith('/') ? FRAGMENT_TYPE_PATH : FRAGMENT_TYPE_DEFINITION;
-      } catch (e) {
-        //NOTE: Swagger docs 解析错误也不会报错
-        this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
-      }
-      return new Fragment({
-        type: elementType,
-        description,
-        value,
-        file: this.file,
-        start: this.start,
-        end: this.end
-      });
-    };
-    return jsDocs.filter(jsDoc =>
+    /**
+     * @type {Array<Fragment>}
+     */
+    const fragments = [];
+    jsDocs.filter(jsDoc =>
       jsDoc.title
       && (jsDoc.title === 'swagger' || jsDoc.title === 'throws')
       && jsDoc.description
-    ).map(jsDocToFragment);
+    ).forEach((jsDoc) => {
+      fragments.push(Fragment.factory(jsDoc, this));
+    });
+
+    fragments.forEach((fragment) => {
+      if (fragment.isException()) {
+        fragment.setParentFragment(fragments.filter(f => f.isPath())[0]);
+      }
+    });
+
+    this.fragments = fragments;
+    return fragments;
   }
 
   toString() {
@@ -183,6 +329,7 @@ export class Annotation {
     this.start = start;
     this.end = end;
     this.yamlErrors = [];
+    this.fragments = null;
   }
 }
 
@@ -283,11 +430,16 @@ export class ExSwagger {
     for (const file of files) {
       const comments = [];
       const source = await fs.readFileSync(file);
-      acorn.parse(source, {
-        ecmaVersion: 8,
-        allowImportExportEverywhere: true,
-        onComment: comments
-      });
+      try {
+        acorn.parse(source, {
+          ecmaVersion: 8,
+          allowImportExportEverywhere: true,
+          onComment: comments
+        });
+      } catch (e) {
+        throw (new AcornParsingException(`Acorn parsing file ${file} failed`)).setPrevError(e);
+      }
+
       results.push(new AnnotationsContainer(file, comments));
     }
     return results;
@@ -352,27 +504,6 @@ export class ExSwagger {
     return exceptions;
   }
 
-  static exceptionToSwaggerDefinition(exception) {
-    return {
-      properties: {
-        code: {
-          type: 'integer',
-          format: 'int64'
-        },
-        message: {
-          type: 'string'
-        }
-      },
-      required: [
-        'code',
-        'message'
-      ],
-      example: {
-        code: exception.getCode(),
-        message: exception.message
-      }
-    };
-  }
 
   async exportJson(dist = this.swaggerDocsPath) {
     this.logger.debug('Start export swagger docs by meta %j', this.getStates());
@@ -433,53 +564,16 @@ export class ExSwagger {
     return swaggerDocs;
   }
 
+  /**
+   * @param _template
+   * @param {Array<Fragment>} fragments
+   * @param exceptions
+   * @param modelDefinitions
+   * @returns {*}
+   */
   static mergeAll(_template, fragments, exceptions, modelDefinitions) {
     const template = _template;
-    let path = null;
-    let method = null;
-    let key = '';
-    const fragmentHandler = (fragment) => {
-      if (fragment.type === FRAGMENT_TYPE_PATH) {
-        path = Object.keys(fragment.value)[0];
-        method = Object.keys(fragment.value[path])[0];
-        if (!template.paths[path]) {
-          template.paths[path] = {};
-        }
-        template.paths[path][method] = fragment.value[path][method];
-        return true;
-      }
-
-      if (fragment.type === FRAGMENT_TYPE_DEFINITION) {
-        key = Object.keys(fragment.value)[0];
-        template.definitions[key] = fragment.value[key];
-        return true;
-      }
-
-      if (fragment.type === FRAGMENT_TYPE_UNKNOWN) {
-        return true;
-      }
-
-      //fragment.type === FRAGMENT_TYPE_EXCEPTION
-      //目前throw一定要定义在path下面
-      key = fragment.value;
-      const exception = exceptions[key];
-      if (!exception) {
-        return true;
-      }
-      template.definitions[key] = ExSwagger.exceptionToSwaggerDefinition(exception);
-      if (!(path && method)) {
-        return true;
-      }
-      template.paths[path][method].responses[exception.getStatusCode()] = {
-        description: fragment.description,
-        schema: {
-          $ref: `#/definitions/${key}`
-        }
-      };
-      return true;
-    };
-    fragments.forEach(fragmentHandler);
-
+    fragments.forEach(fragment => merge(template, fragment.toSwaggerDoc(exceptions)));
     if (modelDefinitions) {
       modelDefinitions.forEach((definition, modelName) => {
         template.definitions[modelName] = definition;
