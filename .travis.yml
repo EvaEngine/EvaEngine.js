@@ -1,11 +1,18 @@
 language: node_js
 services:
-  - redis-server
+- redis-server
 node_js:
-   - "6.9.2"
-   - "7.2.1"
+- 6.9.5
+- 7.5.0
 script:
-    - "npm run lint"
-    - "npm test"
+- npm run lint
+- npm test
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+deploy:
+  provider: npm
+  email: allo.vince@gmail.com
+  api_key:
+    secure: 08B9P65gowdncR7cxHx2F4VuutTlSl3he9ItELEGmIK5vmLVNT+9ad6wNbZHFtNx8fGur1IpjqJy/SiTYdINwXbc5tnTjOztxH6KFxz2lCHXh20cmo1QJmgxEflG/B8DkQzO9ZE4qksACNkf2nm63LtQtRrLxHhAH/Zj3Gu1XHCT1ctBmhdmW58XZN9sE7/H6/nMt5rlEQbGJ7O8/CueKiNU8kW+230NxxHcQsOtdA04lsIoJC7kvMWVP2Bi2fWx52t+70sVJBKhmPDwEfEMXGq7C1yRwUtZisYCzMrwR7FpzIQ3kcTnCy0wcx5mtEPEOhwuXJCTPlCorlVtqDF4NaPlCNXC2XzJz+ofBrqX4lx79TLgpT6mBNjFLVwOYKEZKmqKlUw+5rb6MEKjqdHiauw8tAVCNJZJLz3VzcLfUToNn3y9HLCTy0Hop/BPa5JDwxqJJbqq7iLyFomyUD8tZvMEUh1XhU47Zwh1V7f3Z8k6JRlhMJANIi37LDBC1dbwbmMW3RkByOTsNfWOEQJcVawEF1EvGaUmaz0li7/ZbQOXG89UnkkucyaQmQ/7F+2OPHqGeldxwRYjeqc2oUnvPK7JkGmHLboeINCj4H/GCoTxcIsOcVGJ1v89jIMG2EeKc7L4PiQwgqxXbtfiP2xpLgLPvotRDG6j9rkhac6jO14=
+  on:
+    tags: true
