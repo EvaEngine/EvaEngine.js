@@ -22,7 +22,8 @@ export default class Logger {
     if (process.env.LOG_LEVEL) {
       level = process.env.LOG_LEVEL;
     }
-    winston.level = this.level = level;
+    this.level = level;
+    winston.level = level;
     this.instance = null;
     this.label = null;
     this.logfile = null;

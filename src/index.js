@@ -53,4 +53,5 @@ const core = {
   utils
 };
 
-exports = module.exports = core;
+module.exports = core;
+exports = module.exports;
