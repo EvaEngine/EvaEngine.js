@@ -19,7 +19,7 @@ export class YamlParsingException extends StandardException {
    * @returns {YamlParsingException}
    */
   setAnnotation(annotation) {
-    this.annotation = annotation;
+    this.annotation = annotation || {};
     return this;
   }
 
@@ -27,14 +27,15 @@ export class YamlParsingException extends StandardException {
    * @returns {Annotation}
    */
   getAnnotation() {
-    return this.annotation;
+    return this.annotation || {};
   }
 
   toString() {
+    const { file, start, end, value } = this.getAnnotation();
     return format('Yaml parsing error happened in %s Line[%s - %s]\n Yaml error: %s \nOriginal Yaml Text:',
-      this.annotation.file, this.annotation.start, this.annotation.end,
-      this.getPrevError().message,
-      this.annotation.value.split('\n').map((v, i) => `${(i - 1).toString().padStart(5)} ${v}`));
+      file, start, end,
+      this.getPrevError() ? this.getPrevError().message : '',
+      value ? value.split('\n').map((v, i) => `${(i - 1).toString().padStart(5)} ${v}`) : []);
   }
 
   constructor(...args) {
