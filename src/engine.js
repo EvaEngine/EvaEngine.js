@@ -471,7 +471,12 @@ export default class EvaEngine {
     this.logger.debug('CLI run finished');
   }
 
-  runCrontab(sequence, commandString, useSeconds = true) {
+  /**
+   * @param {String} sequence
+   * @param {String} commandString
+   * @param {Boolean} useSeconds
+   */
+  runCrontab(sequence, commandString, useSeconds = false) {
     if (Object.keys(this.commands).length < 1) {
       throw new RuntimeException('No command registered yet');
     }
@@ -487,9 +492,9 @@ export default class EvaEngine {
     const command = new this.commands[commandName](argv);
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
-    this.logger.debug('Cron job %s %s parsed as %s', sequence, commandString, schedule);
+    this.logger.debug('Cron job %s %s parsed as %j', sequence, commandString, schedule);
     later.setInterval(async() => {
-      this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
+      this.logger.info('Round %d | Cron job %s started with %j', i, commandName, argv);
       //Let job crash if any exception happen
       await command.run();
       this.logger.info('Round %d | Cron job %s finished', i, commandName);
