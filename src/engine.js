@@ -335,12 +335,13 @@ export default class EvaEngine {
           .status(exception.getStatusCode())
           .json(Object.assign(
             exception.toJSON(),
-            env.isDevelopment() ? {} : {
-              prevError: {},
-              filename: '',
-              stack: [],
-              fullStack: []
-            }
+            env.isDevelopment()
+              ? {} : {
+                prevError: {},
+                filename: '',
+                stack: [],
+                fullStack: []
+              }
           ));
       });
   }
@@ -492,14 +493,13 @@ export default class EvaEngine {
     const command = new this.commands[commandName](argv);
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
-    this.logger.debug('Cron job %s %s parsed as %j', sequence, commandString, schedule);
     later.setInterval(async() => {
-      this.logger.info('Round %d | Cron job %s started with %j', i, commandName, argv);
+      this.logger.info('Cron job [%s] | Round %d | started with params %j', commandName, i, argv);
       //Let job crash if any exception happen
       await command.run();
-      this.logger.info('Round %d | Cron job %s finished', i, commandName);
+      this.logger.info('Cron job [%s] | Round %d | finished', commandName, i);
       i += 1;
     }, schedule); //第二个参数为True表示支持秒
-    this.logger.info('Cron job %s registered by [ %s ]', commandString, sequence);
+    this.logger.info('Cron job [%s] with sequence [%s] registered as %j', commandString, sequence, schedule);
   }
 }
