@@ -487,7 +487,7 @@ export default class EvaEngine {
 
     const [commandName, ...options] = commandString.split(' ');
     if (Object.keys(this.commands).includes(commandName) === false) {
-      throw new RuntimeException('Command %s not registered', commandName);
+      throw new RuntimeException(`Command ${commandName} not registered`);
     }
     const argv = yargs(options ? options.join(' ') : '').argv;
     const command = new this.commands[commandName](argv);
