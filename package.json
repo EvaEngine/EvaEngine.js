@@ -10,10 +10,10 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
-    "ava": "LOG_LEVEL=error NODE_ENV=test node ./node_modules/.bin/ava --verbose --serial",
+    "ava": "LOG_LEVEL=error NODE_ENV=test node ava --verbose --serial",
     "ava_v4": "LOG_LEVEL=error NODE_ENV=test ./node_modules/.bin/cross-env node --harmony --harmony-proxies ./node_modules/.bin/ava --verbose --serial",
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
-    "lint": "./node_modules/.bin/eslint src/* --ext .js",
+    "lint": "eslint src/* --ext .js",
     "build": "gulp build"
   },
   "engines": {
@@ -84,7 +84,7 @@
     "moment-timezone": "^0.5.11",
     "morgan": "^1.8.1",
     "mysql": "^2.13.0",
-    "node-mocks-http": "^1.5.6",
+    "node-mocks-http": "^1.6.1",
     "on-headers": "^1.0.1",
     "pug": "^2.0.0-beta6",
     "request": "^2.79.0",
@@ -96,7 +96,7 @@
     "yargs": "^6.6.0"
   },
   "devDependencies": {
-    "ava": "^0.18.1",
+    "ava": "^0.18.2",
     "babel-cli": "^6.23.0",
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",
@@ -106,11 +106,11 @@
     "babel-preset-es2015-node6": "^0.4.0",
     "babel-preset-stage-3": "^6.22.0",
     "cross-env": "^3.1.4",
-    "eslint": "^3.15.0",
+    "eslint": "^3.16.0",
     "eslint-config-airbnb": "^14.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.9.0",
+    "eslint-plugin-react": "^6.10.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-cli": "^1.2.2",
