@@ -484,13 +484,13 @@ export default class EvaEngine {
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
     this.logger.info('Cron job using %s Timezone', later.date.isUTC ? 'UTC' : 'Local');
-
     const [commandName, ...options] = commandString.split(' ');
     if (Object.keys(this.commands).includes(commandName) === false) {
       throw new RuntimeException(`Command ${commandName} not registered`);
     }
     const argv = yargs(options ? options.join(' ') : '').argv;
     const command = new this.commands[commandName](argv);
+
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
     later.setInterval(async() => {
@@ -501,5 +501,19 @@ export default class EvaEngine {
       i += 1;
     }, schedule); //第二个参数为True表示支持秒
     this.logger.info('Cron job [%s] with sequence [%s] registered as %j', commandString, sequence, schedule);
+  }
+
+  /**
+   * @param commandString
+   * @returns {Promise.<EvaEngine|Promise|*>}
+   */
+  async runCommand(commandString) {
+    const [commandName, ...options] = commandString.split(' ');
+    if (Object.keys(this.commands).includes(commandName) === false) {
+      throw new RuntimeException(`Command ${commandName} not registered`);
+    }
+    const argv = yargs(options ? options.join(' ') : '').argv;
+    const command = new this.commands[commandName](argv);
+    return command.run();
   }
 }
