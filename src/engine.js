@@ -320,7 +320,11 @@ export default class EvaEngine {
     return this.defaultErrorHandler ||
       ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
-        if (err instanceof Error && !(err instanceof StandardException)) {
+        if (!(err instanceof Error)) {
+          this.logger.error(req.method, req.originalUrl || req.url, '|', exception);
+          exception = (new RuntimeException('Unknown error')).setPrevError(err);
+        }
+        if (!(exception instanceof StandardException)) {
           exception = new RuntimeException(err);
         }
         if (exception instanceof RuntimeException) {

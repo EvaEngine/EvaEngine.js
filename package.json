@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -10,7 +10,7 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
-    "ava": "LOG_LEVEL=error NODE_ENV=test node ava --verbose --serial",
+    "ava": "LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
     "ava_v4": "LOG_LEVEL=error NODE_ENV=test ./node_modules/.bin/cross-env node --harmony --harmony-proxies ./node_modules/.bin/ava --verbose --serial",
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "eslint src/* --ext .js",
@@ -106,7 +106,7 @@
     "babel-preset-es2015-node6": "^0.4.0",
     "babel-preset-stage-3": "^6.22.0",
     "cross-env": "^3.1.4",
-    "eslint": "^3.16.0",
+    "eslint": "^3.16.1",
     "eslint-config-airbnb": "^14.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
@@ -116,7 +116,7 @@
     "gulp-cli": "^1.2.2",
     "gulp-sourcemaps": "^2.4.0",
     "is-type-of": "^1.0.0",
-    "nock": "^9.0.6",
+    "nock": "^9.0.8",
     "nyc": "^10.1.2",
     "pre-commit": "^1.2.2"
   }
