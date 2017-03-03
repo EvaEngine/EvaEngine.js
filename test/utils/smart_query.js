@@ -1,6 +1,8 @@
 import test from 'ava';
+import moment from 'moment';
 import SmartQuery from '../../src/utils/smart_query'
 
+moment.tz.setDefault('Asia/Shanghai');
 
 test('SmartQuery: equal', (t) => {
   t.deepEqual(
