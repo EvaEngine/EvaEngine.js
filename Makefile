@@ -1,6 +1,8 @@
 list:
 	@echo "build"
 
+pre-build:
+	npm install -g ava nyc
 build:
 	git pull
 	npm install
