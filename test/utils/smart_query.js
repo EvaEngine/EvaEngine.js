@@ -55,6 +55,19 @@ test('SmartQuery: endsWith', (t) => {
     {title: {'$like': '%defaultTitle'}}
   );
 });
+test('SmartQuery: gte', (t) => {
+  t.deepEqual(
+    new SmartQuery({created_starts: 12345}).gte('created_starts', 'createdAt').where,
+    {createdAt: {'$gte': 12345}}
+  );
+});
+test('SmartQuery: lte', (t) => {
+  t.deepEqual(
+    new SmartQuery({created_ends: 12345}).lte('created_ends', 'createdAt').where,
+    {createdAt: {'$lte': 12345}}
+  );
+});
+
 test('SmartQuery: in', (t) => {
   t.deepEqual(
     new SmartQuery({uids: '3,4', redundant: 'bar'}).in('uids', 'userId').where,
@@ -194,45 +207,45 @@ test('SmartQuery: orderable', (t) => {
     ]
   );
 });
-test('SmartQuery: attemptParam', (t) => {
+test('SmartQuery: determineParam', (t) => {
   t.is(
-    new SmartQuery({title: 'foo'}).attemptParam('title'),
+    new SmartQuery({title: 'foo'}).determineParam('title'),
     true
   );
   t.is(
-    new SmartQuery({title: '  '}).attemptParam('title'),
+    new SmartQuery({title: '  '}).determineParam('title'),
     false
   );
   t.is(
-    new SmartQuery({title: null}).attemptParam('title'),
+    new SmartQuery({title: null}).determineParam('title'),
     false
   );
   t.is(
-    new SmartQuery({foo: 'bar'}).attemptParam('title'),
+    new SmartQuery({foo: 'bar'}).determineParam('title'),
     false
   );
   t.is(
-    new SmartQuery({uids: [1]}).attemptParam('uids'),
+    new SmartQuery({uids: [1]}).determineParam('uids'),
     true
   );
   t.is(
-    new SmartQuery({uids: [1, 2]}).attemptParam('uids'),
+    new SmartQuery({uids: [1, 2]}).determineParam('uids'),
     true
   );
   t.is(
-    new SmartQuery({uids: []}).attemptParam('uids'),
+    new SmartQuery({uids: []}).determineParam('uids'),
     false
   );
   t.is(
-    new SmartQuery({uids: {foo: 'bar'}}).attemptParam('uids'),
+    new SmartQuery({uids: {foo: 'bar'}}).determineParam('uids'),
     true
   );
   t.is(
-    new SmartQuery({uids: {foo: 'bar', 'a': 'c'}}).attemptParam('uids'),
+    new SmartQuery({uids: {foo: 'bar', 'a': 'c'}}).determineParam('uids'),
     true
   );
   t.is(
-    new SmartQuery({uids: {}}).attemptParam('uids'),
+    new SmartQuery({uids: {}}).determineParam('uids'),
     false
   );
 });

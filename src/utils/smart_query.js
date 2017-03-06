@@ -4,7 +4,7 @@ import { InvalidArgumentException } from '../exceptions';
 /**
  * 自动根据 req.query 生成 sequelize 查询条件, 自动判断参数清单中是否有值
  */
-export default class {
+export default class SmartQuery {
   constructor(query) {
     this.query = query;
     /**
@@ -26,7 +26,7 @@ export default class {
    * @param {String} defaultValue 当 query 中不包含 paramName 或为空时，使用该值
    */
   equal(paramName, fieldName = paramName, defaultValue = null) {
-    const value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+    const value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value != null) {
       this.applyWhere(fieldName, '$eq', value);
     }
@@ -42,7 +42,7 @@ export default class {
    * @param {String} [delimiter=,] 当值为字符串时的分隔符，默认为 ,
    */
   in(paramName, fieldName = paramName, defaultValue = null, delimiter = ',') {
-    return this.inNotIn(paramName, fieldName, defaultValue, delimiter, false);
+    return this.applyIn(paramName, fieldName, defaultValue, delimiter, false);
   }
 
   /**
@@ -53,7 +53,7 @@ export default class {
    * @param {String} [delimiter=,] 当值为字符串时的分隔符，默认为 ,
    */
   notIn(paramName, fieldName = paramName, defaultValue = null, delimiter = ',') {
-    return this.inNotIn(paramName, fieldName, defaultValue, delimiter, true);
+    return this.applyIn(paramName, fieldName, defaultValue, delimiter, true);
   }
 
   /**
@@ -63,7 +63,7 @@ export default class {
    * @param {String} defaultValue 当 query 中不包含 paramName 或为空时，使用该值
    */
   like(paramName, fieldName = paramName, defaultValue = null) {
-    const value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+    const value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value != null) {
       this.applyWhere(fieldName, '$like', `%${value}%`);
     }
@@ -78,7 +78,7 @@ export default class {
    * @param {String} defaultValue 当 query 中不包含 paramName 或为空时，使用该值
    */
   startsWith(paramName, fieldName = paramName, defaultValue = null) {
-    const value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+    const value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value != null) {
       this.applyWhere(fieldName, '$like', `${value}%`);
     }
@@ -93,7 +93,7 @@ export default class {
    * @param {String} defaultValue 当 query 中不包含 paramName 或为空时，使用该值
    */
   endsWith(paramName, fieldName = paramName, defaultValue = null) {
-    const value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+    const value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value != null) {
       this.applyWhere(fieldName, '$like', `%${value}`);
     }
@@ -107,8 +107,8 @@ export default class {
    * @param {String} fieldName 对应的数据库字段名称，默认与 paramName 一致
    * @param {String} defaultValue 当 query 中不包含 paramName 或为空时，使用该值
    */
-  min(paramName, fieldName = paramName, defaultValue = null) {
-    const value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+  gte(paramName, fieldName = paramName, defaultValue = null) {
+    const value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value != null) {
       this.applyWhere(fieldName, '$gte', value);
     }
@@ -122,8 +122,8 @@ export default class {
    * @param {String} fieldName 对应的数据库字段名称，默认与 paramName 一致
    * @param {String} defaultValue 当 query 中不包含 paramName 或为空时，使用该值
    */
-  max(paramName, fieldName = paramName, defaultValue = null) {
-    const value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+  lte(paramName, fieldName = paramName, defaultValue = null) {
+    const value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value != null) {
       this.applyWhere(fieldName, '$lte', value);
     }
@@ -141,8 +141,8 @@ export default class {
    * @param {String} maxDefault 当 query 中不包含 maxParamName 或为空时，使用该值作为默认值
    */
   range(minParamName, maxParamName, fieldName, minDefault = null, maxDefault = null) {
-    const min = this.attemptParam(minParamName) ? this.query[minParamName] : minDefault;
-    const max = this.attemptParam(maxParamName) ? this.query[maxParamName] : maxDefault;
+    const min = this.determineParam(minParamName) ? this.query[minParamName] : minDefault;
+    const max = this.determineParam(maxParamName) ? this.query[maxParamName] : maxDefault;
     if (min != null) {
       this.applyWhere(fieldName, '$gte', min);
     }
@@ -164,13 +164,13 @@ export default class {
    * @param {String } [targetFormat='X'] 数据库时间格式
    */
   dateRange(minParamName, maxParamName, fieldName, minDefault = null, maxDefault = null, sourceFormat = 'YYYY-MM-DD', targetFormat = 'X') {
-    let min = this.attemptParam(minParamName)
+    let min = this.determineParam(minParamName)
       ? this.query[minParamName]
       : null;
     min = min != null && moment(min, sourceFormat).isValid()
       ? moment(min, sourceFormat)
       : moment(minDefault, sourceFormat);
-    let max = this.attemptParam(maxParamName) ? this.query[maxParamName] : null;
+    let max = this.determineParam(maxParamName) ? this.query[maxParamName] : null;
     max = max != null && moment(max, sourceFormat).isValid()
       ? moment(max, sourceFormat)
       : moment(maxDefault, sourceFormat);
@@ -199,13 +199,13 @@ export default class {
    * @param {String } [targetFormat='X'] 数据库时间格式
    */
   dateTimeRange(minParamName, maxParamName, fieldName, minDefault = null, maxDefault = null, sourceFormat = 'YYYY-MM-DD HH:mm:ss', targetFormat = 'X') {
-    let min = this.attemptParam(minParamName)
+    let min = this.determineParam(minParamName)
       ? this.query[minParamName]
       : null;
     min = min != null && moment(min, sourceFormat).isValid()
       ? moment(min, sourceFormat)
       : moment(minDefault, sourceFormat);
-    let max = this.attemptParam(maxParamName) ? this.query[maxParamName] : null;
+    let max = this.determineParam(maxParamName) ? this.query[maxParamName] : null;
     max = max != null && moment(max, sourceFormat).isValid()
       ? moment(max, sourceFormat)
       : moment(maxDefault, sourceFormat);
@@ -246,7 +246,7 @@ export default class {
     Object.assign(ordersMapping, manualMapping);
 
     const order =
-      this.attemptParam(paramName) && Object.keys(ordersMapping).includes(this.query[paramName])
+      this.determineParam(paramName) && Object.keys(ordersMapping).includes(this.query[paramName])
         ? ordersMapping[this.query[paramName]] : conventionOrder;
     if (order != null) {
       this.order = [order];
@@ -274,14 +274,15 @@ export default class {
 
   /**
    * 当 query 中包含名为 paramName 的属性时，为 fieldName 添加 in 或 not in 查询条件, 值可以为 `delimiter` 分割的字符串或者数组
+   * @protected
    * @param {String} paramName query 中的参数名称
-   * @param {String} [fieldName=paramName] 对应的数据库字段名称，默认与 paramName 一致
+   * @param {String} fieldName 对应的数据库字段名称
    * @param {String|Array} [defaultValue=null] 当 query 中不包含 paramName 或为空时，使用该值
    * @param {String} [delimiter=,] 当值为字符串时的分隔符，默认为 ,
    * @param {Boolean} [negation=false] 是否取反，为 true 时使用 $notIn
    */
-  inNotIn(paramName, fieldName, defaultValue = null, delimiter = ',', negation = false) {
-    let value = this.attemptParam(paramName) ? this.query[paramName] : defaultValue;
+  applyIn(paramName, fieldName, defaultValue = null, delimiter = ',', negation = false) {
+    let value = this.determineParam(paramName) ? this.query[paramName] : defaultValue;
     if (value === null) {
       return this;
     }
@@ -298,6 +299,14 @@ export default class {
     return this;
   }
 
+  /**
+   * 添加 where
+   *
+   * @protected
+   * @param filedName
+   * @param predicate
+   * @param value
+   */
   applyWhere(filedName, predicate, value) {
     if (!Object.keys(this.where).includes(filedName)) {
       this.where[filedName] = {};
@@ -305,7 +314,13 @@ export default class {
     this.where[filedName][predicate] = value;
   }
 
-  attemptParam(paramName) {
+  /**
+   * 判定指定名称的参数是否有效
+   *
+   * @param paramName
+   * @returns {boolean}
+   */
+  determineParam(paramName) {
     if (!Object.keys(this.query).includes(paramName)) {
       return false;
     }
