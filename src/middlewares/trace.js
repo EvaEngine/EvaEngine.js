@@ -148,11 +148,11 @@ function TraceMiddleware(ns, config, logger, client) {
     };
 
     res.set({
-      'X-Service-Name': serviceName,
+      'X-Service-Name': serviceName || '-',
       'X-Requested-At': timestamp,
-      'X-B3-SpanId': spanId,
-      'X-B3-TraceId': traceId,
-      'X-B3-ParentSpanId': parentId,
+      'X-B3-SpanId': spanId || '-',
+      'X-B3-TraceId': traceId || '-',
+      'X-B3-ParentSpanId': parentId || '-',
       'X-B3-Sampled': enabled ? 1 : 0
     });
 
