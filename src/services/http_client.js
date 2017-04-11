@@ -3,6 +3,7 @@ import request from 'request-promise-native';
 import Config from './config';
 import Logger from './logger';
 import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions';
+import ServiceInterface from './interface';
 
 export const deepClone = obj =>
   JSON.parse(JSON.stringify(obj));
@@ -95,15 +96,20 @@ export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEB
 /* eslint-enable */
 
 @Dependencies(Config, Logger) //eslint-disable-line new-cap
-export default class HttpClient {
+export default class HttpClient extends ServiceInterface {
   /**
    * @param config {Config}
    * @param logger {Logger}
    */
   constructor(config, logger) {
+    super();
     this.config = config.get();
     this.client = request;
     requestDebug(logger);
+  }
+
+  getProto() {
+    return request;
   }
 
   getInstance() {

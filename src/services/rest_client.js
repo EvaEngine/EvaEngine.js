@@ -2,14 +2,16 @@ import { Dependencies } from 'constitute';
 import HttpClient from './http_client';
 import Namespace from './namespace';
 import { RestServiceLogicException, RestServiceIOException } from '../exceptions';
+import ServiceInterface from './interface';
 
 @Dependencies(HttpClient, Namespace) //eslint-disable-line new-cap
-export default class RestClient {
+export default class RestClient extends ServiceInterface {
   /**
    * @param {HttpClient} client
    * @param {Namespace} ns
    */
   constructor(client, ns) {
+    super();
     this.client = client;
     this.ns = ns;
     this.baseUrl = null;
@@ -22,6 +24,10 @@ export default class RestClient {
 
   getBaseUrl() {
     return this.baseUrl;
+  }
+
+  getProto() {
+    return this.client.getProto();
   }
 
   getInstance() {

@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import camelCase from 'lodash/camelCase';
 import { RuntimeException } from '../exceptions';
 import Logger from './logger';
+import ServiceInterface from './interface';
 
 /**
  * A strict version of EventEmitter
@@ -11,11 +12,16 @@ import Logger from './logger';
  * 3. all events register and trigger will be recorded
  */
 @Dependencies(Logger) //eslint-disable-line new-cap
-export default class EventManager {
+export default class EventManager extends ServiceInterface {
   constructor(logger) {
+    super();
     this.logger = logger;
     this.emitter = new EventEmitter();
     this.events = new Set();
+  }
+
+  getProto() {
+    return EventEmitter;
   }
 
   getAllowEvents() {

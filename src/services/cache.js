@@ -3,6 +3,7 @@ import { UnsupportedOperationException } from './../exceptions';
 import Redis from './redis';
 import DI from './../di';
 import Config from './config';
+import ServiceInterface from './interface';
 
 export class Store {
   getInstance() {
@@ -124,8 +125,9 @@ export class RedisStore extends Store {
 }
 
 @Dependencies(Config, Redis) //eslint-disable-line new-cap
-export default class Cache {
+export default class Cache extends ServiceInterface {
   constructor(config) {
+    super();
     this.config = config.get('cache');
     this.prefix = this.config.prefix || 'eva';
     this.driver = this.config.driver;
