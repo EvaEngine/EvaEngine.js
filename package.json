@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -91,7 +91,7 @@
     "request-promise-native": "^1.0.3",
     "sequelize": "^3.30.4",
     "swagger-parser": "^3.4.1",
-    "swagger-ui": "^3.0.5",
+    "swagger-ui": "https://github.com/swagger-api/swagger-ui/archive/v3.0.6.tar.gz",
     "winston": "^2.3.1",
     "yargs": "^7.0.2"
   },
