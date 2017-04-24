@@ -656,7 +656,7 @@ export class ExSwagger {
       try {
         fs.accessSync(this.swaggerUIPath, fs.F_OK);
       } catch (e) {
-        this.swaggerUIPath = `${__dirname}/../../../swagger-ui/dist`; //For NPM v3.x
+        this.swaggerUIPath = `${__dirname}/../../../swagger-ui-dist`; //For NPM v3.x
       }
     }
     this.swaggerDocsPath = swaggerDocsPath;
