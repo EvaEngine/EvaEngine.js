@@ -87,6 +87,9 @@ export default {
         in: 'query'
       }
     },
+    security: [{
+      api_key: []
+    }],
     paths: {},
     definitions: {}
   }

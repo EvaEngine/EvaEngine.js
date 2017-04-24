@@ -652,7 +652,7 @@ export class ExSwagger {
     if (swaggerUIPath) {
       this.swaggerUIPath = swaggerUIPath;
     } else {
-      this.swaggerUIPath = `${__dirname}/../../node_modules/swagger-ui/dist`;
+      this.swaggerUIPath = `${__dirname}/../../node_modules/swagger-ui-dist`;
       try {
         fs.accessSync(this.swaggerUIPath, fs.F_OK);
       } catch (e) {
