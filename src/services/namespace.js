@@ -2,6 +2,7 @@ import { Dependencies } from 'constitute';
 import { createNamespace, getNamespace, destroyNamespace, reset } from 'continuation-local-storage';
 import Config from './config';
 import { UnsupportedOperationException } from '../exceptions';
+import ServiceInterface from './interface';
 
 const stores = {};
 
@@ -92,11 +93,12 @@ export class NsStore extends Store {
 }
 
 @Dependencies(Config) //eslint-disable-line new-cap
-export default class Namespace {
+export default class Namespace extends ServiceInterface {
   /**
    * @param config {Config}
    */
   constructor(config) {
+    super();
     this.config = config.get('namespace');
     this.defaultName = config.defaultName || 'eva.ns';
     this.store = null;

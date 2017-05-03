@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import https from 'https';
 import path from 'path';
 import yargs from 'yargs';
 import later from 'later';
@@ -183,6 +184,7 @@ export default class EvaEngine {
           alias: '?'
         }
       }, command.getSpec()))
+      .help()
       .count('verbose')
       .argv;
 
@@ -319,7 +321,11 @@ export default class EvaEngine {
     return this.defaultErrorHandler ||
       ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
-        if (err instanceof Error && !(err instanceof StandardException)) {
+        if (!(err instanceof Error)) {
+          this.logger.error(req.method, req.originalUrl || req.url, '|', exception);
+          exception = (new RuntimeException('Unknown error')).setPrevError(err);
+        }
+        if (!(exception instanceof StandardException)) {
           exception = new RuntimeException(err);
         }
         if (exception instanceof RuntimeException) {
@@ -334,12 +340,13 @@ export default class EvaEngine {
           .status(exception.getStatusCode())
           .json(Object.assign(
             exception.toJSON(),
-            env.isDevelopment() ? {} : {
-              prevError: {},
-              filename: '',
-              stack: [],
-              fullStack: []
-            }
+            env.isDevelopment()
+              ? {} : {
+                prevError: {},
+                filename: '',
+                stack: [],
+                fullStack: []
+              }
           ));
       });
   }
@@ -443,6 +450,20 @@ export default class EvaEngine {
     return this;
   }
 
+  /**
+   * @returns {EvaEngine}
+   */
+  runHttps(port, options = {}) {
+    process.on('uncaughtException', this.getUncaughtExceptionHandler());
+    EvaEngine.getApp().set('port', port || this.port);
+    EvaEngine.getApp().use(this.getDefaultErrorHandler());
+    this.server = https.createServer(options, EvaEngine.getApp());
+    this.server.listen(port || this.port);
+    this.server.on('error', this.getServerErrorHandler());
+    this.logger.info('Engine running http server by listening', this.port);
+    return this;
+  }
+
   getServer() {
     return this.server;
   }
@@ -470,30 +491,48 @@ export default class EvaEngine {
     this.logger.debug('CLI run finished');
   }
 
-  runCrontab(sequence, commandString, useSeconds = true) {
+  /**
+   * @param {String} sequence
+   * @param {String} commandString
+   * @param {Boolean} useSeconds
+   */
+  runCrontab(sequence, commandString, useSeconds = false) {
     if (Object.keys(this.commands).length < 1) {
       throw new RuntimeException('No command registered yet');
     }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
     this.logger.info('Cron job using %s Timezone', later.date.isUTC ? 'UTC' : 'Local');
-
     const [commandName, ...options] = commandString.split(' ');
     if (Object.keys(this.commands).includes(commandName) === false) {
-      throw new RuntimeException('Command %s not registered', commandName);
+      throw new RuntimeException(`Command ${commandName} not registered`);
     }
     const argv = yargs(options ? options.join(' ') : '').argv;
     const command = new this.commands[commandName](argv);
+
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
-    this.logger.debug('Cron job %s %s parsed as %s', sequence, commandString, schedule);
     later.setInterval(async() => {
-      this.logger.info('Round %d | Cron job %s started with %s', i, commandName, argv);
+      this.logger.info('Cron job [%s] | Round %d | started with params %j', commandName, i, argv);
       //Let job crash if any exception happen
       await command.run();
-      this.logger.info('Round %d | Cron job %s finished', i, commandName);
+      this.logger.info('Cron job [%s] | Round %d | finished', commandName, i);
       i += 1;
     }, schedule); //第二个参数为True表示支持秒
-    this.logger.info('Cron job %s registered by [ %s ]', commandString, sequence);
+    this.logger.info('Cron job [%s] with sequence [%s] registered as %j', commandString, sequence, schedule);
+  }
+
+  /**
+   * @param commandString
+   * @returns {Promise.<EvaEngine|Promise|*>}
+   */
+  async runCommand(commandString) {
+    const [commandName, ...options] = commandString.split(' ');
+    if (Object.keys(this.commands).includes(commandName) === false) {
+      throw new RuntimeException(`Command ${commandName} not registered`);
+    }
+    const argv = yargs(options ? options.join(' ') : '').argv;
+    const command = new this.commands[commandName](argv);
+    return command.run();
   }
 }

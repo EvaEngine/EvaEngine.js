@@ -2,13 +2,15 @@ import { Dependencies } from 'constitute';
 import moment from 'moment-timezone';
 import { getTimestamp, getDatabaseDatetime } from '../utils/datetime';
 import Logger from './logger';
+import ServiceInterface from './interface';
 
 @Dependencies(Logger) //eslint-disable-line new-cap
-export default class Now {
+export default class Now extends ServiceInterface {
   /**
    * @param {Logger} logger
    */
   constructor(logger) {
+    super();
     this.logger = logger;
     this.now = null;
   }

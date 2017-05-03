@@ -1,26 +1,56 @@
 /*eslint new-cap: [1]*/
 import fs from 'fs';
-import Promise from 'bluebird';
+import { format } from 'util';
+import assert from 'assert';
+import merge from 'lodash/merge';
 import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
+import SwaggerParser from 'swagger-parser';
 import Entitles from '../entities';
 import { RuntimeException, StandardException } from '../exceptions';
 
-Promise.promisifyAll(fs);
+export class AcornParsingException extends StandardException {
+}
+export class YamlParsingException extends StandardException {
+  /**
+   * @param {Annotation} annotation
+   * @returns {YamlParsingException}
+   */
+  setAnnotation(annotation) {
+    this.annotation = annotation || {};
+    return this;
+  }
 
-export const TYPE_PATH = 'path';
-export const TYPE_DEFINITION = 'definition';
-export const TYPE_EXCEPTION = 'exception';
-export const TYPE_UNKNOWN = 'unknown';
+  /**
+   * @returns {Annotation}
+   */
+  getAnnotation() {
+    return this.annotation || {};
+  }
+
+  toString() {
+    const { file, start, end, value } = this.getAnnotation();
+    return format('Yaml parsing error happened in %s Line[%s - %s]\n Yaml error: %s \nOriginal Yaml Text:',
+      file, start, end,
+      this.getPrevError() ? this.getPrevError().message : '',
+      value ? value.split('\n').map((v, i) => `${(i - 1).toString().padStart(5)} ${v}`) : []);
+  }
+
+  constructor(...args) {
+    super(...args);
+    this.annotation = {};
+  }
+}
 
 
 //Mapping sequelize data types to swagger data types
 //Sequelize types: http://docs.sequelizejs.com/en/latest/api/datatypes/
 //Swagger Data Types: http://swagger.io/specification/
-export const MODEL_TYPE_MAPPING = {
+export const MODEL_TO_FRAGMENT_TYPES_MAPPING = {
   BIGINT: 'integer',
+  ENUM: 'string',
   INTEGER: 'integer',
   FLOAT: 'number',
   DOUBLE: 'number',
@@ -51,7 +81,316 @@ const modelDefaultValueHandlers = {
   default: v => v
 };
 
-let yamlErrors = [];
+const FRAGMENT_TYPE_PATH = 'path';
+const FRAGMENT_TYPE_DEFINITION = 'definition';
+const FRAGMENT_TYPE_EXCEPTION = 'exception';
+const FRAGMENT_TYPE_UNKNOWN = 'unknown';
+export class Fragment {
+  /**
+   * @returns {[*,*,*,*]}
+   */
+  getTypes() {
+    return [FRAGMENT_TYPE_PATH, FRAGMENT_TYPE_DEFINITION,
+      FRAGMENT_TYPE_EXCEPTION, FRAGMENT_TYPE_UNKNOWN];
+  }
+
+  isPath() {
+    return this.type === FRAGMENT_TYPE_PATH;
+  }
+
+  isDefinition() {
+    return this.type === FRAGMENT_TYPE_DEFINITION;
+  }
+
+  isUnknown() {
+    return this.type === FRAGMENT_TYPE_UNKNOWN;
+  }
+
+  isException() {
+    return this.type === FRAGMENT_TYPE_EXCEPTION;
+  }
+
+  /**
+   * @param {Fragment} fragment
+   * @returns {Fragment}
+   */
+  setParentFragment(fragment) {
+    assert(fragment && fragment instanceof Fragment, 'Parent fragment must be instance of Fragment');
+    this.parent = fragment;
+    return this;
+  }
+
+  /**
+   * @returns {null|Fragment}
+   */
+  getParentFragment() {
+    return this.parent;
+  }
+
+  correctSwaggerPath(swaggerDoc = {}) {
+    return swaggerDoc;
+  }
+
+  toSwaggerDoc(exceptions = {}) {
+    if (this.isPath()) {
+      const path = Object.keys(this.value)[0];
+      const method = Object.keys(this.value[path])[0];
+      return {
+        paths: {
+          [path]: {
+            [method]: this.correctSwaggerPath(this.value[path][method])
+          }
+        }
+      };
+    }
+
+    if (this.isDefinition()) {
+      const key = Object.keys(this.value)[0];
+      return {
+        definitions: {
+          [key]: this.value[key]
+        }
+      };
+    }
+
+    if (!this.isUnknown()) {
+      return {};
+    }
+
+    if (this.isException()) {
+      if (!this.getParentFragment()) {
+        return {};
+      }
+      const key = this.value;
+      const exception = exceptions[key];
+      if (!exception) {
+        return {};
+      }
+
+      const path = Object.keys(this.getParentFragment().value)[0];
+      const method = Object.keys(this.getParentFragment().value[path])[0];
+      return {
+        definitions: {
+          [key]: Fragment.exceptionMapping(exception)
+        },
+        paths: {
+          [path]: {
+            [method]: {
+              responses: {
+                [exception.getStatusCode()]: {
+                  description: this.description,
+                  schema: {
+                    $ref: `#/definitions/${key}`
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+    }
+
+    return {};
+  }
+
+  static exceptionMapping(exception) {
+    return {
+      properties: {
+        code: {
+          type: 'integer',
+          format: 'int64'
+        },
+        message: {
+          type: 'string'
+        }
+      },
+      required: [
+        'code',
+        'message'
+      ],
+      example: {
+        code: exception.getCode(),
+        message: exception.message
+      }
+    };
+  }
+
+  /**
+   * @param jsdoc
+   * @param {Annotation} annotation
+   * @returns {Fragment}
+   */
+  static factory(jsdoc, annotation) {
+    const { title, description, type } = jsdoc;
+    if (title === 'throws') {
+      return new Fragment({
+        type: FRAGMENT_TYPE_EXCEPTION,
+        description,
+        value: type ? type.name : FRAGMENT_TYPE_UNKNOWN,
+        file: annotation.file,
+        start: annotation.start,
+        end: annotation.end
+      });
+    }
+
+    let elementType = FRAGMENT_TYPE_UNKNOWN;
+    const value = yaml.load(description);
+    const key = Object.keys(value)[0];
+    if (title === 'swagger') {
+      elementType = key.startsWith('/') ? FRAGMENT_TYPE_PATH : FRAGMENT_TYPE_DEFINITION;
+    }
+    return new Fragment({
+      type: elementType,
+      description,
+      value,
+      file: annotation.file,
+      start: annotation.start,
+      end: annotation.end
+    });
+  }
+
+  constructor({ type, description, value, file, start, end }) {
+    assert(type && description && value && file && start && end, 'Fragment require type && description && value && file && start && end');
+    assert(this.getTypes().includes(type), 'Fragment types not match input');
+    this.type = type;
+    this.description = description;
+    this.value = value;
+    this.file = file;
+    this.start = start;
+    this.end = end;
+    this.parent = null;
+  }
+}
+
+export class Annotation {
+  /**
+   * @returns {Array<Fragment>}
+   */
+  getFragments() {
+    if (this.fragments) {
+      return this.fragments;
+    }
+    //支持两种注解:
+    //1. 所有行首必定为 space*
+    //2. 所有行首必定不为 space*
+    const unwrap = this.value.startsWith('*\n *');
+    const { tags: jsDocs = [] } = doctrine.parse(this.value, { unwrap });
+    if (jsDocs.length < 1) {
+      return [];
+    }
+
+    /**
+     * @type {Array<Fragment>}
+     */
+    const fragments = [];
+    jsDocs.filter(jsDoc =>
+      jsDoc.title
+      && (jsDoc.title === 'swagger' || jsDoc.title === 'throws')
+      && jsDoc.description
+    ).forEach((jsDoc) => {
+      try {
+        fragments.push(Fragment.factory(jsDoc, this));
+      } catch (e) {
+        this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
+      }
+    });
+
+    fragments.forEach((fragment) => {
+      if (fragment.isException()) {
+        fragment.setParentFragment(fragments.filter(f => f.isPath())[0]);
+      }
+    });
+
+    this.fragments = fragments;
+    return fragments;
+  }
+
+  toString() {
+    return format('Annotation %s [%s - %s]: %s', this.file, this.start, this.end, this.value);
+  }
+
+  getYamlErrors() {
+    return this.yamlErrors;
+  }
+
+  constructor({
+    type, //Block
+    value, //Long string
+    file,  //String
+    start,
+    end
+  }) {
+    assert(type && type === 'Block', 'Annotation type must be Block');
+    assert(value && typeof value === 'string', 'Annotation value must be Block');
+    assert(file, 'Annotation must have file');
+    this.value = value;
+    this.file = file;
+    this.start = start;
+    this.end = end;
+    this.yamlErrors = [];
+    this.fragments = null;
+  }
+}
+
+export class AnnotationsContainer {
+  /**
+   * @returns {string}
+   */
+  getFile() {
+    return this.file;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  hasAnnotations() {
+    return this.annotations.length > 0;
+  }
+
+  /**
+   * @returns {Array<Annotation>}
+   */
+  getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * @returns {Array.<Fragment>}
+   */
+  collectFragments() {
+    if (this.fragments.length > 0) {
+      return this.fragments;
+    }
+
+    for (const annotation of this.getAnnotations()) {
+      this.fragments = this.fragments.concat(annotation.getFragments());
+    }
+
+    return this.fragments;
+  }
+
+  /**
+   * @returns {Array}
+   */
+  collectYamlErrors() {
+    let errors = [];
+    for (const annotation of this.getAnnotations()) {
+      errors = errors.concat(annotation.getYamlErrors());
+    }
+    return errors;
+  }
+
+  constructor(file, acornComments) {
+    assert(file && typeof file === 'string', 'Annotations require a file input');
+    assert(acornComments && Array.isArray(acornComments), `Annotations for ${file} require an array of Acorn comments input`);
+    this.file = file;
+    //Annotations MUST start with double stars
+    this.annotations = acornComments
+      .filter(v => v.type === 'Block' && v.value.startsWith('*\n'))
+      .map(c => new Annotation(Object.assign(c, { file })));
+    this.fragments = [];
+  }
+}
 
 /**
  * A Swagger Json document generator
@@ -83,81 +422,26 @@ export class ExSwagger {
    * Get annotations from comments
    * An annotation MUST start with double stars
    * @param files {Array.<string>}
-   * @returns {Array.<string>}
+   * @returns {Array.<AnnotationsContainer>}
    */
-  static async filesToAnnotations(files) {
-    const comments = [];
-    for (const filepath of files) {
-      const source = await fs.readFileAsync(filepath);
-      acorn.parse(source, {
-        ecmaVersion: 6,
-        // plugins: { asyncawait: true },
-        allowImportExportEverywhere: true,
-        onComment: comments
-      });
-    }
-    //Annotations MUST start with double stars
-    return comments.filter(v => v.type === 'Block' && v.value.startsWith('*\n'));
-  }
-
-  static annotationsToFragments(annotations) {
-    yamlErrors = [];
-    const fragments = [];
-    for (const annotation of annotations) {
-      if (!annotation.value) {
-        continue;
+  static async filesToAnnotationsContainers(files) {
+    const results = [];
+    for (const file of files) {
+      const comments = [];
+      const source = await fs.readFileSync(file);
+      try {
+        acorn.parse(source, {
+          ecmaVersion: 8,
+          allowImportExportEverywhere: true,
+          onComment: comments
+        });
+      } catch (e) {
+        throw (new AcornParsingException(`Acorn parsing file ${file} failed`)).setPrevError(e);
       }
-      //支持两种注解:
-      //1. 所有行首必定为 space*
-      //2. 所有行首必定不为 space*
-      const unwrap = annotation.value.startsWith('*\n *');
-      const { tags: jsDocs = [] } = doctrine.parse(annotation.value, { unwrap });
-      if (jsDocs.length < 1) {
-        continue;
-      }
-      let fragment = [];
-      fragment = jsDocs.filter((tag) => {
-        if (
-          tag.title
-          && (tag.title === 'swagger' || tag.title === 'throws')
-          && tag.description
-        ) {
-          return tag;
-        }
-        return null;
-      }).map(ExSwagger.annotationToFragment);
-      if (fragment.length > 0) {
-        fragments.push(fragment);
-      }
-    }
-    return fragments;
-  }
 
-  static annotationToFragment(annotation) {
-    const { title, description, type } = annotation;
-    if (title !== 'swagger') {
-      return {
-        description,
-        type: TYPE_EXCEPTION,
-        value: type ? type.name : TYPE_UNKNOWN
-      };
+      results.push(new AnnotationsContainer(file, comments));
     }
-
-    let value = {};
-    let elementType = TYPE_UNKNOWN;
-    try {
-      value = yaml.load(description);
-      const key = Object.keys(value)[0];
-      elementType = key.startsWith('/') ? TYPE_PATH : TYPE_DEFINITION;
-    } catch (e) {
-      //NOTE: Swagger docs 解析错误也不会报错
-      yamlErrors.push(e);
-    }
-    return {
-      type: elementType,
-      description,
-      value
-    };
+    return results;
   }
 
   static modelToSwaggerDefinition(model) {
@@ -168,7 +452,7 @@ export class ExSwagger {
     const requires = [];
     Object.keys(model).forEach((columnName) => {
       const column = model[columnName];
-      const swaggerType = MODEL_TYPE_MAPPING[column.type.key];
+      const swaggerType = MODEL_TO_FRAGMENT_TYPES_MAPPING[column.type.key];
       const property = {
         type: swaggerType,
         description: column.comment
@@ -219,30 +503,9 @@ export class ExSwagger {
     return exceptions;
   }
 
-  static exceptionToSwaggerDefinition(exception) {
-    return {
-      properties: {
-        code: {
-          type: 'integer',
-          format: 'int64'
-        },
-        message: {
-          type: 'string'
-        }
-      },
-      required: [
-        'code',
-        'message'
-      ],
-      example: {
-        code: exception.getCode(),
-        message: exception.message
-      }
-    };
-  }
 
   async exportJson(dist = this.swaggerDocsPath) {
-    this.logger.debug('Start export by meta', this.getStates());
+    this.logger.debug('Start export swagger docs by meta %j', this.getStates());
     const fileGroups = await Promise.all(
       this.sourceFilesPath.map(path => ExSwagger.scanFiles(path))
     );
@@ -253,12 +516,29 @@ export class ExSwagger {
     if (!files || files.length < 1) {
       throw new RuntimeException('No swagger source files found');
     }
-    this.logger.debug('Scanner found %s files:', files.length, files);
-    const annotations = await ExSwagger.filesToAnnotations(files);
-    const fragments = ExSwagger.annotationsToFragments(annotations);
-    this.logger.debug('Get %s swaggger fragments', fragments.length);
+    this.logger.debug('Scanner will scan %s files under %j:', files.length, this.sourceFilesPath);
+
+    const annotationsContainers = await ExSwagger.filesToAnnotationsContainers(files);
+    let fragments = [];
+    annotationsContainers.forEach((annotationsContainer) => {
+      if (!annotationsContainer.hasAnnotations()) {
+        return false;
+      }
+      const annotationFragments = annotationsContainer.collectFragments();
+      fragments = fragments.concat(annotationFragments);
+      this.logger.debug('Scanner found %s annotations and collected %s fragments in file %s',
+        annotationsContainer.getAnnotations().length.toString().padStart(3),
+        annotationFragments.length.toString().padStart(3),
+        annotationsContainer.getFile());
+
+      const yamlErrors = annotationsContainer.collectYamlErrors();
+      yamlErrors.forEach(yamlError => this.logger.error(yamlError));
+      return true;
+    });
+
+    this.logger.debug('Scanner collected %s fragments in total', fragments.length);
+
     const template = this.swaggerDocsTemplate;
-    this.logger.debug('Swagger template', template);
     const exceptions = {};
     for (const exceptionPath of this.exceptionPaths) {
       this.logger.debug('Search exception in %s', exceptionPath);
@@ -273,69 +553,32 @@ export class ExSwagger {
       ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : new Map();
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
     this.logger.debug('Export to', dist);
-    await fs.writeFileAsync(dist, JSON.stringify(swaggerDocs));
+    await fs.writeFileSync(dist, JSON.stringify(swaggerDocs));
+    try {
+      await SwaggerParser.validate(swaggerDocs);
+    } catch (e) {
+      this.logger.warn('Validated final swagger docs and found issues:');
+      this.logger.warn(e);
+    }
     return swaggerDocs;
   }
 
+  /**
+   * @param _template
+   * @param {Array<Fragment>} fragments
+   * @param exceptions
+   * @param modelDefinitions
+   * @returns {*}
+   */
   static mergeAll(_template, fragments, exceptions, modelDefinitions) {
     const template = _template;
-    let path = null;
-    let method = null;
-    let key = '';
-    const fragmentHandler = (fragment) => {
-      if (fragment.type === TYPE_PATH) {
-        path = Object.keys(fragment.value)[0];
-        method = Object.keys(fragment.value[path])[0];
-        if (!template.paths[path]) {
-          template.paths[path] = {};
-        }
-        template.paths[path][method] = fragment.value[path][method];
-        return true;
-      }
-
-      if (fragment.type === TYPE_DEFINITION) {
-        key = Object.keys(fragment.value)[0];
-        template.definitions[key] = fragment.value[key];
-        return true;
-      }
-
-      if (fragment.type === TYPE_UNKNOWN) {
-        return true;
-      }
-
-      //fragment.type === TYPE_EXCEPTION
-      //目前throw一定要定义在path下面
-      key = fragment.value;
-      const exception = exceptions[key];
-      if (!exception) {
-        return true;
-      }
-      template.definitions[key] = ExSwagger.exceptionToSwaggerDefinition(exception);
-      if (!(path && method)) {
-        return true;
-      }
-      template.paths[path][method].responses[exception.getStatusCode()] = {
-        description: fragment.description,
-        schema: {
-          $ref: `#/definitions/${key}`
-        }
-      };
-      return true;
-    };
-    for (const fragmentGroup of fragments) {
-      fragmentGroup.forEach(fragmentHandler);
-    }
-
+    fragments.forEach(fragment => merge(template, fragment.toSwaggerDoc(exceptions)));
     if (modelDefinitions) {
       modelDefinitions.forEach((definition, modelName) => {
         template.definitions[modelName] = definition;
       });
     }
     return template;
-  }
-
-  static getYamlErrors() {
-    return yamlErrors;
   }
 
   getStates() {
@@ -356,7 +599,7 @@ export class ExSwagger {
 
   async getSwaggerIndexHtml() {
     const uiPath = this.getSwaggerUIPath();
-    const content = await fs.readFileAsync(`${uiPath}/index.html`);
+    const content = await fs.readFileSync(`${uiPath}/index.html`);
     return content.toString().replace('http://petstore.swagger.io/v2/swagger.json',
       this.swaggerDocsPath.replace(this.compileDistPath, ''));
   }
@@ -382,6 +625,10 @@ export class ExSwagger {
     this.logger = logger ||
       {
         debug: () => {
+        },
+        warn: () => {
+        },
+        error: () => {
         }
       };
 
@@ -405,11 +652,11 @@ export class ExSwagger {
     if (swaggerUIPath) {
       this.swaggerUIPath = swaggerUIPath;
     } else {
-      this.swaggerUIPath = `${__dirname}/../../node_modules/swagger-ui/dist`;
+      this.swaggerUIPath = `${__dirname}/../../node_modules/swagger-ui-dist`;
       try {
         fs.accessSync(this.swaggerUIPath, fs.F_OK);
       } catch (e) {
-        this.swaggerUIPath = `${__dirname}/../../../swagger-ui/dist`; //For NPM v3.x
+        this.swaggerUIPath = `${__dirname}/../../../swagger-ui-dist`; //For NPM v3.x
       }
     }
     this.swaggerDocsPath = swaggerDocsPath;

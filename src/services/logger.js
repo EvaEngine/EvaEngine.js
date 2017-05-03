@@ -4,16 +4,18 @@ import winston from 'winston';
 import Env from './env';
 import Config from './config';
 import Namespace from './namespace';
+import ServiceInterface from './interface';
 
 
 @Dependencies(Env, Config, Namespace) //eslint-disable-line new-cap
-export default class Logger {
+export default class Logger extends ServiceInterface {
   /**
    * @param env {Env}
    * @param config {Config}
    * @param namespace {Namespace}
    */
   constructor(env, config, namespace) {
+    super();
     this.env = env;
     this.config = config;
     this.namespace = namespace;
@@ -22,10 +24,15 @@ export default class Logger {
     if (process.env.LOG_LEVEL) {
       level = process.env.LOG_LEVEL;
     }
-    winston.level = this.level = level;
+    this.level = level;
+    winston.level = level;
     this.instance = null;
     this.label = null;
     this.logfile = null;
+  }
+
+  getProto() {
+    return winston;
   }
 
   getWinston() {

@@ -10,25 +10,28 @@ test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
   t.true(files.includes(`${__dirname}${path.sep}_example${path.sep}controller.js`));
 });
-test('Could parse annotions', async(t) => {
-  const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
-  t.is(annotations.length, 6);
+
+test('Could parse annotations', async(t) => {
+  const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${__dirname}/_example/controller.js`]);
+  t.is(annotationContainers.length, 1);
+  t.is(annotationContainers[0].getAnnotations().length, 6);
 });
+
 test('Could parse swagger docs', async(t) => {
-  const annotations = await ExSwagger.filesToAnnotations([`${__dirname}/_example/controller.js`]);
-  const docs = ExSwagger.annotationsToFragments(annotations);
-  t.is(docs.length, 4);
-  t.is('definition', docs[0][0].type);
-  t.true(typeof docs[0][0].value === 'object');
-  t.true(typeof docs[0][0].description === 'string');
-  t.is('path', docs[1][0].type);
-  t.true(typeof docs[1][0].value === 'object');
-  t.true(typeof docs[1][0].description === 'string');
-  t.is('exception', docs[1][1].type);
-  t.true(typeof docs[1][1].value === 'string');
-  t.true(typeof docs[1][1].description === 'string');
-  t.is('unknown', docs[3][0].type);
-  t.is(1, ExSwagger.getYamlErrors().length);
+  const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${__dirname}/_example/controller.js`]);
+  const fragments = annotationContainers[0].collectFragments();
+  t.is(fragments.length, 4);
+  t.true(fragments[0].isDefinition());
+  t.true(typeof fragments[0].value === 'object');
+  t.true(typeof fragments[0].description === 'string');
+  t.true(fragments[1].isPath());
+  t.true(typeof fragments[1].value === 'object');
+  t.true(typeof fragments[1].description === 'string');
+  t.true(fragments[2].isException());
+  t.true(typeof fragments[2].value === 'string');
+  t.true(typeof fragments[2].description === 'string');
+  t.is(1, annotationContainers[0].collectYamlErrors().length);
+  //TODO: test unknown
 });
 test('Scan exceptions', async(t) => {
   const scannedExceptions = await ExSwagger.scanExceptions(

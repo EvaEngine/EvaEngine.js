@@ -2,16 +2,22 @@ import { Dependencies } from 'constitute';
 import jwt from 'jwt-simple';
 import Config from './config';
 import Redis from './redis';
+import ServiceInterface from './interface';
 
 @Dependencies(Config, Redis) //eslint-disable-line new-cap
-export default class JsonWebToken {
+export default class JsonWebToken extends ServiceInterface {
   /**
    * @param config {Config}
    * @param redis {Redis}
    */
   constructor(config, redis) {
+    super();
     this.redis = redis.getInstance();
     this.config = config.get('token');
+  }
+
+  getProto() {
+    return jwt;
   }
 
   getRedis() {

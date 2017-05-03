@@ -86,6 +86,10 @@ export class MakeEntityCommand extends Command {
       dir: {
         required: false,
         description: 'Where entity files to be generated'
+      },
+      prefix: {
+        required: false,
+        description: 'Table prefix'
       }
     };
   }
@@ -214,8 +218,19 @@ export class MakeEntityCommand extends Command {
     );
     const query = sequelize.getQueryInterface();
 
-    const tables = await query.showAllTables();
-    const { dir, timestamp = true } = this.getArgv();
+    let tables = await query.showAllTables();
+    const views = await sequelize.query(`SHOW FULL TABLES IN ${config.db.database} WHERE TABLE_TYPE LIKE 'VIEW'`, {
+      type: sequelize.QueryTypes.SELECT,
+      raw: true
+    });
+    if (views) {
+      const viewNames = views.map(v => Object.values(v)[0]);
+      tables = tables.filter(t => !viewNames.includes(t));
+    }
+    const { dir, timestamp = true, prefix } = this.getArgv();
+    if (prefix) {
+      tables = tables.filter(t => t.startsWith(prefix));
+    }
 
     const path = dir ? `${process.cwd()}/${dir}` : `${process.cwd()}/src/entities`;
     const schemaPath = `${path}/schemas`;

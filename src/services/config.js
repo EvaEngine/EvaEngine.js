@@ -3,15 +3,17 @@ import { Dependencies } from 'constitute';
 import Env from './env';
 import EngineConfig from '../config';
 import { RuntimeException } from '../exceptions';
+import ServiceInterface from './interface';
 
 let config = null;
 
 @Dependencies(Env) //eslint-disable-line new-cap
-export default class Config {
+export default class Config extends ServiceInterface {
   /**
    * @param env {Env}
    */
   constructor(env) {
+    super();
     this.env = env;
     this.path = null;
     this.mergedFiles = [];
