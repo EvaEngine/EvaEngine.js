@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import https from 'https';
 import path from 'path';
 import yargs from 'yargs';
 import later from 'later';
@@ -443,6 +444,20 @@ export default class EvaEngine {
     EvaEngine.getApp().set('port', port || this.port);
     EvaEngine.getApp().use(this.getDefaultErrorHandler());
     this.server = http.createServer(EvaEngine.getApp());
+    this.server.listen(port || this.port);
+    this.server.on('error', this.getServerErrorHandler());
+    this.logger.info('Engine running http server by listening', this.port);
+    return this;
+  }
+
+  /**
+   * @returns {EvaEngine}
+   */
+  runHttps(port, options = {}) {
+    process.on('uncaughtException', this.getUncaughtExceptionHandler());
+    EvaEngine.getApp().set('port', port || this.port);
+    EvaEngine.getApp().use(this.getDefaultErrorHandler());
+    this.server = https.createServer(options, EvaEngine.getApp());
     this.server.listen(port || this.port);
     this.server.on('error', this.getServerErrorHandler());
     this.logger.info('Engine running http server by listening', this.port);
