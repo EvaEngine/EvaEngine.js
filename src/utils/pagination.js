@@ -12,7 +12,7 @@ const toUrl = (scheme, host, path, query = {}) => {
 const toPaginationUrl = (query, req) =>
   toUrl(
     req.protocol, req.get('host'), req.baseUrl + req.path,
-    Object.assign(req.query, query)
+    Object.assign(req.evaOriginalQuery || req.query, query)
   );
 
 
@@ -157,12 +157,12 @@ const transferProperties = (obj, useSnake = false) => {
  */
 //@formatter:on
 export const pagination = ({
-  total,
-  limit,
-  offset,
-  req,
-  snakeCase: useSnake
-}) => {
+                             total,
+                             limit,
+                             offset,
+                             req,
+                             snakeCase: useSnake
+                           }) => {
   const totalNumber = toPositiveInteger(total);
   let offsetNumber = parseInt(offset, 10);
   offsetNumber = isNaN(offsetNumber) ? 0 : offsetNumber;
