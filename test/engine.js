@@ -101,3 +101,17 @@ test('Run commands', (t) => {
   t.is(engine.getCommand().getFoo(), 'bar');
 });
 
+test('timezone', (t) => {
+  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot,
+    port: 3000
+  });
+
+  const config = engine.getDI().get('config');
+  t.is(engine.getTimezone(), config.timezone);
+
+  const tz = 'America/New_York';
+  engine.setTimezone(tz);
+  t.is(engine.getTimezone(), tz);
+});

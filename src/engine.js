@@ -110,10 +110,26 @@ export default class EvaEngine {
     this.registerServiceProviders(EvaEngine.getBaseServiceProviders());
     this.logger = logger || DI.get('logger');
     this.config = config || DI.get('config');
+    this.setTimezone();
     this.namespace = namespace || DI.get('namespace');
     this.logger.info('Engine started, Meta:', this.meta);
     this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
     later.date.localTime();
+  }
+
+  /**
+   * @param {string} timezone
+   */
+  setTimezone(timezone) {
+    const tz = timezone || this.config.timezone;
+    process.env.TZ = tz;
+  }
+
+  /**
+   * @returns {string}
+   */
+  getTimezone() {
+    return process.env.TZ;
   }
 
   /**

@@ -92,5 +92,6 @@ export default {
     }],
     paths: {},
     definitions: {}
-  }
+  },
+  timezone: 'Asia/Shanghai'
 };
