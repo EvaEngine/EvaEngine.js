@@ -7,7 +7,6 @@ import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
-import SwaggerParser from 'swagger-parser';
 import Entitles from '../entities';
 import { RuntimeException, StandardException } from '../exceptions';
 
@@ -554,12 +553,6 @@ export class ExSwagger {
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
     this.logger.debug('Export to', dist);
     await fs.writeFileSync(dist, JSON.stringify(swaggerDocs));
-    try {
-      await SwaggerParser.validate(swaggerDocs);
-    } catch (e) {
-      this.logger.warn('Validated final swagger docs and found issues:');
-      this.logger.warn(e);
-    }
     return swaggerDocs;
   }
 

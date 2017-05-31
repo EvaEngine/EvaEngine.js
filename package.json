@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -10,7 +10,7 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
-    "ava": "cross-env LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
+    "ava": "LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "eslint src/* --ext .js",
     "build": "gulp build"
@@ -89,7 +89,6 @@
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4",
     "sequelize": "^3.30.4",
-    "swagger-parser": "^3.4.1",
     "swagger-ui-dist": "^3.0.12",
     "winston": "^2.3.1",
     "yargs": "^8.0.1"
