@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -65,6 +65,7 @@
   "dependencies": {
     "acorn": "^5.0.3",
     "app-root-path": "^2.0.1",
+    "cloud-config-client": "^1.0.0",
     "connect-redis": "^3.3.0",
     "constitute": "^1.6.2",
     "continuation-local-storage": "^3.2.0",
