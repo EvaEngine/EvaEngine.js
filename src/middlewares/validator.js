@@ -41,6 +41,6 @@ function ValidatorMiddleware(validatorBase) {
       }
     });
 }
-Dependencies(ValidatorBase)(ValidatorMiddleware);  //eslint-disable-line new-cap
+Dependencies(ValidatorBase)(ValidatorMiddleware); //eslint-disable-line new-cap
 
 export default ValidatorMiddleware;

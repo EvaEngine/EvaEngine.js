@@ -1,8 +1,8 @@
-import merge from 'lodash/merge';
+import _ from 'lodash';
 import { Dependencies } from 'constitute';
+import springConfigClient from 'cloud-config-client';
 import Env from './env';
 import EngineConfig from '../config';
-import { RuntimeException } from '../exceptions';
 import ServiceInterface from './interface';
 
 let config = null;
@@ -24,10 +24,38 @@ export default class Config extends ServiceInterface {
     return this;
   }
 
+  /**
+   * Resolve configurations from Spring Cloud Config Server.
+   * @param endpoint
+   * @param name
+   * @param profiles
+   * @param label
+   * @returns {Promise.<void>}
+   */
+  async resolveSpringConfig({ endpoint, name, profiles, label = 'master' }) {
+    if (!config) {
+      config = this.loadConfigFromFiles();
+    }
+    const configRemote = await springConfigClient.load({
+      endpoint,
+      name,
+      profiles: _.isString(profiles) ? profiles.split(',') : [],
+      label
+    });
+    configRemote.forEach((key, value) => {
+      _.set(config, key, value);
+    });
+  }
+
   get(key) {
     if (config) {
       return key ? Config.search(key, config) : config;
     }
+    config = this.loadConfigFromFiles();
+    return key ? Config.search(key, config) : config;
+  }
+
+  loadConfigFromFiles() {
     const env = this.env.get();
     const configPath = this.path;
     const pathDefault = `${configPath}/config.default`;
@@ -48,8 +76,7 @@ export default class Config extends ServiceInterface {
     }
     /*eslint-enable import/no-dynamic-require*/
     /*eslint-enable global-require*/
-    config = merge(EngineConfig, configDefault, configEnv, configLocal);
-    return key ? Config.search(key, config) : config;
+    return _.merge(EngineConfig, configDefault, configEnv, configLocal);
   }
 
   getMergedFiles() {
@@ -69,15 +96,7 @@ export default class Config extends ServiceInterface {
     if (typeof keyString !== 'string') {
       return target;
     }
-    const keys = keyString.split('.');
-    let obj = target;
-    for (const key of keys) {
-      if ({}.hasOwnProperty.call(obj, key) === false) {
-        throw new RuntimeException(`No config found by key ${keyString}`);
-      }
-      obj = obj[key];
-    }
-    return obj;
+    return _.get(target, keyString);
   }
 }
 

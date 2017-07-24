@@ -21,13 +21,13 @@ export const defaultHeadersFilter = (res) => {
 
 export const requestToCacheKey = (req, hashStrategy) => {
   const {
-          method,
-          baseUrl,
-          originalUrl,
-          query,
-          route,
-          uid = null //Custom rule
-        } = req;
+    method,
+    baseUrl,
+    originalUrl,
+    query,
+    route,
+    uid = null //Custom rule
+  } = req;
   if (hashStrategy && !util.isFunction(hashStrategy)) {
     throw new RuntimeException(`View cache hash strategy must be a function for ${originalUrl}`);
   }
@@ -68,11 +68,11 @@ function ViewCacheMiddleware(cache, logger) {
       };
     }
     const {
-            ttl,
-            headersFilter,
-            namespace,
-            hashStrategy
-          } = Object
+      ttl,
+      headersFilter,
+      namespace,
+      hashStrategy
+    } = Object
       .assign({
         ttl: 60,
         headersFilter: defaultHeadersFilter,
@@ -82,9 +82,9 @@ function ViewCacheMiddleware(cache, logger) {
     return wrapper(async (req, res, next) => {
       const cacheKey = requestToCacheKey(req, hashStrategy);
       const {
-              headers: cachedHeaders = [],
-              body: cachedBody
-            } = await cache.namespace(namespace).get(cacheKey)
+        headers: cachedHeaders = [],
+        body: cachedBody
+      } = await cache.namespace(namespace).get(cacheKey)
       || {
         headers: [],
         body: null
@@ -117,6 +117,7 @@ function ViewCacheMiddleware(cache, logger) {
     });
   };
 }
-Dependencies(Cache, Logger)(ViewCacheMiddleware);  //eslint-disable-line new-cap
+
+Dependencies(Cache, Logger)(ViewCacheMiddleware); //eslint-disable-line new-cap
 
 export default ViewCacheMiddleware;
