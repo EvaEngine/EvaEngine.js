@@ -51,6 +51,6 @@ function SessionMiddleware(_config, redis, namespace) {
       middleware;
   };
 }
-Dependencies(Config, Redis, Namespace)(SessionMiddleware);  //eslint-disable-line new-cap
+Dependencies(Config, Redis, Namespace)(SessionMiddleware); //eslint-disable-line new-cap
 
 export default SessionMiddleware;

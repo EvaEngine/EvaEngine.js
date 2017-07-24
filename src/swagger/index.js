@@ -315,7 +315,7 @@ export class Annotation {
   constructor({
     type, //Block
     value, //Long string
-    file,  //String
+    file, //String
     start,
     end
   }) {
@@ -399,7 +399,6 @@ export class AnnotationsContainer {
  * - EvaEngine Exceptions
  */
 export class ExSwagger {
-
   /**
    * Get file path array by glob
    * @param path

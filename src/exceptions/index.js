@@ -37,7 +37,6 @@ let factory = () => {
  * throw (new Exception()).i18n('some %d', 123)
  */
 export class StandardException extends Error {
-
   /**
    * Generate string hash by crc32
    * @param {string} str
