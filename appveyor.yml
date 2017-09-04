@@ -11,7 +11,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # Typical npm stuff.
   - npm cache clean -f
-  - npm -g install npm@latest
+  - appveyor-retry npm -g install npm@latest
   - npm install
 
 # Post-install test scripts.
