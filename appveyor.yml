@@ -7,11 +7,10 @@ environment:
 
 # Install scripts. (runs after repo cloning)
 install:
-  - npm cache clean -f
   # Get the latest stable version of Node 0.STABLE.latest
   - ps: Install-Product node $env:nodejs_version
   # Typical npm stuff.
-  - npm -g install npm@latest
+  - npm -g install npm@latest --force 
   - npm install
 
 # Post-install test scripts.
