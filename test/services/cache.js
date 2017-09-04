@@ -27,3 +27,19 @@ test('Cache namespace flush', async(t) => {
   t.is(await cache.namespace('ns').has('foo'), false);
   t.is(await cache.namespace('ns1').has('foo'), true);
 });
+
+test('Cache namespace set nx || xx', async(t) => {
+  let ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
+  t.false(ret);
+
+  ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
+  t.true(ret);
+  ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
+  t.false(ret);
+  
+  ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
+  t.true(ret);
+
+  await cache.namespace('ns').flush();
+});
+
