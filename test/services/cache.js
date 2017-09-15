@@ -28,13 +28,27 @@ test('Cache namespace flush', async(t) => {
   t.is(await cache.namespace('ns1').has('foo'), true);
 });
 
-test('Cache namespace set nx || xx', async(t) => {
-  await cache.namespace('ns').flush();
+test('Cache set nx || xx', async(t) => {
+  let ret = await cache.set('foo', 'bar', 0, 'xx');
 
+  t.true(ret === null);
+
+  ret = await cache.set('foo', 'bar', 0, 'nx');
+  t.true(ret === 'OK');
+  ret = await cache.set('foo', 'bar', 0, 'nx');
+  t.true(ret === null);
+  
+  ret = await cache.set('foo', 'bar', 0, 'xx');
+  t.true(ret === 'OK');
+  ret = await cache.set('foo', 'bar', 1, 'xx');
+  t.true(ret === 'OK');
+  
+  await cache.flush();
+});
+
+test('Cache namespace set nx || xx', async(t) => {
   let ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
-  console.log('----------------')
-  console.log(ret)
-  console.log('----------------')
+
   t.true(ret === null);
 
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
@@ -49,4 +63,3 @@ test('Cache namespace set nx || xx', async(t) => {
   
   await cache.namespace('ns').flush();
 });
-
