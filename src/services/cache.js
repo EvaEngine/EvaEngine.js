@@ -120,8 +120,8 @@ export class RedisStore extends Store {
       args.push('ex', minutes * 60);
     }
     if (mutex) {
-      const m = mutex.toLowerCase();
-      if (m === 'nx' || m === 'xx') {
+      const m = mutex.toUpperCase();
+      if (m === 'NX' || m === 'XX') {
         args.push(m);
       }
     }
