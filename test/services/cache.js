@@ -63,3 +63,12 @@ test('Cache namespace set nx || xx', async(t) => {
   
   await cache.namespace('ns').flush();
 });
+
+test('Cache namespace flush returns', async(t) => {
+  t.is(await cache.namespace('ns').flush(), 0);
+
+  await cache.namespace('ns').set('foo1', 'bar1', 0, 'nx');
+  await cache.namespace('ns').set('foo2', 'bar2', 0, 'xx');
+  await cache.namespace('ns').set('foo3', 'bar3');
+  t.is(await cache.namespace('ns').flush(), 2);
+});
