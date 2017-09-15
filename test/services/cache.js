@@ -30,12 +30,12 @@ test('Cache namespace flush', async(t) => {
 
 test('Cache namespace set nx || xx', async(t) => {
   let ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
-  t.false(ret !== 'OK');
+  t.true(ret === null);
 
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
   t.true(ret === 'OK');
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
-  t.false(ret !== 'OK');
+  t.true(ret === null);
   
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
   t.true(ret === 'OK');
