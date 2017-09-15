@@ -84,8 +84,8 @@ export class RedisNamespaceStore extends Store {
 
   flush() {
     return this.redis.keys([this.prefix, this.namespace, '*'].join(':'))
-      .then(keys => {
-        if (keys.length) {
+      .then((keys) => {
+        if (keys.length > 0) {
           return this.redis.del(keys);
         }
         return 1;
