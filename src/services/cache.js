@@ -65,12 +65,21 @@ export class RedisNamespaceStore extends Store {
     return this.redis.get(this.key(key)).then(res => JSON.parse(res));
   }
 
-  set(key, value, minutes) {
-    return minutes ?
-      this.redis
-        .set(this.key(key), JSON.stringify(value), 'ex', minutes * 60) :
-      this.redis
-        .set(this.key(key), JSON.stringify(value));
+  set(key, value, minutes, mutex) {
+    const args = [
+      this.key(key),
+      JSON.stringify(value)
+    ];
+    if (minutes) {
+      args.push('ex', minutes * 60);
+    }
+    if (mutex) {
+      const m = mutex.toUpperCase();
+      if (m === 'NX' || m === 'XX') {
+        args.push(m);
+      }
+    }
+    return this.redis.set(...args);
   }
 
   flush() {

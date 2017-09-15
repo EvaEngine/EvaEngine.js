@@ -32,6 +32,9 @@ test('Cache namespace set nx || xx', async(t) => {
   await cache.namespace('ns').flush();
 
   let ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
+  console.log('----------------')
+  console.log(ret)
+  console.log('----------------')
   t.true(ret === null);
 
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
