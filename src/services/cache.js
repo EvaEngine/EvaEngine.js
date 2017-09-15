@@ -88,7 +88,7 @@ export class RedisNamespaceStore extends Store {
         if (keys.length) {
           return this.redis.del(keys);
         }
-        return 1;
+        return 0;
       });
   }
 }
