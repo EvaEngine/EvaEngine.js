@@ -1,5 +1,4 @@
 import test from 'ava';
-import path from 'path';
 import fs from 'fs';
 import Sequelize from 'sequelize';
 import { ExSwagger } from '../../src/swagger';
@@ -8,7 +7,7 @@ import Entities from './../../src/entities';
 
 test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
-  t.true(files.includes(`${__dirname}${path.sep}_example${path.sep}controller.js`));
+  t.true(files.includes(`${__dirname}/_example/controller.js`));
 });
 
 test('Could parse annotations', async(t) => {
