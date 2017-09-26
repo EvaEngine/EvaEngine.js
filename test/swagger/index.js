@@ -8,7 +8,8 @@ import Entities from './../../src/entities';
 
 test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
-  t.true(files.includes(`${__dirname}${path.sep}_example${path.sep}controller.js`));
+  const ctrpath = `${__dirname}${path.sep}_example${path.sep}controller.js`.split(path.sep).join('/');
+  t.true(files.includes(ctrpath));
 });
 
 test('Could parse annotations', async(t) => {
