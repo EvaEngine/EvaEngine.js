@@ -10,7 +10,7 @@
   "scripts": {
     "prestart": "npm run build",
     "prepublish": "rm -rf ./lib && npm run build",
-    "ava": "LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
+    "ava": "cross-env LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "eslint src/* --ext .js",
     "build": "gulp build"
