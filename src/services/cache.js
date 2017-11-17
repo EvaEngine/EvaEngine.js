@@ -22,6 +22,10 @@ export class Store {
     return Promise.resolve(this);
   }
 
+  del() {
+    return Promise.resolve(this);
+  }
+
   flush() {
     return Promise.resolve(true);
   }
@@ -63,6 +67,10 @@ export class RedisNamespaceStore extends Store {
 
   get(key) {
     return this.redis.get(this.key(key)).then(res => JSON.parse(res));
+  }
+
+  del(key) {
+    return this.redis.del(this.key(key));
   }
 
   set(key, value, minutes, mutex) {
@@ -123,6 +131,10 @@ export class RedisStore extends Store {
 
   get(key) {
     return this.redis.get(this.key(key)).then(res => JSON.parse(res));
+  }
+
+  del(key) {
+    return this.redis.del(this.key(key));
   }
 
   set(key, value, minutes, mutex) {
@@ -196,6 +208,10 @@ export default class Cache extends ServiceInterface {
 
   set(...args) {
     return this.getStore().set(...args);
+  }
+
+  del(...args) {
+    return this.getStore().del(...args);
   }
 
   flush() {
