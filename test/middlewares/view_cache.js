@@ -57,7 +57,7 @@ test('Request hash', (t) => {
   req.route = {};
   t.is(
     requestToCacheKey(req),
-    'get/unknown/:043fe182887af19ba0be0cb494b75c9c'
+    'get/unknown:043fe182887af19ba0be0cb494b75c9c'
   );
 });
 
