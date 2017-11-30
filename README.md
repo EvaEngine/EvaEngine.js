@@ -109,7 +109,7 @@ npm link evaengine
 - `LOG_LEVEL`
 - `CLI_NAME`
 - `MAX_REQUEST_DEBUG_BODY`
-
+- `SEQUELIZE_REPLICATION_CONFIG_KEY` : change sequelize replication config key
 
 ## Generate Entities
 
