@@ -3,7 +3,8 @@ services:
 - redis-server
 node_js:
 - 6.10.3
-- 8.0.0
+- 8.9.1
+- 9.2.0
 script:
 - npm run lint
 - npm test
