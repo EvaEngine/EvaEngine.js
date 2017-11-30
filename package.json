@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
@@ -13,7 +13,7 @@
     "ava": "cross-env LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "eslint src/* --ext .js",
-    "build": "node_modules/.bin/babel -D -s -d lib/ src/ "
+    "build": "./node_modules/.bin/babel -D -s -d lib/ src/ "
   },
   "engines": {
     "node": ">=6.0.0"
