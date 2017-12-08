@@ -24,10 +24,12 @@ export const requestToCacheKey = (req, hashStrategy) => {
           method,
           baseUrl,
           originalUrl,
-          query,
+          query: originQuery,
           route,
           uid = null //Custom rule
         } = req;
+  const query = { ...originQuery };
+  delete query.flush;
   if (hashStrategy && !util.isFunction(hashStrategy)) {
     throw new RuntimeException(`View cache hash strategy must be a function for ${originalUrl}`);
   }
@@ -89,7 +91,7 @@ function ViewCacheMiddleware(cache, logger) {
         headers: [],
         body: null
       };
-      if (cachedBody) {
+      if (!req.query.flush && cachedBody) {
         logger.debug('View cache hit by key %s', cacheKey);
         if (cachedHeaders.length > 0) {
           cachedHeaders.forEach(([key, value]) => {
@@ -107,11 +109,13 @@ function ViewCacheMiddleware(cache, logger) {
         res.realSend(body);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
-        cache.namespace(namespace)
+        if (req.status <= 500) {
+          cache.namespace(namespace)
           .set(cacheKey, { headers, body }, ttl)
           .catch((e) => {
             logger.error('View cache set failed for %s', cacheKey, e);
           });
+        }
       };
       next();
     });
