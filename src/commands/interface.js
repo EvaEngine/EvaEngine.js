@@ -36,7 +36,7 @@ export default class Command {
     return '';
   }
 
-  static getSpac() {
+  static getSpec() {
     return {};
   }
 

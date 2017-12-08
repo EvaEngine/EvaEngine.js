@@ -35,7 +35,7 @@ export class MakeDbViewCommand extends Command {
       if (fieldName.endsWith('At')) {
         return ` FROM_UNIXTIME(IF(${fieldName} > 0, ${fieldName}, NULL)) AS ${fieldName}`;
       }
-      return ` ${fieldName} AS ${fieldName}`;
+      return ` \`${fieldName}\` AS \`${fieldName}\``;
     });
     return `DROP VIEW IF EXISTS view_${tableName};
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW view_${tableName}

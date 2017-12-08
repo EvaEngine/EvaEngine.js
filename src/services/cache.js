@@ -22,6 +22,10 @@ export class Store {
     return Promise.resolve(this);
   }
 
+  del() {
+    return Promise.resolve(this);
+  }
+
   flush() {
     return Promise.resolve(true);
   }
@@ -65,17 +69,35 @@ export class RedisNamespaceStore extends Store {
     return this.redis.get(this.key(key)).then(res => JSON.parse(res));
   }
 
-  set(key, value, minutes) {
-    return minutes ?
-      this.redis
-        .set(this.key(key), JSON.stringify(value), 'ex', minutes * 60) :
-      this.redis
-        .set(this.key(key), JSON.stringify(value));
+  del(key) {
+    return this.redis.del(this.key(key));
+  }
+
+  set(key, value, minutes, mutex) {
+    const args = [
+      this.key(key),
+      JSON.stringify(value)
+    ];
+    if (minutes) {
+      args.push('ex', minutes * 60);
+    }
+    if (mutex) {
+      const m = mutex.toUpperCase();
+      if (m === 'NX' || m === 'XX') {
+        args.push(m);
+      }
+    }
+    return this.redis.set(...args);
   }
 
   flush() {
     return this.redis.keys([this.prefix, this.namespace, '*'].join(':'))
-      .then(keys => this.redis.del(keys));
+      .then((keys) => {
+        if (keys.length) {
+          return this.redis.del(keys);
+        }
+        return 0;
+      });
   }
 }
 
@@ -111,12 +133,25 @@ export class RedisStore extends Store {
     return this.redis.get(this.key(key)).then(res => JSON.parse(res));
   }
 
-  set(key, value, minutes) {
-    return minutes ?
-      this.redis
-        .set(this.key(key), JSON.stringify(value), 'ex', minutes * 60) :
-      this.redis
-        .set(this.key(key), JSON.stringify(value));
+  del(key) {
+    return this.redis.del(this.key(key));
+  }
+
+  set(key, value, minutes, mutex) {
+    const args = [
+      this.key(key),
+      JSON.stringify(value)
+    ];
+    if (minutes) {
+      args.push('ex', minutes * 60);
+    }
+    if (mutex) {
+      const m = mutex.toUpperCase();
+      if (m === 'NX' || m === 'XX') {
+        args.push(m);
+      }
+    }
+    return this.redis.set(...args);
   }
 
   flush() {
@@ -173,6 +208,10 @@ export default class Cache extends ServiceInterface {
 
   set(...args) {
     return this.getStore().set(...args);
+  }
+
+  del(...args) {
+    return this.getStore().del(...args);
   }
 
   flush() {

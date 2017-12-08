@@ -13,18 +13,18 @@ export const tracerToZipkins = (tracer) => {
     return false;
   }
   const {
-          url,
-          method,
-          serviceName,
-          spanId: id,
-          traceId,
-          parentId,
-          timestamp,
-          duration,
-          statusCode,
-          port,
-          queries
-        } = tracer;
+    url,
+    method,
+    serviceName,
+    spanId: id,
+    traceId,
+    parentId,
+    timestamp,
+    duration,
+    statusCode,
+    port,
+    queries
+  } = tracer;
 
   const name = `${statusCode} ${method} ${url}`;
   const endpoint = {
@@ -223,6 +223,7 @@ function TraceMiddleware(ns, config, logger, client) {
     });
   };
 }
-Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware);  //eslint-disable-line new-cap
+
+Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware); //eslint-disable-line new-cap
 
 export default TraceMiddleware;

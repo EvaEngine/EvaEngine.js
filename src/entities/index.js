@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
+import cloneDeep from 'lodash/cloneDeep';
 import Sequelize from 'sequelize';
 import util from 'util';
 import DI from '../di';
@@ -122,8 +123,12 @@ export default class Entities {
         Sequelize.cls = ns.use().getContext();
       }
 
+      const dbConfig = cloneDeep(config.db);
+      if (process.env.SEQUELIZE_REPLICATION_CONFIG_KEY) {
+        dbConfig.replication = dbConfig[process.env.SEQUELIZE_REPLICATION_CONFIG_KEY];
+      }
       this.sequelize = new Sequelize(config.db.database, null, null,
-        Object.assign({}, config.sequelize, config.db, Entities.addTracer())
+        Object.assign({}, config.sequelize, dbConfig, Entities.addTracer())
       );
     } else {
       this.sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
