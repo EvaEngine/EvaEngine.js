@@ -24,10 +24,12 @@ export const requestToCacheKey = (req, hashStrategy) => {
     method,
     baseUrl,
     originalUrl,
-    query,
+    query: originQuery,
     route,
     uid = null //Custom rule
   } = req;
+  const query = { ...originQuery };
+  delete query.flush;
   if (hashStrategy && !util.isFunction(hashStrategy)) {
     throw new RuntimeException(`View cache hash strategy must be a function for ${originalUrl}`);
   }
@@ -72,13 +74,12 @@ function ViewCacheMiddleware(cache, logger) {
       headersFilter,
       namespace,
       hashStrategy
-    } = Object
-      .assign({
-        ttl: 60,
-        headersFilter: defaultHeadersFilter,
-        hashStrategy: defaultHashStrategy,
-        namespace: 'view'
-      }, options);
+    } = Object.assign({
+      ttl: 60,
+      headersFilter: defaultHeadersFilter,
+      hashStrategy: defaultHashStrategy,
+      namespace: 'view'
+    }, options);
     return wrapper(async (req, res, next) => {
       const cacheKey = requestToCacheKey(req, hashStrategy);
       const {
@@ -89,7 +90,7 @@ function ViewCacheMiddleware(cache, logger) {
         headers: [],
         body: null
       };
-      if (cachedBody) {
+      if (!req.query.flush && cachedBody) {
         logger.debug('View cache hit by key %s', cacheKey);
         if (cachedHeaders.length > 0) {
           cachedHeaders.forEach(([key, value]) => {
@@ -107,17 +108,16 @@ function ViewCacheMiddleware(cache, logger) {
         res.realSend(body);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
-        cache.namespace(namespace)
-          .set(cacheKey, { headers, body }, ttl)
-          .catch((e) => {
+        if (res.statusCode <= 500) {
+          cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).catch((e) => {
             logger.error('View cache set failed for %s', cacheKey, e);
           });
+        }
       };
       next();
     });
   };
 }
-
-Dependencies(Cache, Logger)(ViewCacheMiddleware); //eslint-disable-line new-cap
+Dependencies(Cache, Logger)(ViewCacheMiddleware);//eslint-disable-line new-cap
 
 export default ViewCacheMiddleware;
