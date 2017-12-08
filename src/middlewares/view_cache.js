@@ -21,13 +21,13 @@ export const defaultHeadersFilter = (res) => {
 
 export const requestToCacheKey = (req, hashStrategy) => {
   const {
-          method,
-          baseUrl,
-          originalUrl,
-          query: originQuery,
-          route,
-          uid = null //Custom rule
-        } = req;
+    method,
+    baseUrl,
+    originalUrl,
+    query: originQuery,
+    route,
+    uid = null //Custom rule
+  } = req;
   const query = { ...originQuery };
   delete query.flush;
   if (hashStrategy && !util.isFunction(hashStrategy)) {
@@ -70,23 +70,22 @@ function ViewCacheMiddleware(cache, logger) {
       };
     }
     const {
-            ttl,
-            headersFilter,
-            namespace,
-            hashStrategy
-          } = Object
-      .assign({
-        ttl: 60,
-        headersFilter: defaultHeadersFilter,
-        hashStrategy: defaultHashStrategy,
-        namespace: 'view'
-      }, options);
+      ttl,
+      headersFilter,
+      namespace,
+      hashStrategy
+    } = Object.assign({
+      ttl: 60,
+      headersFilter: defaultHeadersFilter,
+      hashStrategy: defaultHashStrategy,
+      namespace: 'view'
+    }, options);
     return wrapper(async (req, res, next) => {
       const cacheKey = requestToCacheKey(req, hashStrategy);
       const {
-              headers: cachedHeaders = [],
-              body: cachedBody
-            } = await cache.namespace(namespace).get(cacheKey)
+        headers: cachedHeaders = [],
+        body: cachedBody
+      } = await cache.namespace(namespace).get(cacheKey)
       || {
         headers: [],
         body: null
@@ -110,9 +109,7 @@ function ViewCacheMiddleware(cache, logger) {
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
         if (res.statusCode <= 500) {
-          cache.namespace(namespace)
-          .set(cacheKey, { headers, body }, ttl)
-          .catch((e) => {
+          cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).catch((e) => {
             logger.error('View cache set failed for %s', cacheKey, e);
           });
         }
@@ -121,6 +118,6 @@ function ViewCacheMiddleware(cache, logger) {
     });
   };
 }
-Dependencies(Cache, Logger)(ViewCacheMiddleware);  //eslint-disable-line new-cap
+Dependencies(Cache, Logger)(ViewCacheMiddleware);//eslint-disable-line new-cap
 
 export default ViewCacheMiddleware;
