@@ -109,7 +109,7 @@ function ViewCacheMiddleware(cache, logger) {
         res.realSend(body);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
-        if (req.status <= 500) {
+        if (res.statusCode <= 500) {
           cache.namespace(namespace)
           .set(cacheKey, { headers, body }, ttl)
           .catch((e) => {
