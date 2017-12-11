@@ -225,7 +225,7 @@ export default class SmartQuery {
   /**
    * 处理用户的排序请求
    * @param {Array} [autoMapping=[]] 根据字段名自动排序，数组成员为字段名，每个字段名自动生成正反序，
-   *                                  如 `created_at` 生成 `created_at` 正序和 `created_at-` 倒序
+   *                                  如 `created_at` 生成 `created_at` 正序和 `-created_at` 倒序
    * @param {Object} [manualMapping={}]
    * @param [defaultOrder=null] 默认排序，当 query 中不包含 `paramName` 属性时使用。如不设置则为 `autoMapping` 的第一个字段的倒序
    * @param {String} [paramName='sort'] 参数名称
