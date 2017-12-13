@@ -88,7 +88,7 @@ export default class EvaEngine {
     this.commandName = null;
     this.port = ((val) => {
       const rawPort = parseInt(val, 10);
-      if (isNaN(rawPort)) {
+      if (Number.isNaN(rawPort)) {
         return val;
       }
       if (rawPort >= 0) {
@@ -174,7 +174,7 @@ export default class EvaEngine {
       || !{}.hasOwnProperty.call(command, 'getDescription')) {
       throw new RuntimeException('Command require getSpec and getDescription static method');
     }
-    const argv = yargs
+    const { argv } = yargs
       .command(commandName, command.getDescription(), Object.assign({
         verbose: {
           alias: 'v',
@@ -185,11 +185,10 @@ export default class EvaEngine {
         }
       }, command.getSpec()))
       .help()
-      .count('verbose')
-      .argv;
+      .count('verbose');
 
 
-    const verbose = argv.verbose;
+    const { verbose } = argv;
     const levels = ['info', 'verbose', 'debug', 'debug'];
     const level = levels[verbose] ? levels[verbose] : 'info';
     for (const [, transport = {}] of Object.entries(this.logger.getInstance().transports)) {
@@ -333,8 +332,10 @@ export default class EvaEngine {
           //TODO: with req & res
           this.logger.error(req.method, req.originalUrl || req.url, '|', exception);
         } else {
-          this.logger.warn(req.method, req.originalUrl || req.url, '|',
-            exception.getImportance() > 0 ? exception : exception.message);
+          this.logger.warn(
+            req.method, req.originalUrl || req.url, '|',
+            exception.getImportance() > 0 ? exception : exception.message
+          );
         }
         return res
           .status(exception.getStatusCode())
@@ -399,7 +400,7 @@ export default class EvaEngine {
           throw error;
         }
 
-        const port = this.port;
+        const { port } = this;
 
         const bind = typeof port === 'string'
           ? `Pipe ${port}`
@@ -507,12 +508,12 @@ export default class EvaEngine {
     if (Object.keys(this.commands).includes(commandName) === false) {
       throw new RuntimeException(`Command ${commandName} not registered`);
     }
-    const argv = yargs(options ? options.join(' ') : '').argv;
+    const { argv } = yargs(options ? options.join(' ') : '');
     const command = new this.commands[commandName](argv);
 
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
-    later.setInterval(async() => {
+    later.setInterval(async () => {
       this.logger.info('Cron job [%s] | Round %d | started with params %j', commandName, i, argv);
       //Let job crash if any exception happen
       await command.run();
@@ -531,7 +532,7 @@ export default class EvaEngine {
     if (Object.keys(this.commands).includes(commandName) === false) {
       throw new RuntimeException(`Command ${commandName} not registered`);
     }
-    const argv = yargs(options ? options.join(' ') : '').argv;
+    const { argv } = yargs(options ? options.join(' ') : '');
     const command = new this.commands[commandName](argv);
     return command.run();
   }

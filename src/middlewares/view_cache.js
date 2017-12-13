@@ -35,21 +35,17 @@ export const requestToCacheKey = (req, hashStrategy) => {
     throw new RuntimeException(`View cache middleware require route for ${originalUrl}`);
   }
   if (method.toLowerCase() !== 'get') {
-    throw new RuntimeException(
-      `View cache middleware only support GET method of http request for ${originalUrl}`
-    );
+    throw new RuntimeException(`View cache middleware only support GET method of http request for ${originalUrl}`);
   }
   const { host = 'unknown' } = req.headers;
   const key = [method, `/${host}`, baseUrl, route.path].join('').replace(/:/g, '_').toLowerCase();
   const strategy = hashStrategy || defaultHashStrategy;
-  const hash = crypto.createHash('md5').update(
-    JSON.stringify(strategy({
-      method,
-      originalUrl,
-      query,
-      uid
-    }))
-  ).digest('hex');
+  const hash = crypto.createHash('md5').update(JSON.stringify(strategy({
+    method,
+    originalUrl,
+    query,
+    uid
+  }))).digest('hex');
   return [key, hash].join(':');
 };
 

@@ -32,7 +32,12 @@ export default class Config extends ServiceInterface {
    * @param label
    * @returns {Promise.<void>}
    */
-  async resolveSpringConfig({ endpoint, name, profiles, label = 'master' }) {
+  async resolveSpringConfig({
+    endpoint,
+    name,
+    profiles,
+    label = 'master'
+  }) {
     if (!config) {
       config = this.loadConfigFromFiles();
     }
