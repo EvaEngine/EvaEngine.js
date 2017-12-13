@@ -47,7 +47,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
   const hash = crypto.createHash('md5').update(
     JSON.stringify(strategy({
       method,
-      originalUrl,
+      baseUrl,
       query,
       uid
     }))
@@ -90,7 +90,7 @@ function ViewCacheMiddleware(cache, logger) {
         headers: [],
         body: null
       };
-      if (!req.query.flush && cachedBody) {
+      if (req.query.flush !== 'true' && cachedBody) {
         logger.debug('View cache hit by key %s', cacheKey);
         if (cachedHeaders.length > 0) {
           cachedHeaders.forEach(([key, value]) => {
