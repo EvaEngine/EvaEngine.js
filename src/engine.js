@@ -99,6 +99,7 @@ export default class EvaEngine {
     this.defaultErrorHandler = null;
     this.serverErrorHandler = null;
     this.uncaughtExceptionHandler = null;
+    this.crontabJobHandlers = [];
 
     this.meta = {
       mode,
@@ -294,6 +295,13 @@ export default class EvaEngine {
 
   clearCommands() {
     this.commands = [];
+  }
+
+  clearCrontabs() {
+    this.crontabJobHandlers.forEach((handler) => {
+      clearInterval(handler);
+    });
+    this.crontabJobHandlers = [];
   }
 
   /**
@@ -513,7 +521,7 @@ export default class EvaEngine {
 
     let i = 1;
     const schedule = later.parse.cron(sequence, useSeconds);
-    later.setInterval(async () => {
+    const handler = later.setInterval(async () => {
       this.logger.info('Cron job [%s] | Round %d | started with params %j', commandName, i, argv);
       //Let job crash if any exception happen
       await command.run();
@@ -521,6 +529,7 @@ export default class EvaEngine {
       i += 1;
     }, schedule); //第二个参数为True表示支持秒
     this.logger.info('Cron job [%s] with sequence [%s] registered as %j', commandString, sequence, schedule);
+    this.crontabJobHandlers.push(handler);
   }
 
   /**
