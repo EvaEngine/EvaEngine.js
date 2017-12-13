@@ -1,6 +1,6 @@
 {
   "name": "evaengine",
-  "version": "0.5.5",
+  "version": "0.5.7",
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "repository": {
