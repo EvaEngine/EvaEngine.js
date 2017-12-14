@@ -437,7 +437,7 @@ export class ExSwagger {
       const source = await fs.readFileSync(file);
       try {
         acorn.parse(source, {
-          ecmaVersion: 8,
+          ecmaVersion: 9,
           allowImportExportEverywhere: true,
           onComment: comments
         });
