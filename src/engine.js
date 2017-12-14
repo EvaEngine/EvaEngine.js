@@ -4,12 +4,15 @@ import https from 'https';
 import path from 'path';
 import yargs from 'yargs';
 import later from 'later';
+import moment from 'moment-timezone';
 import DI from './di';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
 import {
   StandardException, RuntimeException
 } from './exceptions';
+
+moment.tz.setDefault(process.env.TZ ? process.env.TZ : 'Asia/Shanghai');
 
 export const MODES = {
   WEB: 'web',
