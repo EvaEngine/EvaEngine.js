@@ -106,8 +106,8 @@ function ViewCacheMiddleware(cache, logger) {
       res.send = (body) => { //eslint-disable-line no-param-reassign
         logger.debug('View cache missed by key %s, creating...', cacheKey);
         res.setHeader('X-View-Cache-Miss', cacheKey);
-        res.setHeader('X-View-Cache-Expire-Date', moment().add(ttl, 'minute').format('YYYY-MM-DD HH:mm:ss'));
-        res.setHeader('X-View-Cache-Date', moment().format('YYYY-MM-DD HH:mm:ss'));
+        res.setHeader('X-View-Cache-Expire-At', moment().add(ttl, 'minute').format('YYYY-MM-DD HH:mm:ss Z'));
+        res.setHeader('X-View-Cache-Created-At', moment().format('YYYY-MM-DD HH:mm:ss Z'));
         res.realSend(body);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
