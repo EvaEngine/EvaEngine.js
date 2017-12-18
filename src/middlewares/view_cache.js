@@ -146,7 +146,7 @@ function ViewCacheMiddleware(cache, logger) {
           return next();
         }
 
-        setTimeout(spinCache(), 0);
+        setTimeout(spinCache, 0);
         logger.info('View cache is spinning...');
         return true;
       };
