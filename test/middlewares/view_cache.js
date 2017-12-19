@@ -61,23 +61,21 @@ test('Request hash', (t) => {
   );
 });
 
-//FIXME: this assert not work!!
-// test('View cache', (t) => {
-//   t.plan(1);
-//   const req = mockRequest({
-//     method: 'GET', url: '/'
-//   });
-//   req.route = {};
-//   const res = mockResponse();
-//   const middleware = DI.get('view_cache')(60);
-//   res.on('end', () => {
-//     cache.namespace('view').has('get/unknown:043fe182887af19ba0be0cb494b75c9c').then((v) => {
-//       t.true(v);
-//     });
-//   });
-//
-//   middleware(req, res, () => {
-//     res.send('something');
-//   });
-// });
+test('View cache', async (t) => {
+  const req = mockRequest({
+    method: 'GET', url: '/'
+  });
+  req.route = {};
+  const res = mockResponse();
+  const middleware = DI.get('view_cache')(60);
+
+  await middleware(req, res, () => {
+    res.send('something');
+  });
+
+  const v = await cache.namespace('view').has('get/unknown/:5bb7eb919a5d177089d48a9ab171fc4e');
+  t.true(v);
+
+  t.is(await cache.namespace('view').flush(), 1);
+});
 
