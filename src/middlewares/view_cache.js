@@ -108,7 +108,7 @@ function ViewCacheMiddleware(cache, logger) {
 
       //重设send方法
       const resetSend = () => {
-        res.realSend = res.send; //eslint-disable-line no-param-reassign
+        res.realSend = res.realSend || res.send; //eslint-disable-line no-param-reassign
         res.send = (body) => { //eslint-disable-line no-param-reassign
           logger.debug('View cache missed by key %s, creating...', cacheKey);
           res.setHeader('X-View-Cache-Miss', cacheKey);
@@ -146,6 +146,7 @@ function ViewCacheMiddleware(cache, logger) {
           return next();
         }
 
+        //自旋
         setTimeout(spinCache, 0);
         logger.info('View cache is spinning...');
         return true;
