@@ -1,4 +1,0 @@
-
-> evaengine@0.5.10 test /Users/harveyz/code/hz/EvaEngine.js
-> nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava
-
