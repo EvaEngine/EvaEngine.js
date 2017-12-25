@@ -18,7 +18,7 @@ const providers = {
   middlewares: MiddlewareProviders
 };
 
-const wrapper = utils.wrapper;
+const { wrapper } = utils;
 
 const {
   DI,
@@ -54,4 +54,4 @@ const core = {
 };
 
 module.exports = core;
-exports = module.exports;
+exports = module.exports; //eslint-disable-line

@@ -198,7 +198,8 @@ export class MakeEntityCommand extends Command {
       {
         type: sequelize.QueryTypes.SELECT,
         raw: true
-      });
+      }
+    );
     if (!rawIndexes) {
       return [];
     }
@@ -213,7 +214,10 @@ export class MakeEntityCommand extends Command {
   async run() {
     const config = DI.get('config').get();
     const logger = DI.get('logger');
-    const sequelize = new Sequelize(config.db.database, null, null,
+    const sequelize = new Sequelize(
+      config.db.database,
+      null,
+      null,
       Object.assign({}, config.sequelize, config.db, { logging: logger.getInstance().verbose })
     );
     const query = sequelize.getQueryInterface();
@@ -241,7 +245,7 @@ export class MakeEntityCommand extends Command {
 
     logger.info('Start generate DB schemas to dir %s', path);
 
-    const tableHandler = async(table) => {
+    const tableHandler = async (table) => {
       const columns = await query.describeTable(table);
       const rawColumns = await sequelize.query(`SHOW FULL COLUMNS FROM ${table}`, {
         type: sequelize.QueryTypes.SELECT,
