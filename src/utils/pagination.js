@@ -165,7 +165,7 @@ export const pagination = ({
 }) => {
   const totalNumber = toPositiveInteger(total);
   let offsetNumber = parseInt(offset, 10);
-  offsetNumber = isNaN(offsetNumber) ? 0 : offsetNumber;
+  offsetNumber = Number.isNaN(offsetNumber) ? 0 : offsetNumber;
   let limitNumber = toPositiveInteger(limit);
   limitNumber = limitNumber < 1 ? 1 : limitNumber;
   const prev = offsetNumber - limitNumber;
@@ -216,8 +216,8 @@ export const pagination = ({
 
 export const paginationFilter = ({ offset, limit }, defaultLimit = 15, maxLimit = 100) => {
   //Solve offset is negative
-  let offsetNumber = parseInt(offset, 10);
-  offsetNumber = isNaN(offsetNumber) ? 0 : offsetNumber;
+  let offsetNumber = Number.parseInt(offset, 10);
+  offsetNumber = Number.isNaN(offsetNumber) ? 0 : offsetNumber;
   let limitNumber = toPositiveInteger(limit);
   limitNumber = limitNumber < 1 ? defaultLimit : limitNumber;
 

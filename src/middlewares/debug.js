@@ -18,39 +18,49 @@ import Logger from '../services/logger';
  '$sent_http_x_b3_parentspanid $sent_http_x_b3_sampled';
  */
 
-morgan.token('host', req =>
-  req.headers.host
+morgan.token(
+  'host',
+  req =>
+    req.headers.host
 );
 
-morgan.token('real-ip', req =>
-  req.headers['x-real-ip'] ||
-  req.headers['x-forwarded-for'] ||
-  req.ip ||
-  (req.connection && req.connection.remoteAddress)
+morgan.token(
+  'real-ip',
+  req =>
+    req.headers['x-real-ip'] ||
+    req.headers['x-forwarded-for'] ||
+    req.ip ||
+    (req.connection && req.connection.remoteAddress)
 );
 
-morgan.token('port', req =>
-  (req.headers.host && req.headers.host.split(':')[1]) || -1
+morgan.token(
+  'port',
+  req =>
+    (req.headers.host && req.headers.host.split(':')[1]) || -1
 );
 
 const hostname = os.hostname();
 morgan.token('hostname', () => hostname);
 
-morgan.token('tokens', (req, res) =>
-  [
-    res.getHeader('X-Uid') || '-',
-    res.getHeader('X-Token') || '-'
-  ].join(' ')
+morgan.token(
+  'tokens',
+  (req, res) =>
+    [
+      res.getHeader('X-Uid') || '-',
+      res.getHeader('X-Token') || '-'
+    ].join(' ')
 );
 
-morgan.token('tracer', (req, res) =>
-  [
-    res.getHeader('X-Service-Name') || '-',
-    res.getHeader('X-B3-SpanId') || '-',
-    res.getHeader('X-B3-TraceId') || '-',
-    res.getHeader('X-B3-ParentSpanId') || '-',
-    res.getHeader('X-B3-Sampled') || '-'
-  ].join(' ')
+morgan.token(
+  'tracer',
+  (req, res) =>
+    [
+      res.getHeader('X-Service-Name') || '-',
+      res.getHeader('X-B3-SpanId') || '-',
+      res.getHeader('X-B3-TraceId') || '-',
+      res.getHeader('X-B3-ParentSpanId') || '-',
+      res.getHeader('X-B3-Sampled') || '-'
+    ].join(' ')
 );
 
 
@@ -63,13 +73,16 @@ function DebugMiddleware(logger) {
   return () =>
     morgan(
       ':real-ip - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ' +
-      '":remote-addr" :host :response-time - :http-version :port :hostname - :tokens :tracer %s', {
+      '":remote-addr" :host :response-time - :http-version :port :hostname - :tokens :tracer %s',
+      {
         stream: {
           write: (message) => {
             logger.info(message);
           }
         }
-      });
+      }
+    );
 }
+
 Dependencies(Logger)(DebugMiddleware); //eslint-disable-line new-cap
 export default DebugMiddleware;

@@ -125,7 +125,7 @@ export class StandardException extends Error {
       message = exceptionOrMsg;
     }
     if (throwingError === true) {
-      message = exceptionOrMsg.message;
+      ({ message } = exceptionOrMsg);
     }
     super(message);
 
@@ -477,7 +477,9 @@ const exceptions = {
 };
 
 factory = (json) => {
-  const { code, name, statusCode, message, prevError, errors, fullStack = [] } = json;
+  const {
+    code, name, statusCode, message, prevError, errors, fullStack = []
+  } = json;
   if (!code || !name || !statusCode || !message) {
     return {};
   }

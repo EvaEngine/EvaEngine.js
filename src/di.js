@@ -29,21 +29,21 @@ export default class DI {
 
   static bindClass(...args) {
     if (typeof args[0] === 'string') {
-      bound[args[0]] = args[1];
+      [, bound[args[0]]] = args;
     }
     return container.bindClass(...args);
   }
 
   static bindValue(...args) {
     if (typeof args[0] === 'string') {
-      bound[args[0]] = args[1];
+      [, bound[args[0]]] = args;
     }
     return container.bindValue(...args);
   }
 
   static bindMethod(...args) {
     if (typeof args[0] === 'string') {
-      bound[args[0]] = args[1];
+      [, bound[args[0]]] = args;
     }
     return container.bindMethod(...args);
   }
