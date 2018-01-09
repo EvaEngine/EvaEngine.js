@@ -6,6 +6,7 @@ import Sequelize from 'sequelize';
 import util from 'util';
 import DI from '../di';
 import { getMicroTimestamp } from '../utils';
+import { StandardException } from '../exceptions';
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
@@ -170,6 +171,12 @@ export default class Entities {
     const uniqueString = typeof uniqueCondition === 'string' ? uniqueCondition :
       [`SELECT * FROM ${tableName} WHERE `, this.getInstance().dialect.QueryGenerator.getWhereConditions(uniqueCondition)].join('');
 
+    const re = /select|update|delete|truncate|join|union|exec|insert|drop|count|'|"|;|>|<|%/i;
+    for (const s of [tableName, columnString, valueString]) {
+      if (re.test(s)) {
+        throw new StandardException(`Invalid SQL param: ${s}.`);
+      }
+    }
     /*
      Original Example:
      entities.getInstance().query(`INSERT INTO ${tableName}
