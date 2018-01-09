@@ -12,6 +12,7 @@ import { RuntimeException, StandardException } from '../exceptions';
 
 export class AcornParsingException extends StandardException {
 }
+
 export class YamlParsingException extends StandardException {
   /**
    * @param {Annotation} annotation
@@ -30,11 +31,15 @@ export class YamlParsingException extends StandardException {
   }
 
   toString() {
-    const { file, start, end, value } = this.getAnnotation();
-    return format('Yaml parsing error happened in %s Line[%s - %s]\n Yaml error: %s \nOriginal Yaml Text:',
+    const {
+      file, start, end, value
+    } = this.getAnnotation();
+    return format(
+      'Yaml parsing error happened in %s Line[%s - %s]\n Yaml error: %s \nOriginal Yaml Text:',
       file, start, end,
       this.getPrevError() ? this.getPrevError().message : '',
-      value ? value.split('\n').map((v, i) => `${(i - 1).toString().padStart(5)} ${v}`) : []);
+      value ? value.split('\n').map((v, i) => `${(i - 1).toString().padStart(5)} ${v}`) : []
+    );
   }
 
   constructor(...args) {
@@ -84,6 +89,7 @@ const FRAGMENT_TYPE_PATH = 'path';
 const FRAGMENT_TYPE_DEFINITION = 'definition';
 const FRAGMENT_TYPE_EXCEPTION = 'exception';
 const FRAGMENT_TYPE_UNKNOWN = 'unknown';
+
 export class Fragment {
   /**
    * @returns {[*,*,*,*]}
@@ -248,7 +254,9 @@ export class Fragment {
     });
   }
 
-  constructor({ type, description, value, file, start, end }) {
+  constructor({
+    type, description, value, file, start, end
+  }) {
     assert(type && description && value && file && start && end, 'Fragment require type && description && value && file && start && end');
     assert(this.getTypes().includes(type), 'Fragment types not match input');
     this.type = type;
@@ -285,14 +293,14 @@ export class Annotation {
     jsDocs.filter(jsDoc =>
       jsDoc.title
       && (jsDoc.title === 'swagger' || jsDoc.title === 'throws')
-      && jsDoc.description
-    ).forEach((jsDoc) => {
-      try {
-        fragments.push(Fragment.factory(jsDoc, this));
-      } catch (e) {
-        this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
-      }
-    });
+      && jsDoc.description)
+      .forEach((jsDoc) => {
+        try {
+          fragments.push(Fragment.factory(jsDoc, this));
+        } catch (e) {
+          this.yamlErrors.push((new YamlParsingException(e)).setAnnotation(this));
+        }
+      });
 
     fragments.forEach((fragment) => {
       if (fragment.isException()) {
@@ -429,7 +437,7 @@ export class ExSwagger {
       const source = await fs.readFileSync(file);
       try {
         acorn.parse(source, {
-          ecmaVersion: 8,
+          ecmaVersion: 9,
           allowImportExportEverywhere: true,
           onComment: comments
         });
@@ -504,9 +512,8 @@ export class ExSwagger {
 
   async exportJson(dist = this.swaggerDocsPath) {
     this.logger.debug('Start export swagger docs by meta %j', this.getStates());
-    const fileGroups = await Promise.all(
-      this.sourceFilesPath.map(path => ExSwagger.scanFiles(path))
-    );
+    const fileGroups = await Promise
+      .all(this.sourceFilesPath.map(path => ExSwagger.scanFiles(path)));
     let files = [];
     fileGroups.forEach((fileGroup) => {
       files = files.concat(fileGroup);
@@ -524,10 +531,12 @@ export class ExSwagger {
       }
       const annotationFragments = annotationsContainer.collectFragments();
       fragments = fragments.concat(annotationFragments);
-      this.logger.debug('Scanner found %s annotations and collected %s fragments in file %s',
+      this.logger.debug(
+        'Scanner found %s annotations and collected %s fragments in file %s',
         annotationsContainer.getAnnotations().length.toString().padStart(3),
         annotationFragments.length.toString().padStart(3),
-        annotationsContainer.getFile());
+        annotationsContainer.getFile()
+      );
 
       const yamlErrors = annotationsContainer.collectYamlErrors();
       yamlErrors.forEach(yamlError => this.logger.error(yamlError));
@@ -541,11 +550,14 @@ export class ExSwagger {
     for (const exceptionPath of this.exceptionPaths) {
       this.logger.debug('Search exception in %s', exceptionPath);
       const exceptionsInFile = await ExSwagger.scanExceptions(
-        exceptionPath, this.exceptionInterface
+        exceptionPath,
+        this.exceptionInterface
       );
       Object.assign(exceptions, exceptionsInFile);
-      this.logger.debug('Scanner found %s exceptions',
-        Object.keys(exceptions).length, Object.keys(exceptions));
+      this.logger.debug(
+        'Scanner found %s exceptions',
+        Object.keys(exceptions).length, Object.keys(exceptions)
+      );
     }
     const modelDefinitions = this.models ?
       ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : new Map();
@@ -592,8 +604,10 @@ export class ExSwagger {
   async getSwaggerIndexHtml() {
     const uiPath = this.getSwaggerUIPath();
     const content = await fs.readFileSync(`${uiPath}/index.html`);
-    return content.toString().replace('http://petstore.swagger.io/v2/swagger.json',
-      this.swaggerDocsPath.replace(this.compileDistPath, ''));
+    return content.toString().replace(
+      'http://petstore.swagger.io/v2/swagger.json',
+      this.swaggerDocsPath.replace(this.compileDistPath, '')
+    );
   }
 
   getCompileDistPath() {

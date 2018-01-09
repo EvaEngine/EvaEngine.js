@@ -40,9 +40,9 @@ module.exports.httpMocker = httpMocker;
 module.exports.runController =
   (controller, request, response = mockResponse()) =>
     new Promise((resolve, reject) => {
-      response.on('end',
-        () => resolve(
-          JSON.parse(response._getData() //eslint-disable-line no-underscore-dangle
-          )));
+      response.on(
+        'end',
+        () => resolve(JSON.parse(response._getData())) //eslint-disable-line no-underscore-dangle
+      );
       controller.handle(request, response, err => reject(err));
     });

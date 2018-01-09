@@ -1,6 +1,7 @@
 import { Dependencies } from 'constitute';
 import crypto from 'crypto';
 import util from 'util';
+import moment from 'moment-timezone';
 import Logger from '../services/logger';
 import Cache from '../services/cache';
 import wrapper from '../utils/wrapper';
@@ -37,21 +38,21 @@ export const requestToCacheKey = (req, hashStrategy) => {
     throw new RuntimeException(`View cache middleware require route for ${originalUrl}`);
   }
   if (method.toLowerCase() !== 'get') {
-    throw new RuntimeException(
-      `View cache middleware only support GET method of http request for ${originalUrl}`
-    );
+    throw new RuntimeException(`View cache middleware only support GET method of http request for ${originalUrl}`);
   }
   const { host = 'unknown' } = req.headers;
   const key = [method, `/${host}`, baseUrl, route.path].join('').replace(/:/g, '_').toLowerCase();
   const strategy = hashStrategy || defaultHashStrategy;
-  const hash = crypto.createHash('md5').update(
-    JSON.stringify(strategy({
-      method,
-      baseUrl,
-      query,
-      uid
-    }))
-  ).digest('hex');
+  const hash = crypto
+    .createHash('md5')
+    .update(JSON
+      .stringify(strategy({
+        method,
+        baseUrl,
+        query,
+        uid
+      })))
+    .digest('hex');
   return [key, hash].join(':');
 };
 
@@ -105,6 +106,8 @@ function ViewCacheMiddleware(cache, logger) {
       res.send = (body) => { //eslint-disable-line no-param-reassign
         logger.debug('View cache missed by key %s, creating...', cacheKey);
         res.setHeader('X-View-Cache-Miss', cacheKey);
+        res.setHeader('X-View-Cache-Expire-At', moment().add(ttl, 'minute').format('YYYY-MM-DD HH:mm:ss Z'));
+        res.setHeader('X-View-Cache-Created-At', moment().format('YYYY-MM-DD HH:mm:ss Z'));
         res.realSend(body);
         const headers = headersFilter && util.isFunction(headersFilter) ?
           headersFilter(res) : defaultHeadersFilter(res);
@@ -118,6 +121,7 @@ function ViewCacheMiddleware(cache, logger) {
     });
   };
 }
+
 Dependencies(Cache, Logger)(ViewCacheMiddleware);//eslint-disable-line new-cap
 
 export default ViewCacheMiddleware;

@@ -117,3 +117,7 @@ npm link evaengine
 ./node_modules/.bin/engine make:entity
 ./node_modules/.bin/engine make:dbview
 ```
+
+## Import eslint with airbnb code standard for Webstorm
+
+WebStorm > Preferences > Editor > Code Style > JavaScript > Scheme > Import Scheme > Choose `airbnb_code_style.xml` under this project

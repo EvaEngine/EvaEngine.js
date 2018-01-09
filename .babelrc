@@ -1,10 +1,19 @@
 {
   "presets": [
-    "stage-3",
-    "es2015-node6"
+    [
+      "env",
+      {
+        "targets": {
+          "node": "6.11.0"
+        },
+        "useBuiltIns": true,
+        "debug": false
+      }
+    ]
   ],
   "plugins": [
     "transform-decorators-legacy",
+    "transform-object-rest-spread",
     [
       "babel-plugin-transform-builtin-extend",
       {
@@ -13,7 +22,5 @@
         ]
       }
     ]
-  ],
-  "env": {
-  }
+  ]
 }

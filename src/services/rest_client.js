@@ -89,12 +89,13 @@ export default class RestClient extends ServiceInterface {
       }
     }
     try {
-      const { headers, body } = await this.client.getInstance()(
-        Object.assign(this.populateTrace(params), {
+      const { headers, body } = await this.client.getInstance()(Object.assign(
+        this.populateTrace(params),
+        {
           json: true,
           resolveWithFullResponse: true
-        })
-      );
+        }
+      ));
       this.saveToTracer(headers);
       return body;
     } catch (e) {

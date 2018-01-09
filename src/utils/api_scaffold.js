@@ -39,8 +39,8 @@ export class OrderScaffold {
   }
 
   getAvailableOrders() {
-    const fields = this.fields;
-    const queryCase = this.queryCase;
+    const { fields } = this;
+    const { queryCase } = this;
     const orders = {};
     fields.forEach((field) => {
       const ascKey = queryCase === SNAKE_CASE ? snakeCase(field) : camelCase(field);
@@ -197,7 +197,7 @@ export class FilterScaffold {
 
   getConditions(query) {
     const conditions = {};
-    const schema = this.schema;
+    const { schema } = this;
     const schemaKeys = Object.keys(schema);
 
     for (const [key, value] of Object.entries(query)) {

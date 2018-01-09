@@ -28,8 +28,7 @@ Sequelize.prototype.validateIsUnique = (col, msg) => {
           return next(message);
         }
         return next();
-      })
-    ).catch(next);
+      })).catch(next);
   };
 };
 
@@ -128,7 +127,8 @@ export default class Entities {
       if (process.env.SEQUELIZE_REPLICATION_CONFIG_KEY) {
         dbConfig.replication = dbConfig[process.env.SEQUELIZE_REPLICATION_CONFIG_KEY];
       }
-      this.sequelize = new Sequelize(config.db.database, null, null,
+      this.sequelize = new Sequelize(
+        config.db.database, null, null,
         Object.assign({}, config.sequelize, dbConfig, Entities.addTracer())
       );
     } else {
@@ -164,7 +164,12 @@ export default class Entities {
    * @param transaction
    * @param options
    */
-  uniqueInsert({ tableName, input, uniqueCondition, transaction }, options = {}) {
+  uniqueInsert({
+    tableName,
+    input,
+    uniqueCondition,
+    transaction
+  }, options = {}) {
     const inputObj = Object.assign({}, input);
     const typeAllowed = ['number', 'string', 'boolean'];
     Object.entries(inputObj).forEach((p) => {

@@ -35,8 +35,7 @@ export class Store {
   }
 
   getContext() {
-    throw new UnsupportedOperationException(
-      'Not able to get namespace context when it be disabled');
+    throw new UnsupportedOperationException('Not able to get namespace context when it be disabled');
   }
 
   createContext() {
