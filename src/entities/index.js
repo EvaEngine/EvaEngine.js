@@ -189,12 +189,6 @@ export default class Entities {
     const valueString = Object.entries(inputObj).map(([key]) => `$${key} \`${key}\``).join(' , ');
     const uniqueString = typeof uniqueCondition === 'string' ? uniqueCondition :
       [`SELECT * FROM ${tableName} WHERE `, this.getInstance().dialect.QueryGenerator.getWhereConditions(uniqueCondition)].join('');
-    const re = /select|update|delete|truncate|join|union|exec|insert|drop|count|'|"|;|>|<|%/i;
-    for (const s of [tableName, columnString, valueString]) {
-      if (re.test(s)) {
-        throw new StandardException(`Invalid SQL param: ${s}.`);
-      }
-    }
     /*
      Original Example:
      entities.getInstance().query(`INSERT INTO ${tableName}
