@@ -9,12 +9,10 @@ script:
 - npm run lint
 - npm test
 after_success:
-- bash <(curl -s https://codecov.io/bash)
-deploy:
-  provider: npm
-  email: allo.vince@gmail.com
-  skip_cleanup: true
-  api_key:
-    secure: lamZ8IkCac75WHrbmA/WfpGa3xDMTPYDYh1kueFofQenU55w1qHq4AgjtYvYCgjSNwfGQJOaVqnikIh46nD9WTMQUh5UdlLkvI2PSYO+kXwr3VGmDzu+yHG3gwIR03eNgRyRGHKx+6AsUh3iQBp0RYXFx/LM3aHKhL53/PinOIaMzEq0JONPCHIjJOiIaz7k1hyYW7gkAnQam2iq5/jGAN5/czYfq4GgvDf0tu4ItLAEf/myxvJkCAOlpnzpAdB70R9x5HoRUuNrB05twkGyufGL1cdvvXTFeQ5PoAiJ6qh0Rzbs5igGsfxTw/aAPTyL8MbflcBPok5sN705OgeLMz3R0BCg7r0AIf1n6iSYygWw9ZPxTaFKx/QkQgUaDW0vXkuPCqOhIlM5u8rkDGtutigL2BxUZTFO1BZIMOluz1asrR3xoQUG7NjHf4EtCuL0vlloK4/MgrE1vdHoqm8KoZeu/+jIE2OcUZW2BNMm7W1WphVpJYfg9JvDRX3SZ7ziJ86747JBS3EbBFej7PvITQhWqS+iV9+MmOpQ0uNvm9ZSRgM5/cPl2gQvzF/I3q1/8UoD9/f3MokGtChnBb2t0qPXX+zr+bDkd77ZtIXTjN7muYIQl455wiwhCoU1EDN8kthohmxcsvJ4gxQwVuZnw5GD54GaRtQztsYMCVuA7CM=
-  on:
-    tags: true
+  - bash <(curl -s https://codecov.io/bash)
+  - npm run travis-deploy-once "npm run semantic-release"
+branches:
+  only:
+    - master
+  except:
+    - /^v\d+\.\d+\.\d+$/

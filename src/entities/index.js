@@ -6,6 +6,7 @@ import Sequelize from 'sequelize';
 import util from 'util';
 import DI from '../di';
 import { getMicroTimestamp } from '../utils';
+import { StandardException } from '../exceptions';
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
@@ -169,12 +170,25 @@ export default class Entities {
     uniqueCondition,
     transaction
   }, options = {}) {
-    const columns = Object.keys(input);
+    const inputObj = Object.assign({}, input);
+    const typeAllowed = ['number', 'string', 'boolean'];
+    Object.entries(inputObj).forEach((p) => {
+      const valType = typeof p[1];
+      if (typeAllowed.indexOf(valType) === -1) {
+        throw new StandardException(`SQL inputObj ${p[0]}:${p[1]} with unsupported type ${valType}.`);
+      } else if (valType === 'boolean') {
+        if (p[1] === true) {
+          inputObj[p[0]] = 1;
+        } else {
+          inputObj[p[0]] = 0;
+        }
+      }
+    });
+    const columns = Object.keys(inputObj);
     const columnString = ['`', columns.join('`, `'), '`'].join('');
-    const valueString = Object.entries(input).map(([key]) => `$${key} \`${key}\``).join(' , ');
+    const valueString = Object.entries(inputObj).map(([key]) => `$${key} \`${key}\``).join(' , ');
     const uniqueString = typeof uniqueCondition === 'string' ? uniqueCondition :
       [`SELECT * FROM ${tableName} WHERE `, this.getInstance().dialect.QueryGenerator.getWhereConditions(uniqueCondition)].join('');
-
     /*
      Original Example:
      entities.getInstance().query(`INSERT INTO ${tableName}
@@ -198,7 +212,7 @@ export default class Entities {
         ) LIMIT 1
       )`; //add FOR UPDATE to use eXclusive Lock
     return this.getInstance().query(sql, Object.assign({
-      bind: input,
+      bind: inputObj,
       transaction,
       type: Sequelize.QueryTypes.INSERT
     }, options));
