@@ -1,6 +1,7 @@
 import { Dependencies } from 'constitute';
 import moment from 'moment-timezone';
 import winston from 'winston';
+import { inspect } from 'util';
 import Env from './env';
 import Config from './config';
 import Namespace from './namespace';
@@ -137,5 +138,9 @@ export default class Logger extends ServiceInterface {
 
   error(...args) {
     return this.getInstance().error(...this.populateTraceId(args));
+  }
+
+  dump(obj) {
+    return this.debug(inspect(obj, { depth: null, colors: true }));
   }
 }

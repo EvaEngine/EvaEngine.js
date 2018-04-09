@@ -1,8 +1,6 @@
 import { Dependencies } from 'constitute';
 import wrapper from '../utils/wrapper';
-import {
-  UnauthorizedException
-} from '../exceptions';
+import { UnauthorizedException } from '../exceptions';
 import Config from '../services/config';
 import Now from '../services/now';
 import JsonWebToken from '../services/jwt_token';
