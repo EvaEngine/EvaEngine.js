@@ -8,9 +8,7 @@ import moment from 'moment-timezone';
 import DI from './di';
 import * as ServiceProviders from './services/providers';
 import * as MiddlewareProviders from './middlewares/providers';
-import {
-  StandardException, RuntimeException
-} from './exceptions';
+import { StandardException, RuntimeException } from './exceptions';
 
 moment.tz.setDefault(process.env.TZ ? process.env.TZ : 'Asia/Shanghai');
 

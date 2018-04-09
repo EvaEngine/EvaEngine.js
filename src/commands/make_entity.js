@@ -7,7 +7,7 @@ import DI from '../di';
 import Entities from '../entities';
 
 
-export class MakeDbViewCommand extends Command {
+export class MakeDbView extends Command {
   static getName() {
     return 'make:dbview';
   }
@@ -68,7 +68,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW view_${tableName}
   }
 }
 
-export class MakeEntityCommand extends Command {
+export class MakeEntity extends Command {
   static getName() {
     return 'make:entity';
   }
@@ -175,7 +175,6 @@ export class MakeEntityCommand extends Command {
 
   static typeAdditional(_type, sequlizeType, rawColumn) {
     const type = _type.toLowerCase();
-    // console.log(_type, sequlizeType)
     let finalType = sequlizeType;
 
     if (type.match(/unsigned/)) {
@@ -253,9 +252,9 @@ export class MakeEntityCommand extends Command {
       });
       Object.values(rawColumns).forEach((rawColumn) => {
         const columnName = rawColumn.Field;
-        columns[columnName].type = MakeEntityCommand.typeAdditional(
+        columns[columnName].type = MakeEntity.typeAdditional(
           columns[columnName].type,
-          MakeEntityCommand.typeMapping(columns[columnName].type),
+          MakeEntity.typeMapping(columns[columnName].type),
           rawColumn
         );
         columns[columnName].unique = rawColumn.Key === 'UNI';
@@ -263,7 +262,7 @@ export class MakeEntityCommand extends Command {
         columns[columnName].autoIncrement = rawColumn.Extra.startsWith('auto_increment') === true;
       });
 
-      const indexes = await MakeEntityCommand.getIndexes(table, sequelize);
+      const indexes = await MakeEntity.getIndexes(table, sequelize);
       const entityFile = `${path}/${table}.js`;
       const schemaFile = `${schemaPath}/${table}.js`;
       try {
@@ -289,7 +288,203 @@ export class MakeEntityCommand extends Command {
     };
 
     //Skip sequelize migrate table
-    await Promise.all(Object.values(tables).filter(t => t !== 'sequelizemeta').map(tableHandler));
+    await Promise.all(Object.values(tables).filter(t => !['sequelizemeta', 'tramp_migrations'].includes(t)).map(tableHandler));
+    logger.info('All DB schemas generated');
+  }
+}
+
+export class MakeGraphql extends Command {
+  static getName() {
+    return 'make:graphql';
+  }
+
+  static getDescription() {
+    return 'Generate graphql schema';
+  }
+
+  static getSpec() {
+    return {
+      dir: {
+        required: false,
+        description: 'Where entity files to be generated'
+      },
+      prefix: {
+        required: false,
+        description: 'Table prefix'
+      },
+      mapping: {
+        required: false,
+        description: 'Mapping file path'
+      }
+    };
+  }
+
+  static typeMapping(_type) {
+    const type = _type.toLowerCase();
+    if (type === 'tinyint(1)' || type === 'boolean' || type === 'bit(1)') {
+      return 'Boolean';
+    }
+
+    if (type.match(/^(smallint|mediumint|tinyint|int)/)) {
+      return 'Int';
+    }
+
+    if (type.startsWith('bigint')) {
+      return 'Int';
+    }
+
+    if (type.startsWith('enum')) {
+      return 'Enum';
+    }
+
+    if (type.match(/^string|varchar|varying|nvarchar/)) {
+      return 'String';
+    }
+
+    if (type.startsWith('char')) {
+      return 'String';
+    }
+
+    if (type.match(/text|ntext$/)) {
+      return 'String';
+    }
+
+    if (type.startsWith('year')) {
+      return 'Int';
+    }
+
+    if (type.startsWith('datetime')) {
+      return 'String';
+    }
+
+    if (type.startsWith('date')) {
+      return 'String';
+    }
+
+    if (type.startsWith('time')) {
+      return 'String';
+    }
+
+    if (type.match(/^(float8|double precision)/)) {
+      return 'Float';
+    }
+
+    if (type.match(/^(float|float4)/)) {
+      return 'Float';
+    }
+
+    if (type.startsWith('decimal')) {
+      return 'Float';
+    }
+
+    if (type.match(/^uuid|uniqueidentifier/)) {
+      return 'String';
+    }
+
+    if (type.startsWith('jsonb')) {
+      return 'JSON';
+    }
+    if (type.startsWith('json')) {
+      return 'JSON';
+    }
+
+    if (type.startsWith('geometry')) {
+      return 'String';
+    }
+
+    return type;
+  }
+
+  getEnums(_type, columnName, tableName) {
+    const type = _type.toLowerCase();
+    const values = type.slice(5, -1).split(',').map(v => v.slice(1, -1));
+    return {
+      name: `ENUM_${tableName}_${columnName}`,
+      values
+    };
+  }
+
+  async run() {
+    const config = DI.get('config').get();
+    const logger = DI.get('logger');
+    const sequelize = new Sequelize(
+      config.db.database,
+      null,
+      null,
+      Object.assign({}, config.sequelize, config.db, { logging: logger.getInstance().verbose })
+    );
+    const query = sequelize.getQueryInterface();
+
+    let tables = await query.showAllTables();
+    const views = await sequelize.query(`SHOW FULL TABLES IN ${config.db.database} WHERE TABLE_TYPE LIKE 'VIEW'`, {
+      type: sequelize.QueryTypes.SELECT,
+      raw: true
+    });
+    if (views) {
+      const viewNames = views.map(v => Object.values(v)[0]);
+      tables = tables.filter(t => !viewNames.includes(t));
+    }
+    const {
+      dir, prefix, mapping
+    } = this.getArgv();
+    if (prefix) {
+      tables = tables.filter(t => t.startsWith(prefix));
+    }
+
+    const path = dir ? `${process.cwd()}/${dir}` : `${process.cwd()}/src/graphql`;
+    const schemaPath = `${path}/entities`;
+    const schemaTemplate = fs.readFileSync(`${__dirname}/../../template/graphql.ejs`, 'utf8');
+    const mappingFile = mapping ? `${process.cwd()}/${mapping}` : `${process.cwd()}/src/graphql/mapping.json`;
+    const mappingContent = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
+    const getMappedTableName = tableName =>
+      (mappingContent[tableName] ? mappingContent[tableName] : tableName);
+    mkdirp.sync(path);
+    mkdirp.sync(schemaPath);
+
+    logger.info('Start generate GraphQL schemas to dir %s', path);
+
+    const tableHandler = async (tableName) => {
+      const enums = [];
+      const columns = await query.describeTable(tableName);
+      const rawColumns = await sequelize.query(`SHOW FULL COLUMNS FROM ${tableName}`, {
+        type: sequelize.QueryTypes.SELECT,
+        raw: true
+      });
+      const mappedTableName = getMappedTableName(tableName);
+      Object.values(rawColumns).forEach((rawColumn) => {
+        const columnName = rawColumn.Field;
+        let type = MakeGraphql.typeMapping(columns[columnName].type, mappedTableName);
+        if (type === 'Enum') {
+          const enumObj = this.getEnums(columns[columnName].type, columnName, mappedTableName);
+          type = enumObj.name;
+          enums.push(enumObj);
+        }
+
+        columns[columnName].type = type;
+        columns[columnName].unique = rawColumn.Key === 'UNI';
+        columns[columnName].comment = rawColumn.Comment;
+        columns[columnName].autoIncrement = rawColumn.Extra.startsWith('auto_increment') === true;
+      });
+
+      const indexes = await MakeEntity.getIndexes(tableName, sequelize);
+      const schemaFile = `${schemaPath}/${tableName}.graphqls`;
+      try {
+        fs.accessSync(schemaFile);
+        logger.info('Graphql schema file %s generate override, already exists by %s', tableName, schemaFile);
+      } catch (e) {
+        logger.info('Graphql schema file %s generated as %s', tableName, schemaFile);
+      }
+      fs.writeFileSync(schemaFile, _.template(schemaTemplate)({
+        tableName,
+        mappedTableName,
+        columns,
+        indexes,
+        enums
+      }));
+    };
+
+    //Skip sequelize migrate table
+    await Promise.all(Object.values(tables).filter(t => !['sequelizemeta', 'tramp_migrations'].includes(t)).map(tableHandler));
     logger.info('All DB schemas generated');
   }
 }

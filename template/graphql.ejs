@@ -1,0 +1,13 @@
+<%
+_.forEach(enums, function(enumObj) { %>
+enum <%=enumObj.name%> {
+  <%=enumObj.values.join(',')%>
+}
+<% }); %>
+
+type <%=mappedTableName%> {<%
+_.forEach(columns, function(column, key) { %>
+  # <%=column.comment%>
+  <%=key%>: <%=column.type%><%if (column.primaryKey || !column.allowNull){%>!<% } %>,
+<% }); %>
+}
