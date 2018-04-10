@@ -1,5 +1,6 @@
 import SessionMiddleware from '../middlewares/session';
 import AuthMiddleware from '../middlewares/auth';
+import AuthKongMiddleware from '../middlewares/auth_kong';
 import DebugMiddleware from '../middlewares/debug';
 import TraceMiddleware from '../middlewares/trace';
 import ViewCacheMiddleware from '../middlewares/view_cache';
@@ -23,7 +24,11 @@ export class AuthMiddlewareProvider extends ServiceProvider {
   }
 
   register() {
-    DI.bindMethod(this.name, AuthMiddleware);
+    if (DI.get('config').get('token.provider') === 'kong') {
+      DI.bindMethod(this.name, AuthKongMiddleware);
+    } else {
+      DI.bindMethod(this.name, AuthMiddleware);
+    }
   }
 }
 

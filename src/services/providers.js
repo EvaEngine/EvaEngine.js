@@ -3,6 +3,7 @@ import Config from './config';
 import Env from './env';
 import HttpClient from './http_client';
 import JsonWebToken from './jwt_token';
+import KongJsonWebToken from './jwt_token_kong';
 import Logger from './logger';
 import Redis from './redis';
 import RestClient from './rest_client';
@@ -78,7 +79,11 @@ export class JsonWebTokenProvider extends ServiceProvider {
   }
 
   register() {
-    DI.bindClass(this.name, JsonWebToken);
+    if (DI.get('config').get('token.provider') === 'kong') {
+      DI.bindClass(this.name, KongJsonWebToken);
+    } else {
+      DI.bindClass(this.name, JsonWebToken);
+    }
   }
 }
 
