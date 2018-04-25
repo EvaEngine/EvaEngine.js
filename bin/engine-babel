@@ -11,6 +11,16 @@ engine.registerCommands([
 
 const logger = DI.get('logger');
 co(function* () {
+  if (process.env.SPRING_CONFIG_ENDPOINT) {
+    const springOptions = {
+      endpoint: process.env.SPRING_CONFIG_ENDPOINT,
+      name: process.env.SPRING_CONFIG_NAME || 'unknown-spring-config-name',
+      profiles: process.env.SPRING_CONFIG_PROFILES || process.env.NODE_ENV,
+      label: process.env.SPRING_CONFIG_LABEL || 'master'
+    };
+    logger.info(`Loading configs from Spring Cloud Config, options:${JSON.stringify(springOptions)}`);
+    yield DI.get('config').resolveSpringConfig(springOptions);
+  }
   try {
     yield engine.runCLI();
   } catch (e) {
