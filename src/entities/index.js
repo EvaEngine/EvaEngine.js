@@ -174,7 +174,8 @@ export default class Entities {
     const typeAllowed = ['number', 'string', 'boolean'];
     Object.entries(inputObj).forEach((p) => {
       const valType = typeof p[1];
-      if (typeAllowed.indexOf(valType) === -1) {
+      //Allow null type here
+      if (typeAllowed.indexOf(valType) === -1 && p[1] !== null) {
         throw new StandardException(`SQL inputObj ${p[0]}:${p[1]} with unsupported type ${valType}.`);
       } else if (valType === 'boolean') {
         if (p[1] === true) {
