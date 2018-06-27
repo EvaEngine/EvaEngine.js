@@ -605,7 +605,7 @@ export class ExSwagger {
     const uiPath = this.getSwaggerUIPath();
     const content = await fs.readFileSync(`${uiPath}/index.html`);
     return content.toString().replace(
-      'http://petstore.swagger.io/v2/swagger.json',
+      'https://petstore.swagger.io/v2/swagger.json',
       this.swaggerDocsPath.replace(this.compileDistPath, '')
     );
   }
