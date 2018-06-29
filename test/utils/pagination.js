@@ -6,21 +6,26 @@ const req = {
   method: 'GET',
   baseUrl: '/',
   path: '',
-  get: () => 'localhost',
+  get(name) {
+    const headers = {
+      host: 'localhost'
+    };
+    return headers[name];
+  },
   query: {}
 };
 
 test('Works when no data', (t) => {
   const {
-          total, offset, limit, prev, next, isFirst, isLast,
-          prevUri, nextUri, firstUri, lastUri
-        } =
-          pagination({
-            total: 0,
-            limit: 10,
-            offset: 15,
-            req
-          });
+    total, offset, limit, prev, next, isFirst, isLast,
+    prevUri, nextUri, firstUri, lastUri
+  } =
+    pagination({
+      total: 0,
+      limit: 10,
+      offset: 15,
+      req
+    });
   t.is(total, 0);
   t.is(offset, 15);
   t.is(limit, 10);
@@ -36,15 +41,15 @@ test('Works when no data', (t) => {
 
 test('Works when less than 1 page', (t) => {
   const {
-          total, offset, limit, prev, next, isFirst, isLast,
-          prevUri, nextUri, firstUri, lastUri
-        } =
-          pagination({
-            total: 3,
-            limit: 5,
-            offset: 0,
-            req
-          });
+    total, offset, limit, prev, next, isFirst, isLast,
+    prevUri, nextUri, firstUri, lastUri
+  } =
+    pagination({
+      total: 3,
+      limit: 5,
+      offset: 0,
+      req
+    });
   t.is(total, 3);
   t.is(offset, 0);
   t.is(limit, 5);
@@ -60,15 +65,15 @@ test('Works when less than 1 page', (t) => {
 
 test('Works when normal', (t) => {
   const {
-          total, offset, limit, prev, next, isFirst, isLast,
-          prevUri, nextUri, firstUri, lastUri
-        } =
-          pagination({
-            total: 100,
-            limit: 15,
-            offset: 30,
-            req
-          });
+    total, offset, limit, prev, next, isFirst, isLast,
+    prevUri, nextUri, firstUri, lastUri
+  } =
+    pagination({
+      total: 100,
+      limit: 15,
+      offset: 30,
+      req
+    });
   t.is(total, 100);
   t.is(offset, 30);
   t.is(limit, 15);
@@ -84,15 +89,15 @@ test('Works when normal', (t) => {
 
 test('Works when not aligned', (t) => {
   const {
-          total, offset, limit, prev, next, isFirst, isLast,
-          prevUri, nextUri, firstUri, lastUri
-        } =
-          pagination({
-            total: 100,
-            limit: 15,
-            offset: 5,
-            req
-          });
+    total, offset, limit, prev, next, isFirst, isLast,
+    prevUri, nextUri, firstUri, lastUri
+  } =
+    pagination({
+      total: 100,
+      limit: 15,
+      offset: 5,
+      req
+    });
   t.is(total, 100);
   t.is(offset, 5);
   t.is(limit, 15);
@@ -108,15 +113,15 @@ test('Works when not aligned', (t) => {
 
 test('Works on last page', (t) => {
   const {
-          total, offset, limit, prev, next, isFirst, isLast,
-          prevUri, nextUri, firstUri, lastUri
-        } =
-          pagination({
-            total: 100,
-            limit: 15,
-            offset: 95,
-            req
-          });
+    total, offset, limit, prev, next, isFirst, isLast,
+    prevUri, nextUri, firstUri, lastUri
+  } =
+    pagination({
+      total: 100,
+      limit: 15,
+      offset: 95,
+      req
+    });
   t.is(total, 100);
   t.is(offset, 95);
   t.is(limit, 15);
@@ -132,14 +137,14 @@ test('Works on last page', (t) => {
 
 test('Works when illegal args', (t) => {
   const {
-          total, offset, limit
-        } =
-          pagination({
-            total: 'abc',
-            limit: [],
-            offset: 'foo',
-            req
-          });
+    total, offset, limit
+  } =
+    pagination({
+      total: 'abc',
+      limit: [],
+      offset: 'foo',
+      req
+    });
   t.is(total, 0);
   t.is(offset, 0);
   t.is(limit, 1);
@@ -147,14 +152,14 @@ test('Works when illegal args', (t) => {
 
 test('Works when negative', (t) => {
   const {
-          total, offset, limit, prev
-        } =
-          pagination({
-            total: 10,
-            limit: -10,
-            offset: -20,
-            req
-          });
+    total, offset, limit, prev
+  } =
+    pagination({
+      total: 10,
+      limit: -10,
+      offset: -20,
+      req
+    });
   t.is(total, 10);
   t.is(offset, -20);
   t.is(limit, 1);
@@ -163,21 +168,26 @@ test('Works when negative', (t) => {
 
 test('Should keep request query', (t) => {
   const {
-          prevUri, nextUri, firstUri, lastUri
-        } =
-          pagination({
-            total: 100,
-            limit: 15,
-            offset: 5,
-            req: {
-              protocol: 'http',
-              method: 'GET',
-              baseUrl: '/',
-              path: '',
-              get: () => 'localhost',
-              query: { foo: 'bar' }
-            }
-          });
+    prevUri, nextUri, firstUri, lastUri
+  } =
+    pagination({
+      total: 100,
+      limit: 15,
+      offset: 5,
+      req: {
+        protocol: 'http',
+        method: 'GET',
+        baseUrl: '/',
+        path: '',
+        get(name) {
+          const headers = {
+            host: 'localhost'
+          };
+          return headers[name];
+        },
+        query: { foo: 'bar' }
+      }
+    });
   t.is(prevUri, 'http://localhost/?foo=bar&offset=-10&limit=15');
   t.is(nextUri, 'http://localhost/?foo=bar&offset=20&limit=15');
   t.is(firstUri, 'http://localhost/?foo=bar&offset=0&limit=15');

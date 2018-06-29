@@ -11,11 +11,13 @@ const toUrl = (scheme, host, path, query = {}) => {
 };
 
 const toPaginationUrl = (query, req) => {
-  const hostInfo = req.get('host');
-
+  const hostInfo = req.get('host').split(':');
+  let scheme = req.protocol;
   let host = hostInfo[0];
   let port = hostInfo[1];
-  let scheme = req.protocol;
+  if (!port) {
+    port = req.protocol === 'https' ? 443 : 80;
+  }
   let requestPath = req.baseUrl;
   if (req.get('x-forwarded-port')) {
     port = req.get('x-forwarded-port');
