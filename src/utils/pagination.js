@@ -1,5 +1,6 @@
 import snakeCase from 'lodash/snakeCase';
 import transform from 'lodash/transform';
+import nodePath from 'path';
 
 const toUrl = (scheme, host, path, query = {}) => {
   let queryString = Object.keys(query)
@@ -9,11 +10,38 @@ const toUrl = (scheme, host, path, query = {}) => {
   return `${scheme}://${host}${path}${queryString}`;
 };
 
-const toPaginationUrl = (query, req) =>
-  toUrl(
-    req.protocol, req.get('host'), req.baseUrl + req.path,
+const toPaginationUrl = (query, req) => {
+  const hostInfo = req.get('host').split(':');
+  let scheme = req.protocol;
+  let host = hostInfo[0];
+  let port = hostInfo[1];
+  if (!port) {
+    port = req.protocol === 'https' ? 443 : 80;
+  }
+  let requestPath = req.baseUrl;
+  if (req.get('x-forwarded-port')) {
+    port = req.get('x-forwarded-port');
+  }
+  if (req.get('x-forwarded-host')) {
+    host = req.get('x-forwarded-host');
+  }
+  if (req.get('x-forwarded-proto')) {
+    scheme = req.get('x-forwarded-proto');
+  }
+  if (req.get('x-forwarded-prefix')) {
+    requestPath = nodePath.join(req.get('x-forwarded-prefix'), requestPath, req.path);
+  }
+  if (
+    (scheme === 'http' && String(port) !== '80')
+    || (scheme === 'https' && String(port) !== '443')
+  ) {
+    host = `${host}:${port}`;
+  }
+  return toUrl(
+    scheme, host, requestPath,
     Object.assign(req.query, query)
   );
+};
 
 
 const toPositiveInteger = (number) => {
