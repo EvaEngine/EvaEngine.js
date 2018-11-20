@@ -23,7 +23,6 @@ export const defaultHeadersFilter = (res) => {
 export const requestToCacheKey = (req, hashStrategy) => {
   const {
     method,
-    baseUrl,
     originalUrl,
     query: originQuery,
     route,
@@ -41,14 +40,15 @@ export const requestToCacheKey = (req, hashStrategy) => {
     throw new RuntimeException(`View cache middleware only support GET method of http request for ${originalUrl}`);
   }
   const { host = 'unknown' } = req.headers;
-  const key = [method, `/${host}`, baseUrl, route.path].join('').replace(/:/g, '_').toLowerCase();
+  const [urlPath = ''] = originalUrl.split('?');
+  const key = [method, `/${host}`, urlPath].join('').replace(/:/g, '_').toLowerCase();
   const strategy = hashStrategy || defaultHashStrategy;
   const hash = crypto
     .createHash('md5')
     .update(JSON
       .stringify(strategy({
         method,
-        baseUrl,
+        urlPath,
         query,
         uid
       })))
