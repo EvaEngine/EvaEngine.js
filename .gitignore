@@ -44,5 +44,6 @@ src/config/config.local*
 src/config/sequelize.json
 lib/*
 .nyc_output
+nohup.out
 yarn.lock
 package-lock.json
