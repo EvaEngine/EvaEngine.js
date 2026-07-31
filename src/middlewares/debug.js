@@ -1,7 +1,7 @@
 import morgan from 'morgan';
 import os from 'os';
 import { Dependencies } from 'constitute';
-import Logger from '../services/logger';
+import Logger from '../services/logger.js';
 
 /**
  Log format:

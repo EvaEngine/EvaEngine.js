@@ -8,7 +8,7 @@ import {
   OperationUnsupportedException,
   ResourceConflictedException,
   RuntimeException
-} from './../../src/exceptions';
+} from './../../src/exceptions/index.js';
 
 
 test('Throw input', (t) => {

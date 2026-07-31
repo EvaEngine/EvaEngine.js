@@ -7,8 +7,8 @@ import doctrine from 'doctrine';
 import * as acorn from 'acorn/dist/acorn';
 import glob from 'glob';
 import yaml from 'js-yaml';
-import Entitles from '../entities';
-import { RuntimeException, StandardException } from '../exceptions';
+import Entitles from '../entities/index.js';
+import { RuntimeException, StandardException } from '../exceptions/index.js';
 
 export class AcornParsingException extends StandardException {
 }
@@ -605,7 +605,7 @@ export class ExSwagger {
     const uiPath = this.getSwaggerUIPath();
     const content = await fs.readFileSync(`${uiPath}/index.html`);
     return content.toString().replace(
-      'https://petstore.swagger.io/v2/swagger.json',
+      'https://petstore.swagger.io/v2/swagger/index.json',
       this.swaggerDocsPath.replace(this.compileDistPath, '')
     );
   }

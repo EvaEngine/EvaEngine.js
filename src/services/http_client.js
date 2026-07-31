@@ -1,9 +1,9 @@
 import { Dependencies } from 'constitute';
 import request from 'request-promise-native';
-import Config from './config';
-import Logger from './logger';
-import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions';
-import ServiceInterface from './interface';
+import Config from './config.js';
+import Logger from './logger.js';
+import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions/index.js';
+import ServiceInterface from './interface.js';
 
 export const deepClone = obj =>
   JSON.parse(JSON.stringify(obj));

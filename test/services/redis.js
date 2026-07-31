@@ -1,6 +1,6 @@
 import test from 'ava';
-import Config from '../../src/services/config';
-import Redis from '../../src/services/redis';
+import Config from '../../src/services/config.js';
+import Redis from '../../src/services/redis.js';
 import ioredis from 'ioredis';
 
 test('Redis init', (t) => {

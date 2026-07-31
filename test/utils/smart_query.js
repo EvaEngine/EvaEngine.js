@@ -1,6 +1,6 @@
 import test from 'ava';
 import moment from 'moment-timezone';
-import SmartQuery from '../../src/utils/smart_query';
+import SmartQuery from '../../src/utils/smart_query.js';
 
 moment.tz.setDefault('Asia/Shanghai');
 

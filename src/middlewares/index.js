@@ -1,10 +1,10 @@
-import AuthMiddleware from './auth';
-import AuthKongMiddleware from './auth_kong';
-import DebugMiddleware from './debug';
-import SessionMiddleware from './session';
-import TraceMiddleware from './trace';
-import ViewCacheMiddleware from './view_cache';
-import ValidatorMiddleware from './validator';
+import AuthMiddleware from './auth.js';
+import AuthKongMiddleware from './auth_kong.js';
+import DebugMiddleware from './debug.js';
+import SessionMiddleware from './session.js';
+import TraceMiddleware from './trace.js';
+import ViewCacheMiddleware from './view_cache.js';
+import ValidatorMiddleware from './validator.js';
 
 export {
   AuthMiddleware,

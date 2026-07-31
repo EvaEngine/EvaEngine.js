@@ -1,8 +1,8 @@
 import { Dependencies } from 'constitute';
 import jwt from 'jwt-simple';
-import Config from './config';
-import Redis from './redis';
-import ServiceInterface from './interface';
+import Config from './config.js';
+import Redis from './redis.js';
+import ServiceInterface from './interface.js';
 
 @Dependencies(Config, Redis) //eslint-disable-line new-cap
 export default class JsonWebToken extends ServiceInterface {

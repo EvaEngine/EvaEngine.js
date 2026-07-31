@@ -2,10 +2,10 @@ import { Dependencies } from 'constitute';
 import jwt from 'jwt-simple';
 import _ from 'lodash';
 
-import { RuntimeException } from '../exceptions';
-import Config from './config';
-import RestClient from '../services/rest_client';
-import ServiceInterface from './interface';
+import { RuntimeException } from '../exceptions/index.js';
+import Config from './config.js';
+import RestClient from '../services/rest_client.js';
+import ServiceInterface from './interface.js';
 
 @Dependencies(Config, RestClient) //eslint-disable-line new-cap
 export default class KongJsonWebToken extends ServiceInterface {

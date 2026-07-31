@@ -1,9 +1,9 @@
 import { Dependencies } from 'constitute';
-import { UnsupportedOperationException } from './../exceptions';
-import Redis from './redis';
-import DI from './../di';
-import Config from './config';
-import ServiceInterface from './interface';
+import { UnsupportedOperationException } from './../exceptions/index.js';
+import Redis from './redis.js';
+import DI from './../di.js';
+import Config from './config.js';
+import ServiceInterface from './interface.js';
 
 export class Store {
   getInstance() {

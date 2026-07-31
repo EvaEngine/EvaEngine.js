@@ -1,5 +1,5 @@
 import test from 'ava';
-import { OrderScaffold, FilterScaffold } from '../../src/utils/api_scaffold';
+import { OrderScaffold, FilterScaffold } from '../../src/utils/api_scaffold.js';
 
 test('Order Scaffold Works normal', (t) => {
   const orderScaffold = new OrderScaffold();

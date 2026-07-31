@@ -1,8 +1,8 @@
 import test from 'ava';
-import Config from '../../src/services/config';
-import Env from '../../src/services/env';
-import Redis from '../../src/services/redis';
-import JsonWebToken from '../../src/services/jwt_token';
+import Config from '../../src/services/config.js';
+import Env from '../../src/services/env.js';
+import Redis from '../../src/services/redis.js';
+import JsonWebToken from '../../src/services/jwt_token.js';
 
 test('Get and set', async(t) => {
   const jwt = new JsonWebToken(

@@ -1,10 +1,10 @@
 import onHeaders from 'on-headers';
 import { Dependencies } from 'constitute';
-import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils';
-import Namespace from '../services/namespace';
-import Config from '../services/config';
-import Logger from '../services/logger';
-import HttpClient from '../services/http_client';
+import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils/index.js';
+import Namespace from '../services/namespace.js';
+import Config from '../services/config.js';
+import Logger from '../services/logger.js';
+import HttpClient from '../services/http_client.js';
 
 const hostIp = getHostIp();
 

@@ -1,15 +1,15 @@
-import Cache from './cache';
-import Config from './config';
-import Env from './env';
-import HttpClient from './http_client';
-import JsonWebToken from './jwt_token';
-import Logger from './logger';
-import Redis from './redis';
-import RestClient from './rest_client';
-import Namespace from './namespace';
-import Now from './now';
-import ValidatorBase from './joi';
-import EventManager from './event_manager';
+import Cache from './cache.js';
+import Config from './config.js';
+import Env from './env.js';
+import HttpClient from './http_client.js';
+import JsonWebToken from './jwt_token.js';
+import Logger from './logger.js';
+import Redis from './redis.js';
+import RestClient from './rest_client.js';
+import Namespace from './namespace.js';
+import Now from './now.js';
+import ValidatorBase from './joi.js';
+import EventManager from './event_manager.js';
 
 export {
   Cache,

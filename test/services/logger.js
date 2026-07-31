@@ -1,7 +1,7 @@
 import test from 'ava';
-import Env from '../../src/services/env';
-import Config from '../../src/services/config';
-import Logger from '../../src/services/logger';
+import Env from '../../src/services/env.js';
+import Config from '../../src/services/config.js';
+import Logger from '../../src/services/logger.js';
 import winston from 'winston';
 
 let oldEnv = null;

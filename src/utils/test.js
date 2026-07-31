@@ -1,6 +1,6 @@
 import httpMocker from 'node-mocks-http';
 import EventEmitter from 'events';
-import DI from '../di';
+import DI from '../di.js';
 
 module.exports.truncateAll = async (entities) => {
   const names = [];

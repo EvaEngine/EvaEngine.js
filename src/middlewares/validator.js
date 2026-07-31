@@ -1,8 +1,8 @@
 import Joi from 'joi';
 import { Dependencies } from 'constitute';
-import wrapper from '../utils/wrapper';
-import { FormInvalidateException } from '../exceptions';
-import ValidatorBase from '../services/joi';
+import wrapper from '../utils/wrapper.js';
+import { FormInvalidateException } from '../exceptions/index.js';
+import ValidatorBase from '../services/joi.js';
 
 const validate = (data, schema, options) =>
   new Promise((resolve, reject) => {

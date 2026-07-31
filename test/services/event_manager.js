@@ -1,7 +1,7 @@
 import test from 'ava';
-import DI from '../../src/di';
-import * as exceptions from './../../src/exceptions';
-import * as providers from '../../src/services/providers';
+import DI from '../../src/di.js';
+import * as exceptions from './../../src/exceptions/index.js';
+import * as providers from '../../src/services/providers.js';
 
 DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
 const eventManager = DI.get('event_manager');

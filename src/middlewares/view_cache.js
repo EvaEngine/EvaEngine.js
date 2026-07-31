@@ -2,10 +2,10 @@ import { Dependencies } from 'constitute';
 import crypto from 'crypto';
 import util from 'util';
 import moment from 'moment-timezone';
-import Logger from '../services/logger';
-import Cache from '../services/cache';
-import wrapper from '../utils/wrapper';
-import { RuntimeException } from '../exceptions';
+import Logger from '../services/logger.js';
+import Cache from '../services/cache.js';
+import wrapper from '../utils/wrapper.js';
+import { RuntimeException } from '../exceptions/index.js';
 
 export const defaultHashStrategy = obj => obj;
 
@@ -30,7 +30,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
   } = req;
   const query = { ...originQuery };
   delete query.flush;
-  if (hashStrategy && !util.isFunction(hashStrategy)) {
+  if (hashStrategy && typeof hashStrategy !== 'function') {
     throw new RuntimeException(`View cache hash strategy must be a function for ${originalUrl}`);
   }
   if (!route) {
@@ -109,7 +109,7 @@ function ViewCacheMiddleware(cache, logger) {
         res.setHeader('X-View-Cache-Expire-At', moment().add(ttl, 'minute').format('YYYY-MM-DD HH:mm:ss Z'));
         res.setHeader('X-View-Cache-Created-At', moment().format('YYYY-MM-DD HH:mm:ss Z'));
         res.realSend(body);
-        const headers = headersFilter && util.isFunction(headersFilter) ?
+        const headers = headersFilter && typeof headersFilter === 'function' ?
           headersFilter(res) : defaultHeadersFilter(res);
         if (res.statusCode <= 500) {
           cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).catch((e) => {

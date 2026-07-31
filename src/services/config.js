@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { Dependencies } from 'constitute';
 import springConfigClient from 'cloud-config-client';
-import Env from './env';
-import EngineConfig from '../config';
-import ServiceInterface from './interface';
+import Env from './env.js';
+import EngineConfig from '../config/index.js';
+import ServiceInterface from './interface.js';
 
 let config = null;
 

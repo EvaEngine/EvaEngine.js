@@ -1,5 +1,5 @@
-import Command from './interface';
-import DI from '../di';
+import Command from './interface.js';
+import DI from '../di.js';
 
 export default class TrampConfig extends Command {
   static getName() {

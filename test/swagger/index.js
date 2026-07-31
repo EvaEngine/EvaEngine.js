@@ -2,9 +2,9 @@ import test from 'ava';
 import path from 'path';
 import fs from 'fs';
 import Sequelize from 'sequelize';
-import { ExSwagger } from '../../src/swagger';
-import * as exceptions from '../../src/exceptions';
-import Entities from './../../src/entities';
+import { ExSwagger } from '../../src/swagger/index.js';
+import * as exceptions from '../../src/exceptions/index.js';
+import Entities from './../../src/entities/index.js';
 
 test('Could get file lists', async(t) => {
   const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);

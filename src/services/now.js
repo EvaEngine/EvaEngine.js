@@ -1,8 +1,8 @@
 import { Dependencies } from 'constitute';
 import moment from 'moment-timezone';
-import { getTimestamp, getDatabaseDatetime } from '../utils/datetime';
-import Logger from './logger';
-import ServiceInterface from './interface';
+import { getTimestamp, getDatabaseDatetime } from '../utils/datetime.js';
+import Logger from './logger.js';
+import ServiceInterface from './interface.js';
 
 @Dependencies(Logger) //eslint-disable-line new-cap
 export default class Now extends ServiceInterface {

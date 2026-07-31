@@ -1,8 +1,8 @@
 import test from 'ava';
 import path from 'path';
-import EvaEngine, { DI } from '../src/engine';
-import { RuntimeException } from '../src/exceptions';
-import Command from '../src/commands';
+import EvaEngine, { DI } from '../src/engine.js';
+import { RuntimeException } from '../src/exceptions/index.js';
+import Command from '../src/commands/index.js';
 
 test('default properties', (t) => {
   const projectRoot = path.normalize(`${__dirname}/_demo_project`);

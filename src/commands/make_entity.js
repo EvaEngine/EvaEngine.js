@@ -2,9 +2,9 @@ import _ from 'lodash';
 import Sequelize from 'sequelize';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
-import Command from './interface';
-import DI from '../di';
-import Entities from '../entities';
+import Command from './interface.js';
+import DI from '../di.js';
+import Entities from '../entities/index.js';
 
 
 export class MakeDbView extends Command {

@@ -1,5 +1,5 @@
 import moment from 'moment-timezone';
-import { InvalidArgumentException } from '../exceptions';
+import { InvalidArgumentException } from '../exceptions/index.js';
 
 /**
  * 自动根据 req.query 生成 sequelize 查询条件, 自动判断参数清单中是否有值

@@ -4,9 +4,9 @@ import assert from 'assert';
 import cloneDeep from 'lodash/cloneDeep';
 import Sequelize from 'sequelize';
 import util from 'util';
-import DI from '../di';
-import { getMicroTimestamp } from '../utils';
-import { StandardException } from '../exceptions';
+import DI from '../di.js';
+import { getMicroTimestamp } from '../utils/index.js';
+import { StandardException } from '../exceptions/index.js';
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
@@ -132,7 +132,7 @@ export default class Entities {
         Object.assign({}, config.sequelize, dbConfig, Entities.addTracer())
       );
     } else {
-      this.sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
+      this.sequelize = typeof this.sequelize === 'function' ? this.sequelize() : this.sequelize;
     }
 
     this.scan(this.entitiesPath, withAssociate);

@@ -1,5 +1,5 @@
 import test from 'ava';
-import { randomString } from './../../src/utils/random';
+import { randomString } from './../../src/utils/random.js';
 
 test('Random string', (t) => {
   t.is(randomString(1).length, 1);

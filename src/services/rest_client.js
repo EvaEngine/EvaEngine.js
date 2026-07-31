@@ -1,8 +1,8 @@
 import { Dependencies } from 'constitute';
-import HttpClient from './http_client';
-import Namespace from './namespace';
-import { RestServiceLogicException, RestServiceIOException } from '../exceptions';
-import ServiceInterface from './interface';
+import HttpClient from './http_client.js';
+import Namespace from './namespace.js';
+import { RestServiceLogicException, RestServiceIOException } from '../exceptions/index.js';
+import ServiceInterface from './interface.js';
 
 @Dependencies(HttpClient, Namespace) //eslint-disable-line new-cap
 export default class RestClient extends ServiceInterface {

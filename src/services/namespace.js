@@ -1,8 +1,8 @@
 import { Dependencies } from 'constitute';
 import { createNamespace, getNamespace, destroyNamespace, reset } from 'continuation-local-storage';
-import Config from './config';
-import { UnsupportedOperationException } from '../exceptions';
-import ServiceInterface from './interface';
+import Config from './config.js';
+import { UnsupportedOperationException } from '../exceptions/index.js';
+import ServiceInterface from './interface.js';
 
 const stores = {};
 

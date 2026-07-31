@@ -1,5 +1,5 @@
 import test from 'ava';
-import { pagination, paginationFilter } from '../../src/utils/pagination';
+import { pagination, paginationFilter } from '../../src/utils/pagination.js';
 
 const req = {
   protocol: 'http',

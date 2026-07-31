@@ -1,9 +1,9 @@
 import { Dependencies } from 'constitute';
-import wrapper from '../utils/wrapper';
-import { UnauthorizedException } from '../exceptions';
-import Config from '../services/config';
-import Now from '../services/now';
-import JsonWebToken from '../services/jwt_token';
+import wrapper from '../utils/wrapper.js';
+import { UnauthorizedException } from '../exceptions/index.js';
+import Config from '../services/config.js';
+import Now from '../services/now.js';
+import JsonWebToken from '../services/jwt_token.js';
 
 /**
  * @param _config {Config}

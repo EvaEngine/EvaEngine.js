@@ -1,9 +1,9 @@
 import { Dependencies } from 'constitute';
 import EventEmitter from 'events';
 import camelCase from 'lodash/camelCase';
-import { RuntimeException } from '../exceptions';
-import Logger from './logger';
-import ServiceInterface from './interface';
+import { RuntimeException } from '../exceptions/index.js';
+import Logger from './logger.js';
+import ServiceInterface from './interface.js';
 
 /**
  * A strict version of EventEmitter

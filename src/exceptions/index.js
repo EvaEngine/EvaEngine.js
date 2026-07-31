@@ -1,7 +1,7 @@
 import appRoot from 'app-root-path';
 import path from 'path';
 import { format } from 'util';
-import crc32 from '../utils/crc32';
+import crc32 from '../utils/crc32.js';
 
 
 /**

@@ -1,7 +1,7 @@
 import test from 'ava';
 import Sequelize from 'sequelize';
 import util from 'util';
-import Entities from './../../src/entities';
+import Entities from './../../src/entities/index.js';
 
 test('Custom validator', (t) => {
   const entities = new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize());

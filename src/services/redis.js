@@ -1,7 +1,7 @@
 import Ioredis from 'ioredis';
 import { Dependencies } from 'constitute';
-import Config from './config';
-import ServiceInterface from './interface';
+import Config from './config.js';
+import ServiceInterface from './interface.js';
 
 let redisClient = null;
 
@@ -47,9 +47,7 @@ export default class Redis extends ServiceInterface {
     redisClient = new Ioredis(Object.assign({
       enableOfflineQueue: true //make redis connect failings throw error
     }, this.options || this.config.get('redis')));
-    redisClient.on('error', (e) => {
-      throw e;
-    });
+    redisClient.on('error', () => {});
     return redisClient;
   }
 }

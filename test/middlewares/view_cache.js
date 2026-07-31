@@ -1,12 +1,12 @@
 import test from 'ava';
-import DI from '../../src/di';
-import * as providers from '../../src/services/providers';
-import * as middlewares from '../../src/middlewares/providers';
+import DI from '../../src/di.js';
+import * as providers from '../../src/services/providers.js';
+import * as middlewares from '../../src/middlewares/providers.js';
 import {
   requestToCacheKey
-} from '../../src/middlewares/view_cache';
-import { mockRequest, mockResponse } from '../../src/utils/test';
-import { RuntimeException } from './../../src/exceptions';
+} from '../../src/middlewares/view_cache.js';
+import { mockRequest, mockResponse } from '../../src/utils/test.js';
+import { RuntimeException } from './../../src/exceptions/index.js';
 
 DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
 DI.registerServiceProviders(Object.values(middlewares));

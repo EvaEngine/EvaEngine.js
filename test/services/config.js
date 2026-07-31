@@ -1,6 +1,6 @@
 import test from 'ava';
-import Config from '../../src/services/config';
-import Env from '../../src/services/env';
+import Config from '../../src/services/config.js';
+import Env from '../../src/services/env.js';
 
 test('merge 3 levels files', (t) => {
   const config = new Config(new Env());

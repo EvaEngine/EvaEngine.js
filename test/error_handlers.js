@@ -1,8 +1,8 @@
 import test from 'ava';
 import path from 'path';
-import EvaEngine from '../src/engine';
-import { mockRequest, mockResponse, mockInstance } from '../src/utils/test';
-import { RuntimeException, LogicException } from '../src/exceptions';
+import EvaEngine from '../src/engine.js';
+import { mockRequest, mockResponse, mockInstance } from '../src/utils/test.js';
+import { RuntimeException, LogicException } from '../src/exceptions/index.js';
 
 
 test('Default errorHandler', (t) => {

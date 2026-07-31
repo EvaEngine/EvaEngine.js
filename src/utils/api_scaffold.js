@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
 import snakeCase from 'lodash/snakeCase';
 import camelCase from 'lodash/camelCase';
-import { InvalidArgumentException } from '../exceptions';
+import { InvalidArgumentException } from '../exceptions/index.js';
 
 const SNAKE_CASE = 'snake';
 const CAMEL_CASE = 'camel';
