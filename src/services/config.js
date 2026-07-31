@@ -5,8 +5,6 @@ import Env from './env.js';
 import EngineConfig from '../config/index.js';
 import ServiceInterface from './interface.js';
 
-let config = null;
-
 @Dependencies(Env) //eslint-disable-line new-cap
 export default class Config extends ServiceInterface {
   /**
@@ -17,6 +15,7 @@ export default class Config extends ServiceInterface {
     this.env = env;
     this.path = null;
     this.mergedFiles = [];
+    this.config = null;
   }
 
   setPath(path) {
@@ -38,8 +37,8 @@ export default class Config extends ServiceInterface {
     profiles,
     label = 'master'
   }) {
-    if (!config) {
-      config = this.loadConfigFromFiles();
+    if (!this.config) {
+      this.config = this.loadConfigFromFiles();
     }
     const configRemote = await springConfigClient.load({
       endpoint,
@@ -48,16 +47,16 @@ export default class Config extends ServiceInterface {
       label
     });
     configRemote.forEach((key, value) => {
-      _.set(config, key, value);
+      _.set(this.config, key, value);
     });
   }
 
   get(key) {
-    if (config) {
-      return key ? Config.search(key, config) : config;
+    if (this.config) {
+      return key ? Config.search(key, this.config) : this.config;
     }
-    config = this.loadConfigFromFiles();
-    return key ? Config.search(key, config) : config;
+    this.config = this.loadConfigFromFiles();
+    return key ? Config.search(key, this.config) : this.config;
   }
 
   loadConfigFromFiles() {
@@ -81,7 +80,7 @@ export default class Config extends ServiceInterface {
     }
     /*eslint-enable import/no-dynamic-require*/
     /*eslint-enable global-require*/
-    return _.merge(EngineConfig, configDefault, configEnv, configLocal);
+    return _.merge({}, EngineConfig, configDefault, configEnv, configLocal);
   }
 
   getMergedFiles() {
@@ -89,7 +88,7 @@ export default class Config extends ServiceInterface {
   }
 
   reload() {
-    config = null;
+    this.config = null;
   }
 
   /**

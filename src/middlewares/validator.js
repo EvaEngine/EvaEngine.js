@@ -4,19 +4,21 @@ import wrapper from '../utils/wrapper.js';
 import { FormInvalidateException } from '../exceptions/index.js';
 import ValidatorBase from '../services/joi.js';
 
-const validate = (data, schema, options) =>
-  new Promise((resolve, reject) => {
-    Joi.validate(data, schema, Object.assign(
-      { abortEarly: false, allowUnknown: true },
-      options
-    ), (err, value) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(value);
-      }
+const validate = (data, schema, options) => {
+  const validationOptions = Object.assign(
+    { abortEarly: false, allowUnknown: true },
+    options
+  );
+  if (schema && typeof schema.validateAsync === 'function') {
+    return schema.validateAsync(data, validationOptions);
+  }
+  return new Promise((resolve, reject) => {
+    Joi.validate(data, schema, validationOptions, (err, value) => {
+      if (err) reject(err);
+      else resolve(value);
     });
   });
+};
 
 /**
  * @returns {function()}

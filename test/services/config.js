@@ -8,3 +8,10 @@ test('merge 3 levels files', (t) => {
   t.true(Object.keys(config.get()).length > 6);
   t.is(config.get('swagger.basePath'), '/');
 });
+
+test('config instances do not share loaded values', (t) => {
+  const first = new Config(new Env()).setPath(`${__dirname}/../_demo_project/config`);
+  const second = new Config(new Env()).setPath(`${__dirname}/../_demo_project/config`);
+  first.get().app.name = 'first';
+  t.not(second.get().app.name, 'first');
+});

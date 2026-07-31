@@ -39,7 +39,7 @@ function AuthMiddleware(_config, token, now) {
       if (!uid) {
         throw new UnauthorizedException('User info not found in token');
       }
-      if (expiredAt < now.getTimestamp()) {
+      if (typeof expiredAt !== 'number' || expiredAt <= now.getTimestamp()) {
         throw new UnauthorizedException('Token expired');
       }
       req.auth = { //eslint-disable-line no-param-reassign

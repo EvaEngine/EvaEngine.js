@@ -4,8 +4,8 @@ import { format } from 'util';
 import assert from 'assert';
 import merge from 'lodash/merge';
 import doctrine from 'doctrine';
-import * as acorn from 'acorn/dist/acorn';
-import glob from 'glob';
+import * as acorn from 'acorn';
+import { glob } from 'glob';
 import yaml from 'js-yaml';
 import Entitles from '../entities/index.js';
 import { RuntimeException, StandardException } from '../exceptions/index.js';
@@ -414,14 +414,7 @@ export class ExSwagger {
    * @returns {Promise|Array.<string>}
    */
   static async scanFiles(path, options = {}) {
-    return new Promise((resolve, reject) => {
-      glob(path, options, (err, files) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(files);
-      });
-    });
+    return glob(path, options);
   }
 
   /**
@@ -483,7 +476,9 @@ export class ExSwagger {
       if (blacklist.includes(modelName)) {
         return true;
       }
-      const definition = ExSwagger.modelToSwaggerDefinition(models[modelName].attributes);
+      const model = models[modelName];
+      const attributes = model.attributes || model.rawAttributes;
+      const definition = ExSwagger.modelToSwaggerDefinition(attributes);
       definitions.set(modelName, definition);
       return true;
     });

@@ -8,6 +8,7 @@ const cache = DI.get('cache');
 test.beforeEach('Flush all', () => {
   cache.flush();
 });
+test.after.always('Close Redis', () => DI.get('redis').cleanup());
 
 test('Cache get && set && del', async (t) => {
   await cache.set('foo', 'bar');

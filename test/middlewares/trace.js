@@ -14,3 +14,17 @@ test('Unique request id', (t) => {
   });
   t.truthy(res.getHeader('X-B3-SpanId'));
 });
+
+test('propagates disabled upstream sampling', (t) => {
+  const middleware = DI.get('trace')();
+  const req = mockRequest({
+    headers: {
+      'x-b3-traceid': 'trace-id',
+      'x-b3-spanid': '1',
+      'x-b3-sampled': '0'
+    }
+  });
+  const res = mockResponse();
+  middleware(req, res, () => {});
+  t.is(res.getHeader('X-B3-Sampled'), 0);
+});

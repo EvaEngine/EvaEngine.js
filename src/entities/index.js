@@ -88,7 +88,10 @@ export default class Entities {
           (['js', 'es6'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
       })
       .forEach((file) => {
-        const entity = this.sequelize.import(path.join(entitiesPath, file));
+        const entityModule = require(path.join(entitiesPath, file)); //eslint-disable-line global-require, import/no-dynamic-require
+        const entityFactory = entityModule.default || entityModule;
+        const entity = typeof entityFactory === 'function' ?
+          entityFactory(this.sequelize, Sequelize) : entityFactory;
         this.entities[entity.name] = entity;
       });
 
@@ -120,7 +123,12 @@ export default class Entities {
       const ns = DI.get('namespace');
       if (ns.isEnabled()) {
         //Inject sequelize inner namespace, refer: http://docs.sequelizejs.com/en/latest/docs/transactions/
-        Sequelize.cls = ns.use().getContext();
+        const context = ns.use().getContext();
+        if (typeof Sequelize.useCLS === 'function') {
+          Sequelize.useCLS(context);
+        } else {
+          Sequelize.cls = context;
+        }
       }
 
       const dbConfig = cloneDeep(config.db);

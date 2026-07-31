@@ -55,7 +55,7 @@ test('Generate json file', async(t) => {
   const exSwagger = new ExSwagger({
     compileDistPath,
     extraSourcePaths: [`${__dirname}/../../../lib/utils/**/*.js`],
-    models: new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize()),
+    models: new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' })),
     swaggerDocsTemplate: { definitions: {}, paths: {} },
     sourceRootPath: `${__dirname}/_example`
   });

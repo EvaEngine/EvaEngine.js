@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import https from 'https';
 import path from 'path';
-import yargs from 'yargs';
+import yargs from 'yargs/yargs';
 import later from 'later';
 import moment from 'moment-timezone';
 import DI from './di.js';
@@ -163,7 +163,7 @@ export default class EvaEngine {
 
     const commandName = commandNameInput || commandNameFromArgv;
     if (!commandName) {
-      return yargs.argv;
+      return yargs(process.argv.slice(2)).argv;
     }
 
     this.commandName = commandName;
@@ -176,7 +176,7 @@ export default class EvaEngine {
       || !{}.hasOwnProperty.call(command, 'getDescription')) {
       throw new RuntimeException('Command require getSpec and getDescription static method');
     }
-    const { argv } = yargs
+    const { argv } = yargs([])
       .command(commandName, command.getDescription(), Object.assign({
         verbose: {
           alias: 'v',
@@ -295,7 +295,7 @@ export default class EvaEngine {
   }
 
   clearCommands() {
-    this.commands = [];
+    this.commands = {};
   }
 
   clearCrontabs() {
@@ -518,7 +518,7 @@ export default class EvaEngine {
     if (Object.keys(this.commands).includes(commandName) === false) {
       throw new RuntimeException(`Command ${commandName} not registered`);
     }
-    const { argv } = yargs(options ? options.join(' ') : '');
+    const { argv } = yargs(options);
     const command = new this.commands[commandName](argv);
 
     let i = 1;
@@ -543,7 +543,7 @@ export default class EvaEngine {
     if (Object.keys(this.commands).includes(commandName) === false) {
       throw new RuntimeException(`Command ${commandName} not registered`);
     }
-    const { argv } = yargs(options ? options.join(' ') : '');
+    const { argv } = yargs(options);
     const command = new this.commands[commandName](argv);
     return command.run();
   }

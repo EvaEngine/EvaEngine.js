@@ -11,9 +11,10 @@ import { RuntimeException } from './../../src/exceptions/index.js';
 DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
 DI.registerServiceProviders(Object.values(middlewares));
 const cache = DI.get('cache');
-test.beforeEach('Flush all', () => {
-  cache.flush();
+test.beforeEach('Flush all', async() => {
+  await cache.flush();
 });
+test.after.always('Close Redis', () => DI.get('redis').cleanup());
 
 test('No route', (t) => {
   try {

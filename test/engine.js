@@ -41,7 +41,7 @@ test('CLI without commands', (t) => {
     projectRoot
   }, 'cli');
   t.is(engine.getMeta().mode, 'cli');
-  t.throws(() => engine.getCLI(), RuntimeException);
+  t.throws(() => engine.getCLI(), { instanceOf: RuntimeException });
 });
 
 test('CLI with commands', (t) => {
@@ -68,6 +68,7 @@ test('CLI with commands', (t) => {
   t.is(engine.getCommandName(), 'hello:world');
   engine.clearCommands();
   t.is(Object.keys(engine.getCommands()).length, 0);
+  t.false(Array.isArray(engine.getCommands()));
 });
 
 test('Run commands', (t) => {
@@ -99,5 +100,11 @@ test('Run commands', (t) => {
   engine.registerCommands({ test: TestCommand });
   engine.runCLI('hello:world');
   t.is(engine.getCommand().getFoo(), 'bar');
+});
+
+test('rejects unknown command and cron without commands', async (t) => {
+  const engine = new EvaEngine({ projectRoot: path.normalize(`${__dirname}/_demo_project`) }, 'cli');
+  await t.throwsAsync(engine.runCommand('missing'), { instanceOf: RuntimeException });
+  t.throws(() => engine.runCrontab('* * * * *', 'missing'), { instanceOf: RuntimeException });
 });
 

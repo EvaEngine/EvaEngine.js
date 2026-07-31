@@ -14,7 +14,7 @@ import {
 test('Throw input', (t) => {
   t.throws(() => {
     new RuntimeException([]);
-  }, TypeError);
+  }, { instanceOf: TypeError });
 
   t.is((new StandardException()).message, 'StandardException');
   t.is((new LogicException()).message, 'LogicException');
@@ -25,7 +25,7 @@ test('Throw input', (t) => {
   t.is((new StandardException()).setMessage('custom').message, 'custom');
   t.throws(() => {
     new RuntimeException(new LogicException());
-  }, LogicException);
+  }, { instanceOf: LogicException });
 });
 
 test('Factory', (t) => {

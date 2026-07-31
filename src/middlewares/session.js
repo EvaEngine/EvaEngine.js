@@ -24,12 +24,14 @@ function SessionMiddleware(_config, redis, namespace) {
     if (middleware) {
       return middleware;
     }
-    const RedisStore = connectRedis(session);
+    const RedisStore = connectRedis.RedisStore || connectRedis(session);
     let store = null;
     const config = _config.get().session;
 
     if (config.store) {
-      const RedisClient = new RedisStore(Object.assign({}, config.store));
+      const RedisClient = new RedisStore(Object.assign({}, config.store, {
+        client: config.store.client || redis.getInstance()
+      }));
       RedisClient.client.on('error', (err) => {
         throw err;
       });

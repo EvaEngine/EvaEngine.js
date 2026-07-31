@@ -4,10 +4,14 @@ import Env from '../../src/services/env.js';
 import Redis from '../../src/services/redis.js';
 import JsonWebToken from '../../src/services/jwt_token.js';
 
+let redisClient;
+test.after.always('Close Redis', () => redisClient && redisClient.cleanup());
+
 test('Get and set', async(t) => {
+  redisClient = (new Redis()).setOptions({});
   const jwt = new JsonWebToken(
     (new Config(new Env()).setPath(`${__dirname}/../_demo_project/config`)),
-    (new Redis()).setOptions({}));
+    redisClient);
   const str = await jwt.save(2, { foo: 'bar' });
   t.is(str.split('.').length, 3);
   const obj = await jwt.find(str);

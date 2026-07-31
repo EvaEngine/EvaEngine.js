@@ -153,7 +153,7 @@ function TraceMiddleware(ns, config, logger, client) {
       'X-B3-SpanId': spanId,
       'X-B3-TraceId': traceId,
       'X-B3-ParentSpanId': parentId,
-      'X-B3-Sampled': enabled ? 1 : 0
+      'X-B3-Sampled': sampled
     });
 
     if (sampled < 1) {

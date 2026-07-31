@@ -74,7 +74,7 @@ test('Filter Scaffold support number', (t) => {
   t.throws(() => filterScaffold.getConditions({
     total_amount_$gte: 100,
     total_amount: 200
-  }, /conflict/));
+  }, { message: /conflict/ }));
 });
 
 test('Filter Scaffold replace default operators', (t) => {
