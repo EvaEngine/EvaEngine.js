@@ -1,11 +1,10 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import HttpClient from './http_client.js';
 import Namespace from './namespace.js';
 import { RestServiceLogicException, RestServiceIOException } from '../exceptions/index.js';
 import ServiceInterface from './interface.js';
 
-@Dependencies(HttpClient, Namespace) //eslint-disable-line new-cap
-export default class RestClient extends ServiceInterface {
+class RestClient extends ServiceInterface {
   /**
    * @param {HttpClient} client
    * @param {Namespace} ns
@@ -17,7 +16,7 @@ export default class RestClient extends ServiceInterface {
     this.baseUrl = null;
   }
 
-  setBaseUrl(baseUrl) {
+    setBaseUrl(baseUrl) {
     this.baseUrl = baseUrl;
     return this;
   }
@@ -73,7 +72,7 @@ export default class RestClient extends ServiceInterface {
     if (this.baseUrl) {
       Object.assign(params, { url: this.baseUrl + (params.url || params.uri) });
       if (params.uri) {
-        delete params.uri; //eslint-disable-line no-param-reassign
+        delete params.uri;
       }
     }
     return this.client.getInstance()(this.populateTrace(params));
@@ -85,7 +84,7 @@ export default class RestClient extends ServiceInterface {
         url: this.baseUrl + (params.url || params.uri)
       });
       if (params.uri) {
-        delete params.uri; //eslint-disable-line no-param-reassign
+        delete params.uri;
       }
     }
     try {
@@ -108,3 +107,6 @@ export default class RestClient extends ServiceInterface {
     }
   }
 }
+
+constitute.Dependencies(HttpClient, Namespace)(RestClient);
+export default RestClient;

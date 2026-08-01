@@ -17,7 +17,7 @@ export default class TrampConfig extends Command {
   async run() {
     const config = DI.get('config');
     const dbConfig = config.get('db');
-    // eslint-disable-next-line no-console
+
     console.log(JSON.stringify({
       connection: {
         host: dbConfig.replication.write.host,

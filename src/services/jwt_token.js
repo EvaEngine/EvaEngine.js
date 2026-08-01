@@ -1,11 +1,10 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import jwt from 'jwt-simple';
 import Config from './config.js';
 import Redis from './redis.js';
 import ServiceInterface from './interface.js';
 
-@Dependencies(Config, Redis) //eslint-disable-line new-cap
-export default class JsonWebToken extends ServiceInterface {
+class JsonWebToken extends ServiceInterface {
   /**
    * @param config {Config}
    * @param redis {Redis}
@@ -16,7 +15,7 @@ export default class JsonWebToken extends ServiceInterface {
     this.config = config.get('token');
   }
 
-  getProto() {
+    getProto() {
     return jwt;
   }
 
@@ -85,3 +84,6 @@ export default class JsonWebToken extends ServiceInterface {
     return jwt.decode(str, secret);
   }
 }
+
+constitute.Dependencies(Config, Redis)(JsonWebToken);
+export default JsonWebToken;

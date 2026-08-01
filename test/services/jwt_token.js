@@ -10,7 +10,7 @@ test.after.always('Close Redis', () => redisClient && redisClient.cleanup());
 test('Get and set', async(t) => {
   redisClient = (new Redis()).setOptions({});
   const jwt = new JsonWebToken(
-    (new Config(new Env()).setPath(`${__dirname}/../_demo_project/config`)),
+    (new Config(new Env()).setPath(`${import.meta.dirname}/../_demo_project/config`)),
     redisClient);
   const str = await jwt.save(2, { foo: 'bar' });
   t.is(str.split('.').length, 3);

@@ -5,7 +5,7 @@ import { RuntimeException } from '../src/exceptions/index.js';
 import Command from '../src/commands/index.js';
 
 test('default properties', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     port: 3000
@@ -24,7 +24,7 @@ test('create app', (t) => {
 });
 
 test('bootstrap', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     port: 3000
@@ -36,7 +36,7 @@ test('bootstrap', (t) => {
 
 
 test('CLI without commands', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
@@ -58,7 +58,7 @@ test('CLI with commands', (t) => {
       return {};
     }
   }
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
@@ -93,7 +93,7 @@ test('Run commands', (t) => {
       this.foo = 'bar';
     }
   }
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
@@ -103,7 +103,7 @@ test('Run commands', (t) => {
 });
 
 test('rejects unknown command and cron without commands', async (t) => {
-  const engine = new EvaEngine({ projectRoot: path.normalize(`${__dirname}/_demo_project`) }, 'cli');
+  const engine = new EvaEngine({ projectRoot: path.normalize(`${import.meta.dirname}/_demo_project`) }, 'cli');
   await t.throwsAsync(engine.runCommand('missing'), { instanceOf: RuntimeException });
   t.throws(() => engine.runCrontab('* * * * *', 'missing'), { instanceOf: RuntimeException });
 });

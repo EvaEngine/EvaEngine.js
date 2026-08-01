@@ -32,7 +32,7 @@ export default (str) => {
   let crc = 0;
   let x = 0;
   let y = 0;
-  /*eslint-disable no-bitwise*/
+
   crc ^= -1;
   for (let i = 0, iTop = str.length; i < iTop; i += 1) {
     y = (crc ^ str.charCodeAt(i)) & 0xFF;
@@ -40,5 +40,5 @@ export default (str) => {
     crc = (crc >>> 8) ^ x;
   }
   return (crc ^ (-1)) >>> 0;
-  /*eslint-enable no-bitwise*/
+
 };

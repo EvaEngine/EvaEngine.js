@@ -1,6 +1,6 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import EventEmitter from 'events';
-import camelCase from 'lodash/camelCase';
+import camelCase from 'lodash/camelCase.js';
 import { RuntimeException } from '../exceptions/index.js';
 import Logger from './logger.js';
 import ServiceInterface from './interface.js';
@@ -11,8 +11,7 @@ import ServiceInterface from './interface.js';
  * 2. unregistered event not allow to emit
  * 3. all events register and trigger will be recorded
  */
-@Dependencies(Logger) //eslint-disable-line new-cap
-export default class EventManager extends ServiceInterface {
+class EventManager extends ServiceInterface {
   constructor(logger) {
     super();
     this.logger = logger;
@@ -20,7 +19,7 @@ export default class EventManager extends ServiceInterface {
     this.events = new Set();
   }
 
-  getProto() {
+    getProto() {
     return EventEmitter;
   }
 
@@ -80,3 +79,6 @@ export default class EventManager extends ServiceInterface {
     return this.emitter.emit(eventName, callback);
   }
 }
+
+constitute.Dependencies(Logger)(EventManager);
+export default EventManager;

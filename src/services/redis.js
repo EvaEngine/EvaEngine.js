@@ -1,10 +1,9 @@
 import Ioredis from 'ioredis';
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import Config from './config.js';
 import ServiceInterface from './interface.js';
 
-@Dependencies(Config) //eslint-disable-line new-cap
-export default class Redis extends ServiceInterface {
+class Redis extends ServiceInterface {
   /**
    * @param config Config
    */
@@ -15,7 +14,7 @@ export default class Redis extends ServiceInterface {
     this.client = null;
   }
 
-  getProto() {
+    getProto() {
     return Ioredis;
   }
 
@@ -50,4 +49,7 @@ export default class Redis extends ServiceInterface {
     return this.client;
   }
 }
+
+constitute.Dependencies(Config)(Redis);
+export default Redis;
 

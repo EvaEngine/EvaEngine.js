@@ -1,12 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep.js';
 import Sequelize from 'sequelize';
-import util from 'util';
+import { createRequire } from 'module';
 import DI from '../di.js';
 import { getMicroTimestamp } from '../utils/index.js';
 import { StandardException } from '../exceptions/index.js';
+
+const require = createRequire(import.meta.url);
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
@@ -85,10 +87,10 @@ export default class Entities {
       .filter((file) => {
         const fileArray = file.split('.');
         return (file.indexOf('.') !== 0) &&
-          (['js', 'es6'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
+          (['js', 'es6', 'cjs'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
       })
       .forEach((file) => {
-        const entityModule = require(path.join(entitiesPath, file)); //eslint-disable-line global-require, import/no-dynamic-require
+        const entityModule = require(path.join(entitiesPath, file));
         const entityFactory = entityModule.default || entityModule;
         const entity = typeof entityFactory === 'function' ?
           entityFactory(this.sequelize, Sequelize) : entityFactory;
@@ -211,8 +213,8 @@ export default class Entities {
      )`, { bind, transaction, type: entities.getSequelize().QueryTypes.INSERT });
      */
 
-    const sql = `INSERT INTO ${tableName} 
-      (${columnString}) 
+    const sql = `INSERT INTO ${tableName}
+      (${columnString})
       (
         SELECT *
         FROM (SELECT ${valueString}) AS tmp

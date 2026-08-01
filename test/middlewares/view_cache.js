@@ -5,10 +5,10 @@ import * as middlewares from '../../src/middlewares/providers.js';
 import {
   requestToCacheKey
 } from '../../src/middlewares/view_cache.js';
-import { mockRequest, mockResponse } from '../../src/utils/test.js';
+import { mockRequest } from '../../src/utils/test.js';
 import { RuntimeException } from './../../src/exceptions/index.js';
 
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 DI.registerServiceProviders(Object.values(middlewares));
 const cache = DI.get('cache');
 test.beforeEach('Flush all', async() => {

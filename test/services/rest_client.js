@@ -4,7 +4,7 @@ import DI from '../../src/di.js';
 import * as exceptions from './../../src/exceptions/index.js';
 import * as providers from '../../src/services/providers.js';
 
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 const client = DI.get('rest_client');
 
 test('Rest client request success', async(t) => {

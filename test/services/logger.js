@@ -11,7 +11,7 @@ test.before('Set env to production', () => {
 });
 test('Logger init', (t) => {
   const logger = new Logger(new Env(), new Config());
-  logger.setLogFile(`${__dirname}/../_demo_project/logs/test.log`);
+  logger.setLogFile(`${import.meta.dirname}/../_demo_project/logs/test.log`);
   logger.setLabel('foo');
   logger.setLevel('debug');
   t.is(logger.getWinston(), winston);

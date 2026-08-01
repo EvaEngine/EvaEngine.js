@@ -1,4 +1,4 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import moment from 'moment-timezone';
 import winston from 'winston';
 import { inspect } from 'util';
@@ -8,8 +8,7 @@ import Namespace from './namespace.js';
 import ServiceInterface from './interface.js';
 
 
-@Dependencies(Env, Config, Namespace) //eslint-disable-line new-cap
-export default class Logger extends ServiceInterface {
+class Logger extends ServiceInterface {
   /**
    * @param env {Env}
    * @param config {Config}
@@ -32,7 +31,7 @@ export default class Logger extends ServiceInterface {
     this.logfile = null;
   }
 
-  getProto() {
+    getProto() {
     return winston;
   }
 
@@ -144,3 +143,6 @@ export default class Logger extends ServiceInterface {
     return this.debug(inspect(obj, { depth: null, colors: true }));
   }
 }
+
+constitute.Dependencies(Env, Config, Namespace)(Logger);
+export default Logger;

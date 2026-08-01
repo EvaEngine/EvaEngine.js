@@ -4,13 +4,13 @@ import util from 'util';
 import Entities from './../../src/entities/index.js';
 
 test('Custom validator', (t) => {
-  const entities = new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
+  const entities = new Entities(`${import.meta.dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
   t.true(util.isFunction(entities.getInstance().validateIsUnique));
 });
 
 test('Multi instances', (t) => {
-  const entities1 = new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
-  const entities2 = new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
+  const entities1 = new Entities(`${import.meta.dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
+  const entities2 = new Entities(`${import.meta.dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
   t.true(entities1.getInstance() instanceof Sequelize);
   t.true(entities2.getInstance() instanceof Sequelize);
   t.false(entities1 === entities2);
@@ -18,7 +18,7 @@ test('Multi instances', (t) => {
 });
 
 test('Scan from file', (t) => {
-  const entities = new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
+  const entities = new Entities(`${import.meta.dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' }));
   t.is(entities.getSequelize(), Sequelize);
   t.true(entities.getInstance() instanceof Sequelize);
   t.is(Object.keys(entities.getAll()).length, 1);

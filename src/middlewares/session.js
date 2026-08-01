@@ -1,6 +1,6 @@
 import session from 'express-session';
-import connectRedis from 'connect-redis';
-import { Dependencies } from 'constitute';
+import { RedisStore } from 'connect-redis';
+import constitute from 'constitute';
 import Config from '../services/config.js';
 import Redis from '../services/redis.js';
 import Namespace from '../services/namespace.js';
@@ -24,12 +24,12 @@ function SessionMiddleware(_config, redis, namespace) {
     if (middleware) {
       return middleware;
     }
-    const RedisStore = connectRedis.RedisStore || connectRedis(session);
+    const Store = RedisStore;
     let store = null;
     const config = _config.get().session;
 
     if (config.store) {
-      const RedisClient = new RedisStore(Object.assign({}, config.store, {
+      const RedisClient = new Store(Object.assign({}, config.store, {
         client: config.store.client || redis.getInstance()
       }));
       RedisClient.client.on('error', (err) => {
@@ -37,7 +37,7 @@ function SessionMiddleware(_config, redis, namespace) {
       });
       store = RedisClient;
     } else {
-      store = new RedisStore(Object.assign({}, { client: redis.getInstance() }));
+      store = new Store(Object.assign({}, { client: redis.getInstance() }));
     }
 
     middleware = session({
@@ -53,6 +53,6 @@ function SessionMiddleware(_config, redis, namespace) {
       middleware;
   };
 }
-Dependencies(Config, Redis, Namespace)(SessionMiddleware); //eslint-disable-line new-cap
+constitute.Dependencies(Config, Redis, Namespace)(SessionMiddleware);
 
 export default SessionMiddleware;

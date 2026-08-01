@@ -1,6 +1,6 @@
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 import wrapper from './wrapper.js';
-import test from './test.js';
+import * as test from './test.js';
 import { pagination, paginationFilter } from './pagination.js';
 import crc32 from './crc32.js';
 import { randomNumber, randomString } from './random.js';

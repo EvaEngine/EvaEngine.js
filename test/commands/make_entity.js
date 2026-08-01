@@ -3,7 +3,7 @@ import { MakeEntity, MakeDbView } from './../../src/commands/make_entity.js';
 import DI from '../../src/di.js';
 import * as providers from '../../src/services/providers.js';
 
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 
 test('Make entity mapping', (t) => {
   t.is(MakeEntity.typeMapping('boolean'), 'DataTypes.BOOLEAN');

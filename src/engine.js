@@ -5,6 +5,7 @@ import path from 'path';
 import yargs from 'yargs/yargs';
 import later from 'later';
 import moment from 'moment-timezone';
+import packageJson from '../package.json' with { type: 'json' };
 import DI from './di.js';
 import * as ServiceProviders from './services/providers.js';
 import * as MiddlewareProviders from './middlewares/providers.js';
@@ -147,7 +148,7 @@ export default class EvaEngine {
    * @returns {express}
    */
   static createRouter() {
-    return express.Router(); //eslint-disable-line new-cap
+    return express.Router();
   }
 
   /**
@@ -480,7 +481,7 @@ export default class EvaEngine {
   }
 
   static getVersion() {
-    return require(`${__dirname}/../package.json`).version; //eslint-disable-line
+    return packageJson.version;
   }
 
   async runCLI(inputCommandName) {

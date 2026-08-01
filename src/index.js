@@ -1,5 +1,5 @@
 import constitute from 'constitute';
-import mysql from 'mysql';
+import * as mysql from 'mysql';
 import sequelize from 'sequelize';
 import Joi from 'joi';
 import EvaEngine, * as engine from './engine.js';
@@ -53,5 +53,5 @@ const core = {
   utils
 };
 
-module.exports = core;
-exports = module.exports; //eslint-disable-line
+export default core;
+export { core };

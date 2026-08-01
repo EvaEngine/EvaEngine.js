@@ -9,4 +9,4 @@ if (!util.isFunction) {
 // if (process.version.replace(/v|\./g, '') < 600) {
 //   global.Reflect = require('harmony-reflect'); //eslint-disable-line global-require
 // }
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${process.cwd()}/test/_demo_project/config`);

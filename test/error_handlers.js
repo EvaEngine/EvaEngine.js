@@ -6,7 +6,7 @@ import { RuntimeException, LogicException } from '../src/exceptions/index.js';
 
 
 test('Default errorHandler', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   });
@@ -14,7 +14,7 @@ test('Default errorHandler', (t) => {
 });
 
 test('Error handler for not expect error', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     config: mockInstance(),
@@ -31,7 +31,7 @@ test('Error handler for not expect error', (t) => {
 });
 
 test('Error handler for RuntimeException', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     config: mockInstance(),
@@ -48,7 +48,7 @@ test('Error handler for RuntimeException', (t) => {
 });
 
 test('Error handler for LogicException', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     config: mockInstance(),

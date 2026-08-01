@@ -7,7 +7,7 @@ import { mockRequest, mockResponse } from '../../src/utils/test.js';
 import { UnauthorizedException, FormInvalidateException } from '../../src/exceptions/index.js';
 import AuthKongMiddleware from '../../src/middlewares/auth_kong.js';
 
-DI.registerMockedProviders(Object.values(serviceProviders), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(serviceProviders), `${import.meta.dirname}/../_demo_project/config`);
 DI.registerServiceProviders(Object.values(middlewareProviders));
 
 const getAuth = () => DI.get('auth')();

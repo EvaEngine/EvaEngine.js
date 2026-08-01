@@ -1,4 +1,4 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import crypto from 'crypto';
 import util from 'util';
 import moment from 'moment-timezone';
@@ -66,7 +66,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
 function ViewCacheMiddleware(cache, logger) {
   return (options = {}) => {
     if (!util.isObject(options)) {
-      options = { //eslint-disable-line no-param-reassign
+      options = {
         ttl: options
       };
     }
@@ -102,8 +102,8 @@ function ViewCacheMiddleware(cache, logger) {
         res.send(cachedBody);
         return;
       }
-      res.realSend = res.send; //eslint-disable-line no-param-reassign
-      res.send = (body) => { //eslint-disable-line no-param-reassign
+      res.realSend = res.send;
+      res.send = (body) => {
         logger.debug('View cache missed by key %s, creating...', cacheKey);
         res.setHeader('X-View-Cache-Miss', cacheKey);
         res.setHeader('X-View-Cache-Expire-At', moment().add(ttl, 'minute').format('YYYY-MM-DD HH:mm:ss Z'));
@@ -122,6 +122,6 @@ function ViewCacheMiddleware(cache, logger) {
   };
 }
 
-Dependencies(Cache, Logger)(ViewCacheMiddleware);//eslint-disable-line new-cap
+constitute.Dependencies(Cache, Logger)(ViewCacheMiddleware);
 
 export default ViewCacheMiddleware;

@@ -1,12 +1,14 @@
 import _ from 'lodash';
-import { Dependencies } from 'constitute';
-import springConfigClient from 'cloud-config-client';
+import { createRequire } from 'module';
+import constitute from 'constitute';
+import * as springConfigClient from 'cloud-config-client';
 import Env from './env.js';
 import EngineConfig from '../config/index.js';
 import ServiceInterface from './interface.js';
 
-@Dependencies(Env) //eslint-disable-line new-cap
-export default class Config extends ServiceInterface {
+const require = createRequire(import.meta.url);
+
+class Config extends ServiceInterface {
   /**
    * @param env {Env}
    */
@@ -18,7 +20,7 @@ export default class Config extends ServiceInterface {
     this.config = null;
   }
 
-  setPath(path) {
+    setPath(path) {
     this.path = path;
     return this;
   }
@@ -62,11 +64,11 @@ export default class Config extends ServiceInterface {
   loadConfigFromFiles() {
     const env = this.env.get();
     const configPath = this.path;
-    const pathDefault = `${configPath}/config.default`;
-    const pathEnv = `${configPath}/config.${env}`;
-    const pathLocal = `${configPath}/config.local.${env}`;
-    /*eslint-disable global-require*/
-    /*eslint-disable import/no-dynamic-require*/
+    const pathDefault = `${configPath}/config.default.cjs`;
+    const pathEnv = `${configPath}/config.${env}.cjs`;
+    const pathLocal = `${configPath}/config.local.${env}.cjs`;
+
+
     const configDefault = require(pathDefault);
     this.mergedFiles.push(pathDefault);
     const configEnv = require(pathEnv);
@@ -75,11 +77,11 @@ export default class Config extends ServiceInterface {
     try {
       configLocal = require(pathLocal);
       this.mergedFiles.push(pathLocal);
-    } catch (e) {
+    } catch {
       configLocal = {};
     }
-    /*eslint-enable import/no-dynamic-require*/
-    /*eslint-enable global-require*/
+
+
     return _.merge({}, EngineConfig, configDefault, configEnv, configLocal);
   }
 
@@ -103,4 +105,7 @@ export default class Config extends ServiceInterface {
     return _.get(target, keyString);
   }
 }
+
+constitute.Dependencies(Env)(Config);
+export default Config;
 

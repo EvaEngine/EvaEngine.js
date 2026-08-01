@@ -1,4 +1,4 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import jwt from 'jwt-simple';
 import _ from 'lodash';
 
@@ -7,8 +7,7 @@ import Config from './config.js';
 import RestClient from '../services/rest_client.js';
 import ServiceInterface from './interface.js';
 
-@Dependencies(Config, RestClient) //eslint-disable-line new-cap
-export default class KongJsonWebToken extends ServiceInterface {
+class KongJsonWebToken extends ServiceInterface {
   /**
    * @param config {Config}
    * @param restClient {RestClient}
@@ -22,7 +21,7 @@ export default class KongJsonWebToken extends ServiceInterface {
     }
   }
 
-  getProto() {
+    getProto() {
     return jwt;
   }
 
@@ -71,3 +70,6 @@ export default class KongJsonWebToken extends ServiceInterface {
     return jwt.decode(str, secret);
   }
 }
+
+constitute.Dependencies(Config, RestClient)(KongJsonWebToken);
+export default KongJsonWebToken;

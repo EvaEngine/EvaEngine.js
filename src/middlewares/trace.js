@@ -1,5 +1,5 @@
 import onHeaders from 'on-headers';
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils/index.js';
 import Namespace from '../services/namespace.js';
 import Config from '../services/config.js';
@@ -224,6 +224,6 @@ function TraceMiddleware(ns, config, logger, client) {
   };
 }
 
-Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware); //eslint-disable-line new-cap
+constitute.Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware);
 
 export default TraceMiddleware;
