@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.0...v1.0.1) (2026-08-04)
+
+### Bug Fixes
+
+* lib -> src ([20bf233](https://github.com/EvaEngine/EvaEngine.js/commit/20bf233784ce48ae963798461816fcad04cb8d27))
+
 ## [1.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v0.11.3...v1.0.0) (2026-08-04)
 
 ### ⚠ BREAKING CHANGES
