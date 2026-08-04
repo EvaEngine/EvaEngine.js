@@ -1,4 +1,4 @@
-# EvaEngine For NodeJS
+# EvaEngine for Node.js
 
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
 [![CI](https://github.com/EvaEngine/EvaEngine.js/actions/workflows/ci.yml/badge.svg)](https://github.com/EvaEngine/EvaEngine.js/actions/workflows/ci.yml)
@@ -7,38 +7,38 @@
 [![npm](https://img.shields.io/npm/dm/evaengine.svg?maxAge=2592000)](https://www.npmjs.com/package/evaengine)
 [![License](https://img.shields.io/npm/l/evaengine.svg?maxAge=2592000?style=plastic)](https://github.com/EvaEngine/EvaEngine.js/blob/master/LICENSE)
 
+EvaEngine is a lightweight Node.js microservice development engine. It gives you dependency injection, middleware, CLI commands, scheduled jobs, session and auth helpers, cache support, Swagger generation, and a simple way to structure services.
 
-A micro service development engine for NodeJS.
+## Requirements
 
-- Full DI support (Injected by ES7 decorators as well)
-- ES7 `async` & `await` support
-- CLI mode support (easily convert to schedules)
-- Better exceptions design
-- ORM support (Based on Sequelize)
-- Quick test by mocking request & response
-- Builtin cache layer
-- Builtin session / token authentications
-- Http client with fully debugging log
-- Distributed tracing log support (Zipkin compatible)
-- API document generator
+- Node.js 24 or newer
+- npm
 
+## Install
 
+For a new project:
+
+```bash
+npm install evaengine
+```
+
+For local development of this repository:
+
+```bash
+git clone https://github.com/EvaEngine/EvaEngine.js.git
+cd EvaEngine.js
+npm install
+```
 
 ## Quick Start
 
-Clone this skeleton project to quick start:
+### Run as a web server
 
-[EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)
-
-- [项目规范(中文版)](docs/new_project_guide.md)
-
-### Run as web server
-
-``` js
+```js
 import { EvaEngine } from 'evaengine';
 
 const engine = new EvaEngine({
-  projectRoot: `${__dirname}/..`,
+  projectRoot: process.cwd(),
   port: 3000
 });
 
@@ -49,76 +49,67 @@ engine.use('/', (req, res) => {
 engine.run();
 ```
 
-Then visit `http://localhost:3000` to view API.
+Then open http://localhost:3000.
 
-### Run as CLI
+### Run as a CLI app
 
-``` js
+```js
 import { EvaEngine } from 'evaengine';
-import * as UserCommands from './commands/user';
+import * as UserCommands from './commands/user.js';
+
 const engine = new EvaEngine({
-  projectRoot: `${__dirname}/..`
+  projectRoot: process.cwd()
 }, 'cli');
+
 engine.registerCommands(UserCommands);
-(async() => {
-    await engine.runCLI();
-})();
+
+await engine.runCLI();
 ```
 
-### Run as Cron Job
+### Run as a cron job
 
-``` js
+```js
 import { EvaEngine } from 'evaengine';
-import * as HelloWorldCommands from './commands/hello_world';
+import * as HelloWorldCommands from './commands/hello_world.js';
 
 const engine = new EvaEngine({
-  projectRoot: `${__dirname}/..`
+  projectRoot: process.cwd()
 }, 'cli');
-engine.registerCommands([
-  HelloWorldCommands
-]);
 
+engine.registerCommands([HelloWorldCommands]);
 engine.runCrontab('0/10 * * * * *', 'hello:world --id=EvaEngine');
 ```
 
-## Swagger Support
+## Common Commands
 
-Process as follow:
-
-- Node 24 ESM Files =(acorn)=>
-- AST =(filter)=> 
-- Annotations =(doctrine)=>
-- JsDocs =(convert)=> 
-- Fragments + EvaEngine Exceptions + Sequelize Models =(Merge & Compile)=>
-- Swagger Specification JSON File
-
-
-## Debug with Projects
-
-```
-cd EvaNode
-npm link
-cd your_project
-npm link evaengine
+```bash
+npm run lint
+npm run build
+npm test
 ```
 
-## Global Environment Variables
+## Environment Variables
+
+Common variables include:
 
 - `NODE_ENV`
 - `PORT`
 - `LOG_LEVEL`
 - `CLI_NAME`
 - `MAX_REQUEST_DEBUG_BODY`
-- `SEQUELIZE_REPLICATION_CONFIG_KEY` : change sequelize replication config key
+- `SEQUELIZE_REPLICATION_CONFIG_KEY`
 
-## Generate Entities
+## Generate entities
 
-```
+```bash
 ./node_modules/.bin/engine make:entity
 ./node_modules/.bin/engine make:dbview
 ```
 
-## Import eslint with airbnb code standard for Webstorm
+## Start from a skeleton project
 
+If you want a ready-made starting point, use the skeleton repository:
 
-WebStorm > Preferences > Editor > Code Style > JavaScript > Scheme > Import Scheme > Choose `airbnb_code_style.xml` under this project
+- [EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)
+
+For project conventions and setup guidance, see [docs/new_project_guide.md](docs/new_project_guide.md).

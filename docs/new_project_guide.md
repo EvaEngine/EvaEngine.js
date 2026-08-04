@@ -1,12 +1,123 @@
-# EvaEngine.js项目规范
+# EvaEngine.js 新项目上手指南
 
-## 基础依赖
+这是给人看的使用说明，重点是：怎么安装、怎么启动、怎么用。
 
-- Node版本 >= 4.4.7
-- 底层统一使用[EvaEngine.js](https://github.com/EvaEngine/EvaEngine.js)
-- 源代码使用ES2015+ 编写, 通过Babel编译为Node可运行版本
+## 1. 先准备环境
 
-## 目录结构及文件命名
+- Node.js 24 或更新版本
+- npm
+
+如果你只是想使用这个框架，直接安装即可：
+
+```bash
+npm install evaengine
+```
+
+如果你想在本地开发这个仓库：
+
+```bash
+git clone https://github.com/EvaEngine/EvaEngine.js.git
+cd EvaEngine.js
+npm install
+```
+
+## 2. 启动一个 Web 服务
+
+最简单的方式是先创建一个入口文件，然后初始化一个 EvaEngine 实例：
+
+```js
+import { EvaEngine } from 'evaengine';
+
+const engine = new EvaEngine({
+  projectRoot: process.cwd(),
+  port: 3000
+});
+
+engine.bootstrap();
+engine.use('/', (req, res) => {
+  res.json({ hello: 'world' });
+});
+engine.run();
+```
+
+然后在浏览器里打开：
+
+```text
+http://localhost:3000
+```
+
+## 3. 启动 CLI 命令
+
+如果你想把它当成命令行工具来用，可以注册命令：
+
+```js
+import { EvaEngine } from 'evaengine';
+import * as UserCommands from './commands/user.js';
+
+const engine = new EvaEngine({
+  projectRoot: process.cwd()
+}, 'cli');
+
+engine.registerCommands(UserCommands);
+await engine.runCLI();
+```
+
+## 4. 启动定时任务
+
+也可以把它当成定时任务引擎：
+
+```js
+import { EvaEngine } from 'evaengine';
+import * as HelloWorldCommands from './commands/hello_world.js';
+
+const engine = new EvaEngine({
+  projectRoot: process.cwd()
+}, 'cli');
+
+engine.registerCommands([HelloWorldCommands]);
+engine.runCrontab('0/10 * * * * *', 'hello:world --id=EvaEngine');
+```
+
+## 5. 常用环境变量
+
+项目里常用的环境变量有：
+
+- `NODE_ENV`
+- `PORT`
+- `LOG_LEVEL`
+- `CLI_NAME`
+- `MAX_REQUEST_DEBUG_BODY`
+- `SEQUELIZE_REPLICATION_CONFIG_KEY`
+
+## 6. 生成实体
+
+如果你要生成实体或数据库视图，可以直接用 CLI：
+
+```bash
+./node_modules/.bin/engine make:entity
+./node_modules/.bin/engine make:dbview
+```
+
+## 7. 运行测试和检查
+
+开发时可以这样用：
+
+```bash
+npm run lint
+npm run build
+npm test
+```
+
+## 8. 推荐的起步方式
+
+如果你想快速开始，最省事的方法是直接基于官方 skeleton 项目改：
+
+- [EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)
+
+这样能少走很多弯路，也更容易把项目结构维护好。
+
+---
+
 
 ```
 Root
@@ -106,7 +217,3 @@ Root
 建议单元测试目录下保持与`src`目录下完全一致的目录结构,测试文件与源代码文件一一对应
 
 ## API规范
-
-- API采用RESTFul风格
-- uri只接受数字,小写字母,下划线和连接线
-- API至少需要在Path中有一级命名空间, 如`/v1`或`/v2`
