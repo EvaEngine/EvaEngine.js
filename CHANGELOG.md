@@ -1,3 +1,11 @@
+## [1.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v0.11.3...v1.0.0) (2026-08-04)
+
+### ⚠ BREAKING CHANGES
+
+* node js upgrade
+
+* Merge pull request [#78](https://github.com/EvaEngine/EvaEngine.js/issues/78) from EvaEngine/dev ([acfe5f5](https://github.com/EvaEngine/EvaEngine.js/commit/acfe5f5058934806f319741e50ad2d3dad65ee08))
+
 ## [0.11.3](https://github.com/EvaEngine/EvaEngine.js/compare/v0.11.2...v0.11.3) (2026-08-04)
 
 ### Bug Fixes
