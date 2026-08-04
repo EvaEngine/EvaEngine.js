@@ -2,7 +2,6 @@
 
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
 [![CI](https://github.com/EvaEngine/EvaEngine.js/actions/workflows/ci.yml/badge.svg)](https://github.com/EvaEngine/EvaEngine.js/actions/workflows/ci.yml)
-[![Dependencies Status](https://david-dm.org/EvaEngine/EvaEngine.js.svg)](https://david-dm.org/EvaEngine/EvaEngine.js)
 [![codecov](https://codecov.io/gh/EvaEngine/EvaEngine.js/branch/master/graph/badge.svg)](https://codecov.io/gh/EvaEngine/EvaEngine.js)
 [![npm](https://img.shields.io/npm/dm/evaengine.svg?maxAge=2592000)](https://www.npmjs.com/package/evaengine)
 [![License](https://img.shields.io/npm/l/evaengine.svg?maxAge=2592000?style=plastic)](https://github.com/EvaEngine/EvaEngine.js/blob/master/LICENSE)
