@@ -1,6 +1,6 @@
 *
 !.ai/**/*
-!lib/**/*
+!src/**/*
 !bin/**/*
 !template/**/*
 !index.js
