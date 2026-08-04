@@ -16,8 +16,9 @@
     "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
     "lint": "eslint src test index.js",
     "build": "node --check src/index.js",
-    "travis-deploy-once": "travis-deploy-once",
-    "semantic-release": "semantic-release"
+    "ci:check": "npm run lint && npm run build",
+    "semantic-release": "semantic-release",
+    "release": "semantic-release"
   },
   "engines": {
     "node": ">=24.0.0"
@@ -97,7 +98,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/github": "^11.0.0",
+    "@semantic-release/npm": "^12.0.0",
+    "@semantic-release/release-notes-generator": "^14.0.0",
     "ava": "^8.0.1",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.5",
     "eslint-plugin-import": "^2.32.0",
@@ -106,7 +114,6 @@
     "nock": "^14.0.17",
     "nyc": "^18.0.0",
     "pre-commit": "^2.0.0",
-    "semantic-release": "^25.0.8",
-    "travis-deploy-once": "^5.0.11"
+    "semantic-release": "^25.0.8"
   }
 }
