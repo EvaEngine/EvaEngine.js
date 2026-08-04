@@ -1,5 +1,5 @@
-import { UnauthorizedException } from '../exceptions';
-import wrapper from '../utils/wrapper';
+import { UnauthorizedException } from '../exceptions/index.js';
+import wrapper from '../utils/wrapper.js';
 
 /**
  * @returns {function()}

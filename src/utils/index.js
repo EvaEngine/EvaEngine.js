@@ -1,16 +1,16 @@
-import merge from 'lodash/merge';
-import wrapper from './wrapper';
-import test from './test';
-import { pagination, paginationFilter } from './pagination';
-import crc32 from './crc32';
-import { randomNumber, randomString } from './random';
-import { toCamelCase, toSnakeCase } from './case_converter';
-import { getHostFullUrl, getHostIp, getHostPort, getClientIp } from './host';
+import merge from 'lodash/merge.js';
+import wrapper from './wrapper.js';
+import * as test from './test.js';
+import { pagination, paginationFilter } from './pagination.js';
+import crc32 from './crc32.js';
+import { randomNumber, randomString } from './random.js';
+import { toCamelCase, toSnakeCase } from './case_converter.js';
+import { getHostFullUrl, getHostIp, getHostPort, getClientIp } from './host.js';
 import {
   getTimestamp, getMilliTimestamp,
   getMicroTimestamp, getDatabaseDatetime
-} from './datetime';
-import * as apiScaffold from './api_scaffold';
+} from './datetime.js';
+import * as apiScaffold from './api_scaffold.js';
 
 export {
   apiScaffold,

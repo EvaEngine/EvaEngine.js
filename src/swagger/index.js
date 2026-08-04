@@ -1,14 +1,17 @@
 /*eslint new-cap: [1]*/
 import fs from 'fs';
+import { createRequire } from 'module';
 import { format } from 'util';
 import assert from 'assert';
-import merge from 'lodash/merge';
-import doctrine from 'doctrine';
-import * as acorn from 'acorn/dist/acorn';
-import glob from 'glob';
-import yaml from 'js-yaml';
-import Entitles from '../entities';
-import { RuntimeException, StandardException } from '../exceptions';
+import merge from 'lodash/merge.js';
+import * as doctrine from 'doctrine';
+import * as acorn from 'acorn';
+import { glob } from 'glob';
+import * as yaml from 'js-yaml';
+import Entitles from '../entities/index.js';
+import { RuntimeException, StandardException } from '../exceptions/index.js';
+
+const require = createRequire(import.meta.url);
 
 export class AcornParsingException extends StandardException {
 }
@@ -414,14 +417,7 @@ export class ExSwagger {
    * @returns {Promise|Array.<string>}
    */
   static async scanFiles(path, options = {}) {
-    return new Promise((resolve, reject) => {
-      glob(path, options, (err, files) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(files);
-      });
-    });
+    return glob(path, options);
   }
 
   /**
@@ -483,7 +479,9 @@ export class ExSwagger {
       if (blacklist.includes(modelName)) {
         return true;
       }
-      const definition = ExSwagger.modelToSwaggerDefinition(models[modelName].attributes);
+      const model = models[modelName];
+      const attributes = model.attributes || model.rawAttributes;
+      const definition = ExSwagger.modelToSwaggerDefinition(attributes);
       definitions.set(modelName, definition);
       return true;
     });
@@ -497,7 +495,7 @@ export class ExSwagger {
       return exceptions;
     }
     for (const file of files) {
-      const exceptionsInFile = require(file); //eslint-disable-line
+      const exceptionsInFile = require(file);
       Object.keys(exceptionsInFile).forEach((exceptionName) => {
         const exceptionClass = exceptionsInFile[exceptionName];
         const exception = new exceptionClass(exceptionName); //eslint-disable-line new-cap
@@ -605,7 +603,7 @@ export class ExSwagger {
     const uiPath = this.getSwaggerUIPath();
     const content = await fs.readFileSync(`${uiPath}/index.html`);
     return content.toString().replace(
-      'https://petstore.swagger.io/v2/swagger.json',
+      'https://petstore.swagger.io/v2/swagger/index.json',
       this.swaggerDocsPath.replace(this.compileDistPath, '')
     );
   }
@@ -625,7 +623,7 @@ export class ExSwagger {
     swaggerDocsPath = `${compileDistPath}/docs.json`,
     sourceFilesPath = `${sourceRootPath}/**/*.js`,
     exceptionInterface = StandardException,
-    extraSourcePaths = [`${__dirname}/../utils/**/*.js`],
+    extraSourcePaths = [`${import.meta.dirname}/../utils/**/*.js`],
     exceptionPaths
   }) {
     this.logger = logger ||
@@ -652,17 +650,17 @@ export class ExSwagger {
       ? extraSourcePaths.concat(sourceFilesPath) :
       extraSourcePaths.concat([sourceFilesPath]);
     this.exceptionPaths = exceptionPaths ?
-      [`${__dirname}/../exceptions`].concat(exceptionPaths) : [`${__dirname}/../exceptions`];
+      [`${import.meta.dirname}/../exceptions`].concat(exceptionPaths) : [`${import.meta.dirname}/../exceptions`];
     this.exceptionInterface = exceptionInterface;
     this.compileDistPath = compileDistPath;
     if (swaggerUIPath) {
       this.swaggerUIPath = swaggerUIPath;
     } else {
-      this.swaggerUIPath = `${__dirname}/../../node_modules/swagger-ui-dist`;
+      this.swaggerUIPath = `${import.meta.dirname}/../../node_modules/swagger-ui-dist`;
       try {
         fs.accessSync(this.swaggerUIPath, fs.F_OK);
-      } catch (e) {
-        this.swaggerUIPath = `${__dirname}/../../../swagger-ui-dist`; //For NPM v3.x
+      } catch {
+        this.swaggerUIPath = `${import.meta.dirname}/../../../swagger-ui-dist`; //For NPM v3.x
       }
     }
     this.swaggerDocsPath = swaggerDocsPath;

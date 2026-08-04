@@ -1,9 +1,9 @@
 import test from 'ava';
-import { MakeEntity } from './../../src/commands/make_entity';
-import DI from '../../src/di';
-import * as providers from '../../src/services/providers';
+import { MakeEntity, MakeDbView } from './../../src/commands/make_entity.js';
+import DI from '../../src/di.js';
+import * as providers from '../../src/services/providers.js';
 
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 
 test('Make entity mapping', (t) => {
   t.is(MakeEntity.typeMapping('boolean'), 'DataTypes.BOOLEAN');
@@ -45,4 +45,11 @@ test('Make entity mapping', (t) => {
   t.is(MakeEntity.typeMapping('json'), 'DataTypes.JSON');
 
   t.is(MakeEntity.typeMapping('geometry'), 'DataTypes.GEOMETRY');
+});
+
+test('Make entity generates timestamp SQL expressions', (t) => {
+  const command = new MakeDbView({});
+  const sql = command.getSql('users', [{ fieldName: 'createdAt' }, { fieldName: 'name' }]);
+  t.true(sql.includes('FROM_UNIXTIME'));
+  t.true(sql.includes('`name` AS `name`'));
 });

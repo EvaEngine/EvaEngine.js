@@ -1,11 +1,11 @@
 import test from 'ava';
 import path from 'path';
-import EvaEngine, { DI } from '../src/engine';
-import { RuntimeException } from '../src/exceptions';
-import Command from '../src/commands';
+import EvaEngine, { DI } from '../src/engine.js';
+import { RuntimeException } from '../src/exceptions/index.js';
+import Command from '../src/commands/index.js';
 
 test('default properties', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     port: 3000
@@ -24,7 +24,7 @@ test('create app', (t) => {
 });
 
 test('bootstrap', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     port: 3000
@@ -36,12 +36,12 @@ test('bootstrap', (t) => {
 
 
 test('CLI without commands', (t) => {
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
   t.is(engine.getMeta().mode, 'cli');
-  t.throws(() => engine.getCLI(), RuntimeException);
+  t.throws(() => engine.getCLI(), { instanceOf: RuntimeException });
 });
 
 test('CLI with commands', (t) => {
@@ -58,7 +58,7 @@ test('CLI with commands', (t) => {
       return {};
     }
   }
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
@@ -68,6 +68,7 @@ test('CLI with commands', (t) => {
   t.is(engine.getCommandName(), 'hello:world');
   engine.clearCommands();
   t.is(Object.keys(engine.getCommands()).length, 0);
+  t.false(Array.isArray(engine.getCommands()));
 });
 
 test('Run commands', (t) => {
@@ -92,12 +93,18 @@ test('Run commands', (t) => {
       this.foo = 'bar';
     }
   }
-  const projectRoot = path.normalize(`${__dirname}/_demo_project`);
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
   engine.registerCommands({ test: TestCommand });
   engine.runCLI('hello:world');
   t.is(engine.getCommand().getFoo(), 'bar');
+});
+
+test('rejects unknown command and cron without commands', async (t) => {
+  const engine = new EvaEngine({ projectRoot: path.normalize(`${import.meta.dirname}/_demo_project`) }, 'cli');
+  await t.throwsAsync(engine.runCommand('missing'), { instanceOf: RuntimeException });
+  t.throws(() => engine.runCrontab('* * * * *', 'missing'), { instanceOf: RuntimeException });
 });
 

@@ -1,12 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep.js';
 import Sequelize from 'sequelize';
-import util from 'util';
-import DI from '../di';
-import { getMicroTimestamp } from '../utils';
-import { StandardException } from '../exceptions';
+import { createRequire } from 'module';
+import DI from '../di.js';
+import { getMicroTimestamp } from '../utils/index.js';
+import { StandardException } from '../exceptions/index.js';
+
+const require = createRequire(import.meta.url);
 
 //From https://github.com/angelxmoreno/sequelize-isunique-validator
 Sequelize.prototype.validateIsUnique = (col, msg) => {
@@ -85,10 +87,13 @@ export default class Entities {
       .filter((file) => {
         const fileArray = file.split('.');
         return (file.indexOf('.') !== 0) &&
-          (['js', 'es6'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
+          (['js', 'es6', 'cjs'].indexOf(fileArray.pop()) !== -1) && (fileArray[0] !== 'index');
       })
       .forEach((file) => {
-        const entity = this.sequelize.import(path.join(entitiesPath, file));
+        const entityModule = require(path.join(entitiesPath, file));
+        const entityFactory = entityModule.default || entityModule;
+        const entity = typeof entityFactory === 'function' ?
+          entityFactory(this.sequelize, Sequelize) : entityFactory;
         this.entities[entity.name] = entity;
       });
 
@@ -120,7 +125,12 @@ export default class Entities {
       const ns = DI.get('namespace');
       if (ns.isEnabled()) {
         //Inject sequelize inner namespace, refer: http://docs.sequelizejs.com/en/latest/docs/transactions/
-        Sequelize.cls = ns.use().getContext();
+        const context = ns.use().getContext();
+        if (typeof Sequelize.useCLS === 'function') {
+          Sequelize.useCLS(context);
+        } else {
+          Sequelize.cls = context;
+        }
       }
 
       const dbConfig = cloneDeep(config.db);
@@ -132,7 +142,7 @@ export default class Entities {
         Object.assign({}, config.sequelize, dbConfig, Entities.addTracer())
       );
     } else {
-      this.sequelize = util.isFunction(this.sequelize) ? this.sequelize() : this.sequelize;
+      this.sequelize = typeof this.sequelize === 'function' ? this.sequelize() : this.sequelize;
     }
 
     this.scan(this.entitiesPath, withAssociate);
@@ -203,8 +213,8 @@ export default class Entities {
      )`, { bind, transaction, type: entities.getSequelize().QueryTypes.INSERT });
      */
 
-    const sql = `INSERT INTO ${tableName} 
-      (${columnString}) 
+    const sql = `INSERT INTO ${tableName}
+      (${columnString})
       (
         SELECT *
         FROM (SELECT ${valueString}) AS tmp

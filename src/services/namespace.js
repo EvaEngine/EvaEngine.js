@@ -1,8 +1,8 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import { createNamespace, getNamespace, destroyNamespace, reset } from 'continuation-local-storage';
-import Config from './config';
-import { UnsupportedOperationException } from '../exceptions';
-import ServiceInterface from './interface';
+import Config from './config.js';
+import { OperationUnsupportedException } from '../exceptions/index.js';
+import ServiceInterface from './interface.js';
 
 const stores = {};
 
@@ -35,7 +35,7 @@ export class Store {
   }
 
   getContext() {
-    throw new UnsupportedOperationException('Not able to get namespace context when it be disabled');
+    throw new OperationUnsupportedException('Not able to get namespace context when it be disabled');
   }
 
   createContext() {
@@ -91,8 +91,7 @@ export class NsStore extends Store {
   }
 }
 
-@Dependencies(Config) //eslint-disable-line new-cap
-export default class Namespace extends ServiceInterface {
+class Namespace extends ServiceInterface {
   /**
    * @param config {Config}
    */
@@ -104,7 +103,7 @@ export default class Namespace extends ServiceInterface {
     this.name = null;
   }
 
-  isEnabled() {
+    isEnabled() {
     return this.config.enable;
   }
 
@@ -172,3 +171,6 @@ export default class Namespace extends ServiceInterface {
     return this.use().createContext();
   }
 }
+
+constitute.Dependencies(Config)(Namespace);
+export default Namespace;

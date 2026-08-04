@@ -1,22 +1,24 @@
 import Joi from 'joi';
-import { Dependencies } from 'constitute';
-import wrapper from '../utils/wrapper';
-import { FormInvalidateException } from '../exceptions';
-import ValidatorBase from '../services/joi';
+import constitute from 'constitute';
+import wrapper from '../utils/wrapper.js';
+import { FormInvalidateException } from '../exceptions/index.js';
+import ValidatorBase from '../services/joi.js';
 
-const validate = (data, schema, options) =>
-  new Promise((resolve, reject) => {
-    Joi.validate(data, schema, Object.assign(
-      { abortEarly: false, allowUnknown: true },
-      options
-    ), (err, value) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(value);
-      }
+const validate = (data, schema, options) => {
+  const validationOptions = Object.assign(
+    { abortEarly: false, allowUnknown: true },
+    options
+  );
+  if (schema && typeof schema.validateAsync === 'function') {
+    return schema.validateAsync(data, validationOptions);
+  }
+  return new Promise((resolve, reject) => {
+    Joi.validate(data, schema, validationOptions, (err, value) => {
+      if (err) reject(err);
+      else resolve(value);
     });
   });
+};
 
 /**
  * @returns {function()}
@@ -24,7 +26,7 @@ const validate = (data, schema, options) =>
  */
 function ValidatorMiddleware(validatorBase) {
   return (getSchema, options, validator) =>
-    wrapper(async (req, res, next) => { //eslint-disable-line no-unused-vars
+    wrapper(async (req, res, next) => {
       const { query, body, path } = getSchema(validator || validatorBase.getJoi());
       try {
         if (query) {
@@ -43,6 +45,6 @@ function ValidatorMiddleware(validatorBase) {
     });
 }
 
-Dependencies(ValidatorBase)(ValidatorMiddleware); //eslint-disable-line new-cap
+constitute.Dependencies(ValidatorBase)(ValidatorMiddleware);
 
 export default ValidatorMiddleware;

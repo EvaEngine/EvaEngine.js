@@ -1,4 +1,4 @@
-import ServiceInterface from './interface';
+import ServiceInterface from './interface.js';
 
 let env = null;
 export const TYPES = {

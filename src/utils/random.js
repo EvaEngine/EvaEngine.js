@@ -1,4 +1,4 @@
-import random from 'lodash/random';
+import random from 'lodash/random.js';
 
 const randomString = (len = 16) => {
   const digits = '0123456789abcdefghijklmnopqrstuvwxyz';

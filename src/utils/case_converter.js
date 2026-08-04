@@ -1,5 +1,5 @@
-import snakeCase from 'lodash/snakeCase';
-import camelCase from 'lodash/camelCase';
+import snakeCase from 'lodash/snakeCase.js';
+import camelCase from 'lodash/camelCase.js';
 
 /**
  * deeply converts keys of an object from one case to another

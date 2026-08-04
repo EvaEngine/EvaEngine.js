@@ -2,7 +2,7 @@ import test from 'ava';
 import {
   getTimestamp, getMilliTimestamp,
   getMicroTimestamp, getDatabaseDatetime
-} from './../../src/utils/datetime';
+} from './../../src/utils/datetime.js';
 
 test('Datetime length', (t) => {
   t.is(getTimestamp().toString().length, 10);

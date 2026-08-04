@@ -2,24 +2,24 @@ import test from 'ava';
 import path from 'path';
 import fs from 'fs';
 import Sequelize from 'sequelize';
-import { ExSwagger } from '../../src/swagger';
-import * as exceptions from '../../src/exceptions';
-import Entities from './../../src/entities';
+import { ExSwagger } from '../../src/swagger/index.js';
+import * as exceptions from '../../src/exceptions/index.js';
+import Entities from './../../src/entities/index.js';
 
 test('Could get file lists', async(t) => {
-  const files = await ExSwagger.scanFiles(`${__dirname}/_example/**/*.js`);
-  const ctrpath = `${__dirname}${path.sep}_example${path.sep}controller.js`.split(path.sep).join('/');
+  const files = await ExSwagger.scanFiles(`${import.meta.dirname}/_example/**/*.js`);
+  const ctrpath = `${import.meta.dirname}${path.sep}_example${path.sep}controller.js`.split(path.sep).join('/');
   t.true(files.includes(ctrpath));
 });
 
 test('Could parse annotations', async(t) => {
-  const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${__dirname}/_example/controller.js`]);
+  const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${import.meta.dirname}/_example/controller.js`]);
   t.is(annotationContainers.length, 1);
   t.is(annotationContainers[0].getAnnotations().length, 6);
 });
 
 test('Could parse swagger docs', async(t) => {
-  const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${__dirname}/_example/controller.js`]);
+  const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${import.meta.dirname}/_example/controller.js`]);
   const fragments = annotationContainers[0].collectFragments();
   t.is(fragments.length, 4);
   t.true(fragments[0].isDefinition());
@@ -36,7 +36,7 @@ test('Could parse swagger docs', async(t) => {
 });
 test('Scan exceptions', async(t) => {
   const scannedExceptions = await ExSwagger.scanExceptions(
-    `${__dirname}/../../src/exceptions/**/*.js`, exceptions.StandardException
+    `${import.meta.dirname}/../../src/exceptions/**/*.js`, exceptions.StandardException
   );
   t.true(Object.keys(scannedExceptions).length >= 12);
 });
@@ -51,13 +51,13 @@ test('default properties', async(t) => {
 });
 
 test('Generate json file', async(t) => {
-  const compileDistPath = `${__dirname}/_example/exports`;
+  const compileDistPath = `${import.meta.dirname}/_example/exports`;
   const exSwagger = new ExSwagger({
     compileDistPath,
-    extraSourcePaths: [`${__dirname}/../../../lib/utils/**/*.js`],
-    models: new Entities(`${__dirname}/../_demo_project/entities`, new Sequelize()),
+    extraSourcePaths: [`${import.meta.dirname}/../../../lib/utils/**/*.js`],
+    models: new Entities(`${import.meta.dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' })),
     swaggerDocsTemplate: { definitions: {}, paths: {} },
-    sourceRootPath: `${__dirname}/_example`
+    sourceRootPath: `${import.meta.dirname}/_example`
   });
   await exSwagger.exportJson();
   t.truthy(JSON.parse(fs.readFileSync(`${compileDistPath}/docs.json`)));

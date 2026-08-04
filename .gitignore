@@ -45,4 +45,3 @@ src/config/sequelize.json
 lib/*
 .nyc_output
 yarn.lock
-package-lock.json

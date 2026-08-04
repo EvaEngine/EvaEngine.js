@@ -1,14 +1,14 @@
 import _ from 'lodash';
-import { Dependencies } from 'constitute';
-import springConfigClient from 'cloud-config-client';
-import Env from './env';
-import EngineConfig from '../config';
-import ServiceInterface from './interface';
+import { createRequire } from 'module';
+import constitute from 'constitute';
+import * as springConfigClient from 'cloud-config-client';
+import Env from './env.js';
+import EngineConfig from '../config/index.js';
+import ServiceInterface from './interface.js';
 
-let config = null;
+const require = createRequire(import.meta.url);
 
-@Dependencies(Env) //eslint-disable-line new-cap
-export default class Config extends ServiceInterface {
+class Config extends ServiceInterface {
   /**
    * @param env {Env}
    */
@@ -17,9 +17,10 @@ export default class Config extends ServiceInterface {
     this.env = env;
     this.path = null;
     this.mergedFiles = [];
+    this.config = null;
   }
 
-  setPath(path) {
+    setPath(path) {
     this.path = path;
     return this;
   }
@@ -38,8 +39,8 @@ export default class Config extends ServiceInterface {
     profiles,
     label = 'master'
   }) {
-    if (!config) {
-      config = this.loadConfigFromFiles();
+    if (!this.config) {
+      this.config = this.loadConfigFromFiles();
     }
     const configRemote = await springConfigClient.load({
       endpoint,
@@ -48,26 +49,26 @@ export default class Config extends ServiceInterface {
       label
     });
     configRemote.forEach((key, value) => {
-      _.set(config, key, value);
+      _.set(this.config, key, value);
     });
   }
 
   get(key) {
-    if (config) {
-      return key ? Config.search(key, config) : config;
+    if (this.config) {
+      return key ? Config.search(key, this.config) : this.config;
     }
-    config = this.loadConfigFromFiles();
-    return key ? Config.search(key, config) : config;
+    this.config = this.loadConfigFromFiles();
+    return key ? Config.search(key, this.config) : this.config;
   }
 
   loadConfigFromFiles() {
     const env = this.env.get();
     const configPath = this.path;
-    const pathDefault = `${configPath}/config.default`;
-    const pathEnv = `${configPath}/config.${env}`;
-    const pathLocal = `${configPath}/config.local.${env}`;
-    /*eslint-disable global-require*/
-    /*eslint-disable import/no-dynamic-require*/
+    const pathDefault = `${configPath}/config.default.cjs`;
+    const pathEnv = `${configPath}/config.${env}.cjs`;
+    const pathLocal = `${configPath}/config.local.${env}.cjs`;
+
+
     const configDefault = require(pathDefault);
     this.mergedFiles.push(pathDefault);
     const configEnv = require(pathEnv);
@@ -76,12 +77,12 @@ export default class Config extends ServiceInterface {
     try {
       configLocal = require(pathLocal);
       this.mergedFiles.push(pathLocal);
-    } catch (e) {
+    } catch {
       configLocal = {};
     }
-    /*eslint-enable import/no-dynamic-require*/
-    /*eslint-enable global-require*/
-    return _.merge(EngineConfig, configDefault, configEnv, configLocal);
+
+
+    return _.merge({}, EngineConfig, configDefault, configEnv, configLocal);
   }
 
   getMergedFiles() {
@@ -89,7 +90,7 @@ export default class Config extends ServiceInterface {
   }
 
   reload() {
-    config = null;
+    this.config = null;
   }
 
   /**
@@ -104,4 +105,7 @@ export default class Config extends ServiceInterface {
     return _.get(target, keyString);
   }
 }
+
+constitute.Dependencies(Env)(Config);
+export default Config;
 

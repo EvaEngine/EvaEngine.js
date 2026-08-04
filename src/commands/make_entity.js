@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import Sequelize from 'sequelize';
 import fs from 'fs';
-import mkdirp from 'mkdirp';
-import Command from './interface';
-import DI from '../di';
-import Entities from '../entities';
+import * as mkdirp from 'mkdirp';
+import Command from './interface.js';
+import DI from '../di.js';
+import Entities from '../entities/index.js';
 
 
 export class MakeDbView extends Command {
@@ -237,8 +237,8 @@ export class MakeEntity extends Command {
 
     const path = dir ? `${process.cwd()}/${dir}` : `${process.cwd()}/src/entities`;
     const schemaPath = `${path}/schemas`;
-    const entityTemplate = fs.readFileSync(`${__dirname}/../../template/entity.ejs`, 'utf8');
-    const schemaTemplate = fs.readFileSync(`${__dirname}/../../template/schema.ejs`, 'utf8');
+    const entityTemplate = fs.readFileSync(`${import.meta.dirname}/../../template/entity.ejs`, 'utf8');
+    const schemaTemplate = fs.readFileSync(`${import.meta.dirname}/../../template/schema.ejs`, 'utf8');
     mkdirp.sync(path);
     mkdirp.sync(schemaPath);
 
@@ -268,7 +268,7 @@ export class MakeEntity extends Command {
       try {
         fs.accessSync(entityFile);
         logger.info('Entity file %s generate skipped, already exists by %s', table, entityFile);
-      } catch (e) {
+      } catch {
         fs.writeFileSync(entityFile, _.template(entityTemplate)({ table }));
         logger.info('Entity file %s generated as %s', table, entityFile);
       }
@@ -276,7 +276,7 @@ export class MakeEntity extends Command {
       try {
         fs.accessSync(schemaFile);
         logger.info('Schema file %s generate override, already exists by %s', table, schemaFile);
-      } catch (e) {
+      } catch {
         logger.info('Schema file %s generated as %s', table, schemaFile);
       }
       fs.writeFileSync(schemaFile, _.template(schemaTemplate)({
@@ -433,7 +433,7 @@ export class MakeGraphql extends Command {
 
     const path = dir ? `${process.cwd()}/${dir}` : `${process.cwd()}/src/graphql`;
     const schemaPath = `${path}/entities`;
-    const schemaTemplate = fs.readFileSync(`${__dirname}/../../template/graphql.ejs`, 'utf8');
+    const schemaTemplate = fs.readFileSync(`${import.meta.dirname}/../../template/graphql.ejs`, 'utf8');
     const mappingFile = mapping ? `${process.cwd()}/${mapping}` : `${process.cwd()}/src/graphql/mapping.json`;
     const mappingContent = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
     const getMappedTableName = tableName =>
@@ -471,7 +471,7 @@ export class MakeGraphql extends Command {
       try {
         fs.accessSync(schemaFile);
         logger.info('Graphql schema file %s generate override, already exists by %s', tableName, schemaFile);
-      } catch (e) {
+      } catch {
         logger.info('Graphql schema file %s generated as %s', tableName, schemaFile);
       }
       fs.writeFileSync(schemaFile, _.template(schemaTemplate)({

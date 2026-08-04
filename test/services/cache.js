@@ -1,13 +1,14 @@
 import test from 'ava';
-import DI from '../../src/di';
-import * as providers from '../../src/services/providers';
+import DI from '../../src/di.js';
+import * as providers from '../../src/services/providers.js';
 
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 const cache = DI.get('cache');
 
 test.beforeEach('Flush all', () => {
   cache.flush();
 });
+test.after.always('Close Redis', () => DI.get('redis').cleanup());
 
 test('Cache get && set && del', async (t) => {
   await cache.set('foo', 'bar');
@@ -39,12 +40,12 @@ test('Cache set nx || xx', async(t) => {
   t.true(ret === 'OK');
   ret = await cache.set('foo', 'bar', 0, 'nx');
   t.true(ret === null);
-  
+
   ret = await cache.set('foo', 'bar', 0, 'xx');
   t.true(ret === 'OK');
   ret = await cache.set('foo', 'bar', 1, 'xx');
   t.true(ret === 'OK');
-  
+
   await cache.flush();
 });
 
@@ -57,12 +58,12 @@ test('Cache namespace set nx || xx', async(t) => {
   t.true(ret === 'OK');
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
   t.true(ret === null);
-  
+
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
   t.true(ret === 'OK');
   ret = await cache.namespace('ns').set('foo', 'bar', 1, 'xx');
   t.true(ret === 'OK');
-  
+
   await cache.namespace('ns').flush();
 });
 

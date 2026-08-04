@@ -1,12 +1,12 @@
-import SessionMiddleware from '../middlewares/session';
-import AuthMiddleware from '../middlewares/auth';
-import AuthKongMiddleware from '../middlewares/auth_kong';
-import DebugMiddleware from '../middlewares/debug';
-import TraceMiddleware from '../middlewares/trace';
-import ViewCacheMiddleware from '../middlewares/view_cache';
-import ValidatorMiddleware from '../middlewares/validator';
-import DI from '../di';
-import { ServiceProvider } from '../services/providers';
+import SessionMiddleware from '../middlewares/session.js';
+import AuthMiddleware from '../middlewares/auth.js';
+import AuthKongMiddleware from '../middlewares/auth_kong.js';
+import DebugMiddleware from '../middlewares/debug.js';
+import TraceMiddleware from '../middlewares/trace.js';
+import ViewCacheMiddleware from '../middlewares/view_cache.js';
+import ValidatorMiddleware from '../middlewares/validator.js';
+import DI from '../di.js';
+import { ServiceProvider } from '../services/providers.js';
 
 export class SessionMiddlewareProvider extends ServiceProvider {
   get name() {

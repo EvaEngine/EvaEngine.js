@@ -1,10 +1,10 @@
 import onHeaders from 'on-headers';
-import { Dependencies } from 'constitute';
-import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils';
-import Namespace from '../services/namespace';
-import Config from '../services/config';
-import Logger from '../services/logger';
-import HttpClient from '../services/http_client';
+import constitute from 'constitute';
+import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils/index.js';
+import Namespace from '../services/namespace.js';
+import Config from '../services/config.js';
+import Logger from '../services/logger.js';
+import HttpClient from '../services/http_client.js';
 
 const hostIp = getHostIp();
 
@@ -153,7 +153,7 @@ function TraceMiddleware(ns, config, logger, client) {
       'X-B3-SpanId': spanId,
       'X-B3-TraceId': traceId,
       'X-B3-ParentSpanId': parentId,
-      'X-B3-Sampled': enabled ? 1 : 0
+      'X-B3-Sampled': sampled
     });
 
     if (sampled < 1) {
@@ -224,6 +224,6 @@ function TraceMiddleware(ns, config, logger, client) {
   };
 }
 
-Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware); //eslint-disable-line new-cap
+constitute.Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware);
 
 export default TraceMiddleware;

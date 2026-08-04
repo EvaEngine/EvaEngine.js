@@ -1,11 +1,10 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import moment from 'moment-timezone';
-import { getTimestamp, getDatabaseDatetime } from '../utils/datetime';
-import Logger from './logger';
-import ServiceInterface from './interface';
+import { getTimestamp, getDatabaseDatetime } from '../utils/datetime.js';
+import Logger from './logger.js';
+import ServiceInterface from './interface.js';
 
-@Dependencies(Logger) //eslint-disable-line new-cap
-export default class Now extends ServiceInterface {
+class Now extends ServiceInterface {
   /**
    * @param {Logger} logger
    */
@@ -15,7 +14,7 @@ export default class Now extends ServiceInterface {
     this.now = null;
   }
 
-  setNow(now) {
+    setNow(now) {
     if (typeof now === 'number') {
       this.now = now;
     } else if (now instanceof moment) {
@@ -44,4 +43,7 @@ export default class Now extends ServiceInterface {
     return this.now ? moment.unix(this.now).format('YYYY-MM-DD HH:mm:ss') : getDatabaseDatetime();
   }
 }
+
+constitute.Dependencies(Logger)(Now);
+export default Now;
 

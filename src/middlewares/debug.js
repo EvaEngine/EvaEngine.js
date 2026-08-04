@@ -1,7 +1,7 @@
 import morgan from 'morgan';
 import os from 'os';
-import { Dependencies } from 'constitute';
-import Logger from '../services/logger';
+import constitute from 'constitute';
+import Logger from '../services/logger.js';
 
 /**
  Log format:
@@ -84,5 +84,5 @@ function DebugMiddleware(logger) {
     );
 }
 
-Dependencies(Logger)(DebugMiddleware); //eslint-disable-line new-cap
+constitute.Dependencies(Logger)(DebugMiddleware);
 export default DebugMiddleware;

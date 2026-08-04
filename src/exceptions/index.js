@@ -1,17 +1,17 @@
-import appRoot from 'app-root-path';
+import * as appRoot from 'app-root-path';
 import path from 'path';
 import { format } from 'util';
-import crc32 from '../utils/crc32';
+import crc32 from '../utils/crc32.js';
 
 
 /**
  * Make Error be able to work with JSON.stringify()
  */
 if (!('toJSON' in Error.prototype)) {
-  Object.defineProperty(Error.prototype, 'toJSON', { //eslint-disable-line
-    value: function () { //eslint-disable-line
+  Object.defineProperty(Error.prototype, 'toJSON', {
+    value: function () {
       const alt = {};
-      Object.getOwnPropertyNames(this).forEach(function (key) { //eslint-disable-line
+      Object.getOwnPropertyNames(this).forEach(function (key) {
         alt[key] = this[key];
       }, this);
       return alt;
@@ -54,9 +54,9 @@ export class StandardException extends Error {
    * @param {string} fileName
    * @returns {Number}
    */
-  static generateCode(className, fileName = __filename) {
+  static generateCode(className, fileName = import.meta.filename) {
     const namespace = fileName.replace(appRoot.path, '').split(path.sep).join('/');
-    const group = fileName === __filename ? '11111' : crc32(namespace).toString().substring(0, 5);
+    const group = fileName === import.meta.filename ? '11111' : crc32(namespace).toString().substring(0, 5);
     return parseInt(`${group}000${StandardException.hash(className)}`, 10);
   }
 
@@ -140,7 +140,7 @@ export class StandardException extends Error {
     this.details = throwingError ? exceptionOrMsg : [];
     this.prevError = {};
     this.code = null;
-    this.filename = __filename;
+    this.filename = import.meta.filename;
     this.translated = false;
     this.importance = 0;
     if (throwingError === true) {
@@ -486,7 +486,7 @@ factory = (json) => {
 
   let e = null;
   if (Object.keys(exceptions).includes(name)) {
-    e = new exceptions[name]; //eslint-disable-line
+    e = new exceptions[name];
   } else if (statusCode < 500) {
     e = new LogicException(message);
   } else {

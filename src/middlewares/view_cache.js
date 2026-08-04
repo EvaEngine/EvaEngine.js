@@ -1,11 +1,11 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import crypto from 'crypto';
 import util from 'util';
 import moment from 'moment-timezone';
-import Logger from '../services/logger';
-import Cache from '../services/cache';
-import wrapper from '../utils/wrapper';
-import { RuntimeException } from '../exceptions';
+import Logger from '../services/logger.js';
+import Cache from '../services/cache.js';
+import wrapper from '../utils/wrapper.js';
+import { RuntimeException } from '../exceptions/index.js';
 
 export const defaultHashStrategy = obj => obj;
 
@@ -30,7 +30,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
   } = req;
   const query = { ...originQuery };
   delete query.flush;
-  if (hashStrategy && !util.isFunction(hashStrategy)) {
+  if (hashStrategy && typeof hashStrategy !== 'function') {
     throw new RuntimeException(`View cache hash strategy must be a function for ${originalUrl}`);
   }
   if (!route) {
@@ -66,7 +66,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
 function ViewCacheMiddleware(cache, logger) {
   return (options = {}) => {
     if (!util.isObject(options)) {
-      options = { //eslint-disable-line no-param-reassign
+      options = {
         ttl: options
       };
     }
@@ -102,14 +102,14 @@ function ViewCacheMiddleware(cache, logger) {
         res.send(cachedBody);
         return;
       }
-      res.realSend = res.send; //eslint-disable-line no-param-reassign
-      res.send = (body) => { //eslint-disable-line no-param-reassign
+      res.realSend = res.send;
+      res.send = (body) => {
         logger.debug('View cache missed by key %s, creating...', cacheKey);
         res.setHeader('X-View-Cache-Miss', cacheKey);
         res.setHeader('X-View-Cache-Expire-At', moment().add(ttl, 'minute').format('YYYY-MM-DD HH:mm:ss Z'));
         res.setHeader('X-View-Cache-Created-At', moment().format('YYYY-MM-DD HH:mm:ss Z'));
         res.realSend(body);
-        const headers = headersFilter && util.isFunction(headersFilter) ?
+        const headers = headersFilter && typeof headersFilter === 'function' ?
           headersFilter(res) : defaultHeadersFilter(res);
         if (res.statusCode <= 500) {
           cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).catch((e) => {
@@ -122,6 +122,6 @@ function ViewCacheMiddleware(cache, logger) {
   };
 }
 
-Dependencies(Cache, Logger)(ViewCacheMiddleware);//eslint-disable-line new-cap
+constitute.Dependencies(Cache, Logger)(ViewCacheMiddleware);
 
 export default ViewCacheMiddleware;

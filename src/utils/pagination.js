@@ -1,5 +1,5 @@
-import snakeCase from 'lodash/snakeCase';
-import transform from 'lodash/transform';
+import snakeCase from 'lodash/snakeCase.js';
+import transform from 'lodash/transform.js';
 import nodePath from 'path';
 
 const toUrl = (scheme, host, path, query = {}) => {
@@ -52,7 +52,7 @@ const toPositiveInteger = (number) => {
 const transferProperties = (obj, useSnake = false) => {
   if (useSnake === true) {
     return transform(obj, (result, value, key) => {
-      result[snakeCase(key)] = value; //eslint-disable-line no-param-reassign
+      result[snakeCase(key)] = value;
     });
   }
   return obj;

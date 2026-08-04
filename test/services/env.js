@@ -1,5 +1,5 @@
 import test from 'ava';
-import Env from '../../src/services/env';
+import Env from '../../src/services/env.js';
 
 let oldEnv = null;
 

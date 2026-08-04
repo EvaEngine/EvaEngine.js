@@ -1,6 +1,6 @@
 import constitute from 'constitute';
-import { RuntimeException } from './exceptions';
-import { ServiceProvider } from './services/providers';
+import { RuntimeException } from './exceptions/index.js';
+import { ServiceProvider } from './services/providers.js';
 
 let container = new constitute.Container();
 let bound = {};
@@ -41,7 +41,7 @@ export default class DI {
 
   static bindMethod(...args) {
     if (typeof args[0] === 'string') {
-      [, bound[args[0]]] = args;
+      bound[args[0]] = args[0];
     }
     return container.bindMethod(...args);
   }

@@ -1,9 +1,9 @@
-import { Dependencies } from 'constitute';
-import { UnsupportedOperationException } from './../exceptions';
-import Redis from './redis';
-import DI from './../di';
-import Config from './config';
-import ServiceInterface from './interface';
+import constitute from 'constitute';
+import { OperationUnsupportedException } from './../exceptions/index.js';
+import Redis from './redis.js';
+import DI from './../di.js';
+import Config from './config.js';
+import ServiceInterface from './interface.js';
 
 export class Store {
   getInstance() {
@@ -31,7 +31,7 @@ export class Store {
   }
 
   tags() {
-    throw new UnsupportedOperationException('Not support tag feature');
+    throw new OperationUnsupportedException('Not support tag feature');
   }
 }
 
@@ -159,8 +159,7 @@ export class RedisStore extends Store {
   }
 }
 
-@Dependencies(Config, Redis) //eslint-disable-line new-cap
-export default class Cache extends ServiceInterface {
+class Cache extends ServiceInterface {
   constructor(config) {
     super();
     this.config = config.get('cache');
@@ -169,7 +168,7 @@ export default class Cache extends ServiceInterface {
     this.store = null;
   }
 
-  setStore(store) {
+    setStore(store) {
     this.store = store;
     return this;
   }
@@ -218,4 +217,7 @@ export default class Cache extends ServiceInterface {
     return this.getStore().flush();
   }
 }
+
+constitute.Dependencies(Config, Redis)(Cache);
+export default Cache;
 

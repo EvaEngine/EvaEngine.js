@@ -1,9 +1,9 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import request from 'request-promise-native';
-import Config from './config';
-import Logger from './logger';
-import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions';
-import ServiceInterface from './interface';
+import Config from './config.js';
+import Logger from './logger.js';
+import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions/index.js';
+import ServiceInterface from './interface.js';
 
 export const deepClone = obj =>
   JSON.parse(JSON.stringify(obj));
@@ -95,8 +95,7 @@ export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEB
 };
 /* eslint-enable */
 
-@Dependencies(Config, Logger) //eslint-disable-line new-cap
-export default class HttpClient extends ServiceInterface {
+class HttpClient extends ServiceInterface {
   /**
    * @param config {Config}
    * @param logger {Logger}
@@ -108,7 +107,7 @@ export default class HttpClient extends ServiceInterface {
     requestDebug(logger);
   }
 
-  getProto() {
+    getProto() {
     return request;
   }
 
@@ -130,7 +129,7 @@ export default class HttpClient extends ServiceInterface {
 
   dumpRequest(req, asString = false) {
     const getBody = (r) => {
-      if (r._json) { //eslint-disable-line no-underscore-dangle
+      if (r._json) {
         return r.body;
       }
       return r.form(r.formData).body;
@@ -140,7 +139,7 @@ export default class HttpClient extends ServiceInterface {
       protocol: req.uri && req.uri.protocol === 'https:' ? 'https' : 'http',
       url: req.uri ? req.uri.href : null,
       headers: req.headers,
-      body: req.req && (req._json || req.formData) //eslint-disable-line no-underscore-dangle
+      body: req.req && (req._json || req.formData)
         ? getBody(req) : null
     };
     return asString === true ? JSON.stringify(dump) : dump;
@@ -156,3 +155,6 @@ export default class HttpClient extends ServiceInterface {
     return asString === true ? JSON.stringify(dump) : dump;
   }
 }
+
+constitute.Dependencies(Config, Logger)(HttpClient);
+export default HttpClient;

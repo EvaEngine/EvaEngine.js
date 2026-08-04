@@ -1,8 +1,8 @@
 import httpMocker from 'node-mocks-http';
 import EventEmitter from 'events';
-import DI from '../di';
+import DI from '../di.js';
 
-module.exports.truncateAll = async (entities) => {
+export const truncateAll = async (entities) => {
   const names = [];
   const allEntities = entities.getAll();
   Object.values(allEntities).forEach((entity) => {
@@ -14,18 +14,18 @@ module.exports.truncateAll = async (entities) => {
 };
 
 const mockResponse = () => httpMocker.createResponse({ eventEmitter: EventEmitter });
-module.exports.mockResponse = mockResponse;
+export { mockResponse };
 
-module.exports.mockRequest = (...args) => httpMocker.createRequest(...args);
+export const mockRequest = (...args) => httpMocker.createRequest(...args);
 
-module.exports.mockInstance = () =>
+export const mockInstance = () =>
   new Proxy({}, {
     get: () =>
       () => {
       }
   });
 
-module.exports.mockAuthRequest = (...args) => {
+export const mockAuthRequest = (...args) => {
   const uid = DI.get('config').get('token.faker.uid');
   Object.assign(args[0], {
     auth: {
@@ -35,14 +35,14 @@ module.exports.mockAuthRequest = (...args) => {
   return httpMocker.createRequest(...args);
 };
 
-module.exports.httpMocker = httpMocker;
+export { httpMocker };
 
-module.exports.runController =
+export const runController =
   (controller, request, response = mockResponse()) =>
     new Promise((resolve, reject) => {
       response.on(
         'end',
-        () => resolve(JSON.parse(response._getData())) //eslint-disable-line no-underscore-dangle
+        () => resolve(JSON.parse(response._getData()))
       );
       controller.handle(request, response, err => reject(err));
     });

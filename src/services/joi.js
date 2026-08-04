@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import ServiceInterface from './interface';
+import ServiceInterface from './interface.js';
 
 export default class ValidatorBase extends ServiceInterface {
   getProto() {

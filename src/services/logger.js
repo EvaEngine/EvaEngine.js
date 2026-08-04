@@ -1,15 +1,14 @@
-import { Dependencies } from 'constitute';
+import constitute from 'constitute';
 import moment from 'moment-timezone';
 import winston from 'winston';
 import { inspect } from 'util';
-import Env from './env';
-import Config from './config';
-import Namespace from './namespace';
-import ServiceInterface from './interface';
+import Env from './env.js';
+import Config from './config.js';
+import Namespace from './namespace.js';
+import ServiceInterface from './interface.js';
 
 
-@Dependencies(Env, Config, Namespace) //eslint-disable-line new-cap
-export default class Logger extends ServiceInterface {
+class Logger extends ServiceInterface {
   /**
    * @param env {Env}
    * @param config {Config}
@@ -32,7 +31,7 @@ export default class Logger extends ServiceInterface {
     this.logfile = null;
   }
 
-  getProto() {
+    getProto() {
     return winston;
   }
 
@@ -75,7 +74,7 @@ export default class Logger extends ServiceInterface {
    */
   factory(logPath, key = 'global', level = this.level) {
     const timestamp = () => moment().format();
-    return logPath ? new (winston.Logger)({
+    return logPath ? winston.createLogger({
       transports: [
         new (winston.transports.Console)({
           name: `${key}-console`,
@@ -92,7 +91,7 @@ export default class Logger extends ServiceInterface {
           filename: logPath
         })
       ]
-    }) : new (winston.Logger)({
+    }) : winston.createLogger({
       transports: [
         new (winston.transports.Console)({
           name: `${key}-console`,
@@ -144,3 +143,6 @@ export default class Logger extends ServiceInterface {
     return this.debug(inspect(obj, { depth: null, colors: true }));
   }
 }
+
+constitute.Dependencies(Env, Config, Namespace)(Logger);
+export default Logger;

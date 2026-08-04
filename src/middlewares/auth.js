@@ -1,9 +1,9 @@
-import { Dependencies } from 'constitute';
-import wrapper from '../utils/wrapper';
-import { UnauthorizedException } from '../exceptions';
-import Config from '../services/config';
-import Now from '../services/now';
-import JsonWebToken from '../services/jwt_token';
+import constitute from 'constitute';
+import wrapper from '../utils/wrapper.js';
+import { UnauthorizedException } from '../exceptions/index.js';
+import Config from '../services/config.js';
+import Now from '../services/now.js';
+import JsonWebToken from '../services/jwt_token.js';
 
 /**
  * @param _config {Config}
@@ -20,7 +20,7 @@ function AuthMiddleware(_config, token, now) {
       return next();
     }
     if (config.token.faker.enable === true && jwToken === config.token.faker.key) {
-      req.auth = { //eslint-disable-line no-param-reassign
+      req.auth = {
         type: 'fake',
         uid: config.token.faker.uid,
         token: config.token.faker.key
@@ -32,17 +32,17 @@ function AuthMiddleware(_config, token, now) {
       let parsedToken = {};
       try {
         parsedToken = await token.find(jwToken);
-      } catch (e) {
+      } catch {
         throw new UnauthorizedException('Token not recognizable');
       }
       const { uid, expiredAt } = parsedToken;
       if (!uid) {
         throw new UnauthorizedException('User info not found in token');
       }
-      if (expiredAt < now.getTimestamp()) {
+      if (typeof expiredAt !== 'number' || expiredAt <= now.getTimestamp()) {
         throw new UnauthorizedException('Token expired');
       }
-      req.auth = { //eslint-disable-line no-param-reassign
+      req.auth = {
         type: 'jwt',
         uid,
         token: jwToken
@@ -52,7 +52,7 @@ function AuthMiddleware(_config, token, now) {
     }
 
     if (req.session && req.session.uid) {
-      req.auth = { //eslint-disable-line no-param-reassign
+      req.auth = {
         type: 'session',
         uid: req.session.uid,
         token: ''
@@ -63,5 +63,5 @@ function AuthMiddleware(_config, token, now) {
     throw new UnauthorizedException('No authority token found');
   });
 }
-Dependencies(Config, JsonWebToken, Now)(AuthMiddleware); //eslint-disable-line new-cap
+constitute.Dependencies(Config, JsonWebToken, Now)(AuthMiddleware);
 export default AuthMiddleware;

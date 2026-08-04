@@ -1,15 +1,15 @@
 import test from 'ava';
-import DI from '../../src/di';
-import * as exceptions from './../../src/exceptions';
-import * as providers from '../../src/services/providers';
+import DI from '../../src/di.js';
+import * as exceptions from './../../src/exceptions/index.js';
+import * as providers from '../../src/services/providers.js';
 
-DI.registerMockedProviders(Object.values(providers), `${__dirname}/../_demo_project/config`);
+DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 const eventManager = DI.get('event_manager');
 
 test('Register non function', async(t) => {
-  t.throws(() => eventManager.addListener('foo'), exceptions.RuntimeException);
+  t.throws(() => eventManager.addListener('foo'), { instanceOf: exceptions.RuntimeException });
   t.throws(() => eventManager.addListener(class Foo {
-  }), exceptions.RuntimeException);
+  }), { instanceOf: exceptions.RuntimeException });
 });
 
 
@@ -32,7 +32,7 @@ test('Register standard class', async(t) => {
   }
   eventManager.addListener(Foo);
   const events = eventManager.getAllowEvents()
-  t.skip.true(events instanceof Set);
+    t.true(events instanceof Set);
   t.is(events.size, 4);
   t.true(events.has('foo:login:before'));
   t.true(events.has('foo:login:after'));
@@ -44,7 +44,7 @@ test('Register standard class', async(t) => {
 });
 
 test('Emit non exists event', async(t) => {
-  t.throws(() => eventManager.emit('non-exists'), exceptions.RuntimeException);
+  t.throws(() => eventManager.emit('non-exists'), { instanceOf: exceptions.RuntimeException });
 });
 
 test('Register repeat event', async(t) => {
@@ -57,5 +57,5 @@ test('Register repeat event', async(t) => {
       return ['login', 'other'];
     }
   }
-  t.throws(() => eventManager.addListener(Bar), exceptions.RuntimeException);
+  t.throws(() => eventManager.addListener(Bar), { instanceOf: exceptions.RuntimeException });
 });

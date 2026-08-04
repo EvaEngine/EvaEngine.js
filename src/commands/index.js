@@ -1,6 +1,6 @@
-import Command from './interface';
-import { MakeEntity, MakeDbView, MakeGraphql } from './make_entity';
-import TrampConfig from './tramp';
+import Command from './interface.js';
+import { MakeEntity, MakeDbView, MakeGraphql } from './make_entity.js';
+import TrampConfig from './tramp.js';
 
 export default Command;
 

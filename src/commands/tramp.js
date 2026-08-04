@@ -1,5 +1,5 @@
-import Command from './interface';
-import DI from '../di';
+import Command from './interface.js';
+import DI from '../di.js';
 
 export default class TrampConfig extends Command {
   static getName() {
@@ -17,7 +17,7 @@ export default class TrampConfig extends Command {
   async run() {
     const config = DI.get('config');
     const dbConfig = config.get('db');
-    // eslint-disable-next-line no-console
+
     console.log(JSON.stringify({
       connection: {
         host: dbConfig.replication.write.host,

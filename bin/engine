@@ -1,38 +1,32 @@
 #!/usr/bin/env node
-const { EvaEngine, DI, exceptions, commands } = require('../');
-const co = (fn) => { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+import { EvaEngine, DI, exceptions, commands } from '../index.js';
 
 const engine = new EvaEngine({
   projectRoot: process.cwd()
 }, 'cli');
-engine.registerCommands([
-  commands
-]);
+engine.registerCommands([commands]);
 
 const logger = DI.get('logger');
-co(function* () {
+try {
   if (process.env.SPRING_CONFIG_ENDPOINT) {
-    const springOptions = {
+    await DI.get('config').resolveSpringConfig({
       endpoint: process.env.SPRING_CONFIG_ENDPOINT,
       name: process.env.SPRING_CONFIG_NAME || 'unknown-spring-config-name',
       profiles: process.env.SPRING_CONFIG_PROFILES || process.env.NODE_ENV,
       label: process.env.SPRING_CONFIG_LABEL || 'master'
-    };
-    logger.info(`Loading configs from Spring Cloud Config, options:${JSON.stringify(springOptions)}`);
-    yield DI.get('config').resolveSpringConfig(springOptions);
+    });
   }
-  try {
-    yield engine.runCLI();
-  } catch (e) {
-    if (e instanceof exceptions.StandardException) {
-      logger.warn(e.getDetails());
-      return logger.warn(e.message);
-    }
-    logger.error(e);
+  await engine.runCLI();
+} catch (error) {
+  if (error instanceof exceptions.StandardException) {
+    logger.warn(error.getDetails());
+    logger.warn(error.message);
+  } else {
+    logger.error(error);
   }
+} finally {
   const redis = DI.get('redis');
   if (redis.isConnected()) {
-    redis.cleanup();
+    await redis.cleanup();
   }
-  return true;
-})();
+}

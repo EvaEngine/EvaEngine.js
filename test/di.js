@@ -1,10 +1,10 @@
 import test from 'ava';
-import { RuntimeException } from '../src/exceptions';
-import DI from '../src/di';
+import { RuntimeException } from '../src/exceptions/index.js';
+import DI from '../src/di.js';
 import constitute from 'constitute';
 
 test('throw exception when nothing bound', (t) => {
-  t.throws(() => DI.get('not_bound'), RuntimeException);
+  t.throws(() => DI.get('not_bound'), { instanceOf: RuntimeException });
 });
 test('bind value', async(t) => {
   class ValueClass {

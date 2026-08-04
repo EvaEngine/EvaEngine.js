@@ -1,12 +1,9 @@
 import Ioredis from 'ioredis';
-import { Dependencies } from 'constitute';
-import Config from './config';
-import ServiceInterface from './interface';
+import constitute from 'constitute';
+import Config from './config.js';
+import ServiceInterface from './interface.js';
 
-let redisClient = null;
-
-@Dependencies(Config) //eslint-disable-line new-cap
-export default class Redis extends ServiceInterface {
+class Redis extends ServiceInterface {
   /**
    * @param config Config
    */
@@ -14,9 +11,10 @@ export default class Redis extends ServiceInterface {
     super();
     this.config = config;
     this.options = null;
+    this.client = null;
   }
 
-  getProto() {
+    getProto() {
     return Ioredis;
   }
 
@@ -30,7 +28,7 @@ export default class Redis extends ServiceInterface {
   }
 
   isConnected() {
-    return redisClient !== null;
+    return this.client !== null;
   }
 
   cleanup() {
@@ -41,16 +39,17 @@ export default class Redis extends ServiceInterface {
    * @returns {Ioredis}
    */
   getInstance() {
-    if (redisClient) {
-      return redisClient;
+    if (this.client) {
+      return this.client;
     }
-    redisClient = new Ioredis(Object.assign({
+    this.client = new Ioredis(Object.assign({
       enableOfflineQueue: true //make redis connect failings throw error
     }, this.options || this.config.get('redis')));
-    redisClient.on('error', (e) => {
-      throw e;
-    });
-    return redisClient;
+    this.client.on('error', () => {});
+    return this.client;
   }
 }
+
+constitute.Dependencies(Config)(Redis);
+export default Redis;
 

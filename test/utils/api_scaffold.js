@@ -1,5 +1,5 @@
 import test from 'ava';
-import { OrderScaffold, FilterScaffold } from '../../src/utils/api_scaffold';
+import { OrderScaffold, FilterScaffold } from '../../src/utils/api_scaffold.js';
 
 test('Order Scaffold Works normal', (t) => {
   const orderScaffold = new OrderScaffold();
@@ -74,7 +74,7 @@ test('Filter Scaffold support number', (t) => {
   t.throws(() => filterScaffold.getConditions({
     total_amount_$gte: 100,
     total_amount: 200
-  }, /conflict/));
+  }, { message: /conflict/ }));
 });
 
 test('Filter Scaffold replace default operators', (t) => {

@@ -1,7 +1,7 @@
 import test from 'ava';
 import {
   getHostFullUrl,
-} from './../../src/utils/host';
+} from './../../src/utils/host.js';
 
 test('Host full url', (t) => {
   t.is(getHostFullUrl({
