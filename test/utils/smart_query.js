@@ -1,5 +1,6 @@
 import test from 'ava';
 import moment from 'moment-timezone';
+import { Op } from 'sequelize';
 import SmartQuery from '../../src/utils/smart_query.js';
 
 moment.tz.setDefault('Asia/Shanghai');
@@ -7,11 +8,11 @@ moment.tz.setDefault('Asia/Shanghai');
 test('SmartQuery: equal', (t) => {
   t.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).equal('title').where,
-    { title: { '$eq': 'foo' } }
+    { title: { [Op.eq]: 'foo' } }
   );
   t.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).equal('title').equal('content').where,
-    { title: { '$eq': 'foo' } }
+    { title: { [Op.eq]: 'foo' } }
   );
   // test default value
   t.deepEqual(
@@ -19,97 +20,97 @@ test('SmartQuery: equal', (t) => {
       title: 'foo',
       redundant: 'bar'
     }).equal('title').equal('content', 'content', 'defaultContent').where,
-    { title: { '$eq': 'foo' }, content: { '$eq': 'defaultContent' } }
+    { title: { [Op.eq]: 'foo' }, content: { [Op.eq]: 'defaultContent' } }
   );
 });
 
 test('SmartQuery: like', (t) => {
   t.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).like('title').where,
-    { title: { '$like': '%foo%' } }
+    { title: { [Op.like]: '%foo%' } }
   );
   // test default value
   t.deepEqual(
     new SmartQuery({ titlex: 'foo', redundant: 'bar' }).like('title', 'title', 'defaultTitle').where,
-    { title: { '$like': '%defaultTitle%' } }
+    { title: { [Op.like]: '%defaultTitle%' } }
   );
 });
 
 test('SmartQuery: startsWith', (t) => {
   t.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).startsWith('title').where,
-    { title: { '$like': 'foo%' } }
+    { title: { [Op.like]: 'foo%' } }
   );
   // test default value
   t.deepEqual(
     new SmartQuery({ titlex: 'foo', redundant: 'bar' }).startsWith('title', 'title', 'defaultTitle').where,
-    { title: { '$like': 'defaultTitle%' } }
+    { title: { [Op.like]: 'defaultTitle%' } }
   );
 });
 
 test('SmartQuery: endsWith', (t) => {
   t.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).endsWith('title').where,
-    { title: { '$like': '%foo' } }
+    { title: { [Op.like]: '%foo' } }
   );
   // test default value
   t.deepEqual(
     new SmartQuery({ titlex: 'foo', redundant: 'bar' }).endsWith('title', 'title', 'defaultTitle').where,
-    { title: { '$like': '%defaultTitle' } }
+    { title: { [Op.like]: '%defaultTitle' } }
   );
 });
 test('SmartQuery: gte', (t) => {
   t.deepEqual(
     new SmartQuery({ created_starts: 12345 }).gte('created_starts', 'createdAt').where,
-    { createdAt: { '$gte': 12345 } }
+    { createdAt: { [Op.gte]: 12345 } }
   );
 });
 test('SmartQuery: lte', (t) => {
   t.deepEqual(
     new SmartQuery({ created_ends: 12345 }).lte('created_ends', 'createdAt').where,
-    { createdAt: { '$lte': 12345 } }
+    { createdAt: { [Op.lte]: 12345 } }
   );
 });
 
 test('SmartQuery: in', (t) => {
   t.deepEqual(
     new SmartQuery({ uids: '3,4', redundant: 'bar' }).in('uids', 'userId').where,
-    { userId: { '$in': ['3', '4'] } }
+    { userId: { [Op.in]: ['3', '4'] } }
   );
   t.deepEqual(
     new SmartQuery({ status: ['pending', 'deleted'], redundant: 'bar' }).in('status').where,
-    { status: { '$in': ['pending', 'deleted'] } }
+    { status: { [Op.in]: ['pending', 'deleted'] } }
   );
   // test default value
   t.deepEqual(
     new SmartQuery({ redundant: 'bar' }).in('status', 'status', 'published,approved').where,
-    { status: { '$in': ['published', 'approved'] } }
+    { status: { [Op.in]: ['published', 'approved'] } }
   );
 });
 
 test('SmartQuery: notIn', (t) => {
   t.deepEqual(
     new SmartQuery({ uids: '3,4', redundant: 'bar' }).notIn('uids', 'userId').where,
-    { userId: { '$notIn': ['3', '4'] } }
+    { userId: { [Op.notIn]: ['3', '4'] } }
   );
   t.deepEqual(
     new SmartQuery({ uids: [3, 4], redundant: 'bar' }).notIn('uids', 'userId').where,
-    { userId: { '$notIn': [3, 4] } }
+    { userId: { [Op.notIn]: [3, 4] } }
   );
 });
 
 test('SmartQuery: range', (t) => {
   t.deepEqual(
     new SmartQuery({ minUid: 3, maxUid: 4 }).range('minUid', 'maxUid', 'userId').where,
-    { userId: { '$gte': 3, '$lte': 4 } }
+    { userId: { [Op.gte]: 3, [Op.lte]: 4 } }
   );
   t.deepEqual(
     new SmartQuery({ minUid: 3 }).range('minUid', 'maxUid', 'userId').where,
-    { userId: { '$gte': 3 } }
+    { userId: { [Op.gte]: 3 } }
   );
   t.deepEqual(
     new SmartQuery({ maxUid: 4 }).range('minUid', 'maxUid', 'userId').where,
-    { userId: { '$lte': 4 } }
+    { userId: { [Op.lte]: 4 } }
   );
 });
 
@@ -119,26 +120,26 @@ test('SmartQuery: dateRange', (t) => {
       createdStart: '2016-01-01',
       createdEnd: '2016-01-01'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$gte': '1451577600', '$lte': '1451663999' } }
+    { createdAt: { [Op.gte]: '1451577600', [Op.lte]: '1451663999' } }
   );
   t.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$gte': '1451577600' } }
+    { createdAt: { [Op.gte]: '1451577600' } }
   );
   t.deepEqual(
     new SmartQuery({
       createdEnd: '2016-01-01'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$lte': '1451663999' } }
+    { createdAt: { [Op.lte]: '1451663999' } }
   );
   t.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01 03:05',
       createdEnd: '2016-01-01 04:05'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$gte': '1451577600', '$lte': '1451663999' } }
+    { createdAt: { [Op.gte]: '1451577600', [Op.lte]: '1451663999' } }
   );
   t.deepEqual(
     new SmartQuery({
@@ -154,7 +155,7 @@ test('SmartQuery: dateTimeRange', (t) => {
       createdStart: '2016-01-01',
       createdEnd: '2016-01-01'
     }).dateTimeRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$gte': '1451577600', '$lte': '1451577600' } }
+    { createdAt: { [Op.gte]: '1451577600', [Op.lte]: '1451577600' } }
   );
 
   t.deepEqual(
@@ -162,13 +163,13 @@ test('SmartQuery: dateTimeRange', (t) => {
       createdStart: '2016-01-01 03:05',
       createdEnd: '2016-01-01 12:05:03'
     }).dateTimeRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$gte': '1451588700', '$lte': '1451621103' } }
+    { createdAt: { [Op.gte]: '1451588700', [Op.lte]: '1451621103' } }
   );
   t.deepEqual(
     new SmartQuery({
       createdEnd: '2016-01-01 12:05:03'
     }).dateTimeRange('createdStart', 'createdEnd', 'createdAt').where,
-    { createdAt: { '$lte': '1451621103' } }
+    { createdAt: { [Op.lte]: '1451621103' } }
   );
   t.deepEqual(
     new SmartQuery({
@@ -259,7 +260,7 @@ test('SmartQuery: applyWhere', (t) => {
     smartQuery.where,
     {
       title: {
-        '$eq': 'xxx'
+        [Op.eq]: 'xxx'
       }
     }
   );
@@ -268,7 +269,7 @@ test('SmartQuery: applyWhere', (t) => {
     smartQuery.where,
     {
       title: {
-        '$eq': 'ooo'
+        [Op.eq]: 'ooo'
       }
     }
   );
@@ -277,9 +278,26 @@ test('SmartQuery: applyWhere', (t) => {
     smartQuery.where,
     {
       title: {
-        '$eq': 'ooo',
-        '$in': 'bar'
+        [Op.eq]: 'ooo',
+        [Op.in]: 'bar'
       }
     }
   );
+});
+
+test('SmartQuery: getCriteria includes where and order', (t) => {
+  const smartQuery = new SmartQuery({ title: 'foo' });
+  smartQuery.like('title').orderable(['createdAt'], {}, ['id', 'DESC']);
+  t.deepEqual(
+    smartQuery.getCriteria(),
+    {
+      where: { title: { [Op.like]: '%foo%' } },
+      order: [['id', 'DESC']]
+    }
+  );
+});
+
+test('SmartQuery: getCriteria returns empty without conditions', (t) => {
+  const smartQuery = new SmartQuery({});
+  t.deepEqual(smartQuery.getCriteria(), {});
 });
