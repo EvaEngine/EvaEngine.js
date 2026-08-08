@@ -1,6 +1,6 @@
 import constitute from 'constitute';
 import jwt from 'jwt-simple';
-import _ from 'lodash';
+import get from 'lodash/get.js';
 
 import { RuntimeException } from '../exceptions/index.js';
 import Config from './config.js';
@@ -16,7 +16,7 @@ class KongJsonWebToken extends ServiceInterface {
     super();
     this.restClient = restClient;
     this.config = config.get('token');
-    if (!_.get(this.config, 'kong.endpoint')) {
+    if (!get(this.config, 'kong.endpoint')) {
       throw new RuntimeException('config item `token.kong.endpoint` can not be null');
     }
   }

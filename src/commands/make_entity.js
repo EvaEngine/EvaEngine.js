@@ -1,7 +1,7 @@
-import _ from 'lodash';
+import groupBy from 'lodash/groupBy.js';
+import template from 'lodash/template.js';
 import Sequelize from 'sequelize';
 import fs from 'fs';
-import * as mkdirp from 'mkdirp';
 import Command from './interface.js';
 import DI from '../di.js';
 import Entities from '../entities/index.js';
@@ -55,7 +55,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW view_${tableName}
     const entities = new Entities(entityPath);
 
     logger.info('Start generate db views to %s', file);
-    mkdirp.sync(path);
+    fs.mkdirSync(path, { recursive: true });
     const models = Object.values(entities.getInstance().models);
     const sql = [];
     models.forEach((model) => {
@@ -202,7 +202,7 @@ export class MakeEntity extends Command {
     if (!rawIndexes) {
       return [];
     }
-    rawIndexes = _.groupBy(rawIndexes, 'Key_name');
+    rawIndexes = groupBy(rawIndexes, 'Key_name');
     return Object.entries(rawIndexes).filter(([key]) => key !== 'PRIMARY').map(([name, columns]) => {
       const index = columns[0].Non_unique !== 1 ? { name, unique: true } : { name };
       index.fields = columns.map(c => c.Column_name);
@@ -239,8 +239,8 @@ export class MakeEntity extends Command {
     const schemaPath = `${path}/schemas`;
     const entityTemplate = fs.readFileSync(`${import.meta.dirname}/../../template/entity.ejs`, 'utf8');
     const schemaTemplate = fs.readFileSync(`${import.meta.dirname}/../../template/schema.ejs`, 'utf8');
-    mkdirp.sync(path);
-    mkdirp.sync(schemaPath);
+    fs.mkdirSync(path, { recursive: true });
+    fs.mkdirSync(schemaPath, { recursive: true });
 
     logger.info('Start generate DB schemas to dir %s', path);
 
@@ -269,7 +269,7 @@ export class MakeEntity extends Command {
         fs.accessSync(entityFile);
         logger.info('Entity file %s generate skipped, already exists by %s', table, entityFile);
       } catch {
-        fs.writeFileSync(entityFile, _.template(entityTemplate)({ table }));
+        fs.writeFileSync(entityFile, template(entityTemplate)({ table }));
         logger.info('Entity file %s generated as %s', table, entityFile);
       }
 
@@ -279,7 +279,7 @@ export class MakeEntity extends Command {
       } catch {
         logger.info('Schema file %s generated as %s', table, schemaFile);
       }
-      fs.writeFileSync(schemaFile, _.template(schemaTemplate)({
+      fs.writeFileSync(schemaFile, template(schemaTemplate)({
         columns,
         table,
         indexes,
@@ -438,8 +438,8 @@ export class MakeGraphql extends Command {
     const mappingContent = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
     const getMappedTableName = tableName =>
       (mappingContent[tableName] ? mappingContent[tableName] : tableName);
-    mkdirp.sync(path);
-    mkdirp.sync(schemaPath);
+    fs.mkdirSync(path, { recursive: true });
+    fs.mkdirSync(schemaPath, { recursive: true });
 
     logger.info('Start generate GraphQL schemas to dir %s', path);
 
@@ -474,7 +474,7 @@ export class MakeGraphql extends Command {
       } catch {
         logger.info('Graphql schema file %s generated as %s', tableName, schemaFile);
       }
-      fs.writeFileSync(schemaFile, _.template(schemaTemplate)({
+      fs.writeFileSync(schemaFile, template(schemaTemplate)({
         tableName,
         mappedTableName,
         columns,

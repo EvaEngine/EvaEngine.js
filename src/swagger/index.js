@@ -6,7 +6,6 @@ import assert from 'assert';
 import merge from 'lodash/merge.js';
 import * as doctrine from 'doctrine';
 import * as acorn from 'acorn';
-import { glob } from 'glob';
 import * as yaml from 'js-yaml';
 import Entitles from '../entities/index.js';
 import { RuntimeException, StandardException } from '../exceptions/index.js';
@@ -413,7 +412,7 @@ export class ExSwagger {
    * @returns {Promise|Array.<string>}
    */
   static async scanFiles(path, options = {}) {
-    return glob(path, options);
+    return fs.globSync(path, options);
   }
 
   /**

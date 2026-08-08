@@ -3,13 +3,13 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 import yargs from 'yargs/yargs';
-import later from 'later';
 import moment from 'moment-timezone';
 import packageJson from '../package.json' with { type: 'json' };
 import DI from './di.js';
 import * as ServiceProviders from './services/providers.js';
 import * as MiddlewareProviders from './middlewares/providers.js';
 import { StandardException, RuntimeException } from './exceptions/index.js';
+import { parseCron, setCronInterval } from './utils/cron.js';
 
 moment.tz.setDefault(process.env.TZ ? process.env.TZ : 'Asia/Shanghai');
 
@@ -21,8 +21,7 @@ export const MODES = {
 export {
   DI,
   express,
-  yargs,
-  later
+  yargs
 };
 
 let app = null;
@@ -116,7 +115,6 @@ export default class EvaEngine {
     this.namespace = namespace || DI.get('namespace');
     this.logger.info('Engine started, Meta:', this.meta);
     this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
-    later.date.localTime();
   }
 
   /**
@@ -301,7 +299,11 @@ export default class EvaEngine {
 
   clearCrontabs() {
     this.crontabJobHandlers.forEach((handler) => {
-      clearInterval(handler);
+      if (handler && typeof handler.clear === 'function') {
+        handler.clear();
+      } else {
+        clearInterval(handler);
+      }
     });
     this.crontabJobHandlers = [];
   }
@@ -514,7 +516,8 @@ export default class EvaEngine {
     }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
     this.logger.debug('Bound services', Object.keys(DI.getBound()));
-    this.logger.info('Cron job using %s Timezone', later.date.isUTC ? 'UTC' : 'Local');
+    //Cron jobs run in local time, matching the previous later.date.localTime() default
+    this.logger.info('Cron job using %s Timezone', 'Local');
     const [commandName, ...options] = commandString.split(' ');
     if (Object.keys(this.commands).includes(commandName) === false) {
       throw new RuntimeException(`Command ${commandName} not registered`);
@@ -523,14 +526,14 @@ export default class EvaEngine {
     const command = new this.commands[commandName](argv);
 
     let i = 1;
-    const schedule = later.parse.cron(sequence, useSeconds);
-    const handler = later.setInterval(async() => {
+    const schedule = parseCron(sequence, useSeconds);
+    const handler = setCronInterval(async() => {
       this.logger.info('Cron job [%s] | Round %d | started with params %j', commandName, i, argv);
       //Let job crash if any exception happen
       await command.run();
       this.logger.info('Cron job [%s] | Round %d | finished', commandName, i);
       i += 1;
-    }, schedule); //第二个参数为True表示支持秒
+    }, schedule); //useSeconds 为 True 时启用秒级字段
     this.logger.info('Cron job [%s] with sequence [%s] registered as %j', commandString, sequence, schedule);
     this.crontabJobHandlers.push(handler);
   }

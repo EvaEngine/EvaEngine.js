@@ -1,4 +1,7 @@
-import _ from 'lodash';
+import get from 'lodash/get.js';
+import isString from 'lodash/isString.js';
+import merge from 'lodash/merge.js';
+import set from 'lodash/set.js';
 import { createRequire } from 'module';
 import constitute from 'constitute';
 import * as springConfigClient from 'cloud-config-client';
@@ -45,11 +48,11 @@ class Config extends ServiceInterface {
     const configRemote = await springConfigClient.load({
       endpoint,
       name,
-      profiles: _.isString(profiles) ? profiles.split(',') : [],
+      profiles: isString(profiles) ? profiles.split(',') : [],
       label
     });
     configRemote.forEach((key, value) => {
-      _.set(this.config, key, value);
+      set(this.config, key, value);
     });
   }
 
@@ -82,7 +85,7 @@ class Config extends ServiceInterface {
     }
 
 
-    return _.merge({}, EngineConfig, configDefault, configEnv, configLocal);
+    return merge({}, EngineConfig, configDefault, configEnv, configLocal);
   }
 
   getMergedFiles() {
@@ -103,7 +106,7 @@ class Config extends ServiceInterface {
     if (typeof keyString !== 'string') {
       return target;
     }
-    return _.get(target, keyString);
+    return get(target, keyString);
   }
 }
 

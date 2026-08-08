@@ -1,4 +1,3 @@
-import onHeaders from 'on-headers';
 import constitute from 'constitute';
 import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils/index.js';
 import Namespace from '../services/namespace.js';
@@ -7,6 +6,32 @@ import Logger from '../services/logger.js';
 import HttpClient from '../services/http_client.js';
 
 const hostIp = getHostIp();
+
+/**
+ * Execute a listener when a response is about to write headers.
+ * Inlined from the on-headers package (MIT), limited to the behavior trace middleware needs.
+ * @param {object} res
+ * @param {function} listener
+ */
+const onHeaders = (res, listener) => {
+  if (!res) {
+    throw new TypeError('argument res is required');
+  }
+  if (typeof listener !== 'function') {
+    throw new TypeError('argument listener must be a function');
+  }
+
+  const prevWriteHead = res.writeHead;
+  let fired = false;
+
+  res.writeHead = function writeHead() {
+    if (!fired) {
+      fired = true;
+      listener.call(this);
+    }
+    return prevWriteHead.apply(this, arguments);
+  };
+};
 
 export const tracerToZipkins = (tracer) => {
   if (!tracer) {
