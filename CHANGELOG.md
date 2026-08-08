@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.1...v1.0.2) (2026-08-08)
+
+### Bug Fixes
+
+* bug ([2a2a475](https://github.com/EvaEngine/EvaEngine.js/commit/2a2a475e1f6b14a76e0316d38946cbff37dc55ba))
+* bug ([0d35162](https://github.com/EvaEngine/EvaEngine.js/commit/0d35162de058c3814146b84afcc75cdbbc7b0e96))
+
 ## [1.0.1](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.0...v1.0.1) (2026-08-04)
 
 ### Bug Fixes
