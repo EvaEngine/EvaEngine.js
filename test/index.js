@@ -1,6 +1,7 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import engineIndex from '../src/index.js';
 
-test('index', (t) => {
-  t.true(Object.keys(engineIndex).length >= 14);
+test('index', () => {
+  assert.ok(Object.keys(engineIndex).length >= 14);
 });

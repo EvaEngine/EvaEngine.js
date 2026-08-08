@@ -39,7 +39,7 @@ const toPaginationUrl = (query, req) => {
   }
   return toUrl(
     scheme, host, requestPath,
-    Object.assign(req.query, query)
+    Object.assign({}, req.query, query)
   );
 };
 

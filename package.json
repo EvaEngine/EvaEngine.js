@@ -12,8 +12,7 @@
   "scripts": {
     "prestart": "node src/index.js",
     "prepublish": "npm run test",
-    "ava": "cross-env LOG_LEVEL=error NODE_ENV=test ava --verbose --serial",
-    "test": "nyc -a --reporter=lcov --reporter=text --reporter=html npm run ava",
+    "test": "cross-env LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.js --test --experimental-test-coverage \"test/di.js\" \"test/engine.js\" \"test/error_handlers.js\" \"test/index.js\" \"test/exceptions/index.js\" \"test/entities/index.js\" \"test/commands/make_entity.js\" \"test/middlewares/*.js\" \"test/services/*.js\" \"test/swagger/index.js\" \"test/utils/*.js\"",
     "lint": "eslint src test index.js",
     "build": "node --check src/index.js",
     "ci:check": "npm run lint && npm run build",
@@ -38,31 +37,6 @@
     "lint"
   ],
   "author": "AlloVince",
-  "ava": {
-    "files": [
-      "test/**/*.js",
-      "!test/bootstrap.js",
-      "!test/_*/**/*.js",
-      "!test/swagger/_*/**/*.js"
-    ],
-    "source": [
-      "src/**/*.js"
-    ],
-    "failFast": false,
-    "tap": false,
-    "require": [
-      "./test/bootstrap.js"
-    ]
-  },
-  "nyc": {
-    "require": [],
-    "include": [
-      "src/**/*.js"
-    ],
-    "exclude": [
-      "src/config/index.js"
-    ]
-  },
   "dependencies": {
     "acorn": "^8.18.0",
     "app-root-path": "^3.1.0",
@@ -104,7 +78,6 @@
     "@semantic-release/github": "^11.0.0",
     "@semantic-release/npm": "^12.0.0",
     "@semantic-release/release-notes-generator": "^14.0.0",
-    "ava": "^8.0.1",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.5",
@@ -112,7 +85,6 @@
     "globals": "^17.8.0",
     "is-type-of": "^2.2.0",
     "nock": "^14.0.17",
-    "nyc": "^18.0.0",
     "pre-commit": "^2.0.0",
     "semantic-release": "^25.0.8"
   }

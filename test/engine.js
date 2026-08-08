@@ -1,50 +1,49 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import path from 'path';
 import EvaEngine, { DI } from '../src/engine.js';
 import { RuntimeException } from '../src/exceptions/index.js';
 import Command from '../src/commands/index.js';
 
-test('default properties', (t) => {
+test('default properties', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     port: 3000
   });
   const meta = engine.getMeta();
-  t.is(meta.projectRoot, projectRoot);
-  t.is(meta.configPath, `${projectRoot}${path.sep}config`);
-  t.is(meta.sourceRoot, `${projectRoot}${path.sep}src`);
-  t.is(meta.port, 3000);
-  t.is(engine.getDI(), DI);
+  assert.equal(meta.projectRoot, projectRoot);
+  assert.equal(meta.configPath, `${projectRoot}${path.sep}config`);
+  assert.equal(meta.sourceRoot, `${projectRoot}${path.sep}src`);
+  assert.equal(meta.port, 3000);
+  assert.equal(engine.getDI(), DI);
 });
 
-test('create app', (t) => {
-  t.true(EvaEngine.getApp().hasOwnProperty('use'));
-  t.true(EvaEngine.getApp().hasOwnProperty('route'));
+test('create app', () => {
+  assert.ok(Object.prototype.hasOwnProperty.call(EvaEngine.getApp(), 'use'));
+  assert.ok(Object.prototype.hasOwnProperty.call(EvaEngine.getApp(), 'route'));
 });
 
-test('bootstrap', (t) => {
+test('bootstrap', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
     port: 3000
   });
-  // t.is(Object.keys(DI.getBound()).length, 6);
   engine.bootstrap();
-  t.true(Object.keys(DI.getBound()).length > 10);
+  assert.ok(Object.keys(DI.getBound()).length > 10);
 });
 
-
-test('CLI without commands', (t) => {
+test('CLI without commands', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   }, 'cli');
-  t.is(engine.getMeta().mode, 'cli');
-  t.throws(() => engine.getCLI(), { instanceOf: RuntimeException });
+  assert.equal(engine.getMeta().mode, 'cli');
+  assert.throws(() => engine.getCLI(), RuntimeException);
 });
 
-test('CLI with commands', (t) => {
+test('CLI with commands', () => {
   class TestCommand extends Command {
     static getName() {
       return 'hello:world';
@@ -63,15 +62,15 @@ test('CLI with commands', (t) => {
     projectRoot
   }, 'cli');
   engine.registerCommands({ test: TestCommand });
-  t.is(Object.keys(engine.getCommands()).length, 1);
-  t.true(engine.getCLI('hello:world').hasOwnProperty('$0'));
-  t.is(engine.getCommandName(), 'hello:world');
+  assert.equal(Object.keys(engine.getCommands()).length, 1);
+  assert.ok(Object.prototype.hasOwnProperty.call(engine.getCLI('hello:world'), '$0'));
+  assert.equal(engine.getCommandName(), 'hello:world');
   engine.clearCommands();
-  t.is(Object.keys(engine.getCommands()).length, 0);
-  t.false(Array.isArray(engine.getCommands()));
+  assert.equal(Object.keys(engine.getCommands()).length, 0);
+  assert.equal(Array.isArray(engine.getCommands()), false);
 });
 
-test('Run commands', (t) => {
+test('Run commands', async () => {
   class TestCommand extends Command {
     static getName() {
       return 'hello:world';
@@ -98,13 +97,12 @@ test('Run commands', (t) => {
     projectRoot
   }, 'cli');
   engine.registerCommands({ test: TestCommand });
-  engine.runCLI('hello:world');
-  t.is(engine.getCommand().getFoo(), 'bar');
+  await engine.runCLI('hello:world');
+  assert.equal(engine.getCommand().getFoo(), 'bar');
 });
 
-test('rejects unknown command and cron without commands', async (t) => {
+test('rejects unknown command and cron without commands', async () => {
   const engine = new EvaEngine({ projectRoot: path.normalize(`${import.meta.dirname}/_demo_project`) }, 'cli');
-  await t.throwsAsync(engine.runCommand('missing'), { instanceOf: RuntimeException });
-  t.throws(() => engine.runCrontab('* * * * *', 'missing'), { instanceOf: RuntimeException });
+  await assert.rejects(engine.runCommand('missing'), RuntimeException);
+  assert.throws(() => engine.runCrontab('* * * * *', 'missing'), RuntimeException);
 });
-

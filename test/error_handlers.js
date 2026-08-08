@@ -1,19 +1,19 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import path from 'path';
 import EvaEngine from '../src/engine.js';
 import { mockRequest, mockResponse, mockInstance } from '../src/utils/test.js';
 import { RuntimeException, LogicException } from '../src/exceptions/index.js';
 
-
-test('Default errorHandler', (t) => {
+test('Default errorHandler', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot
   });
-  t.true(typeof engine.getDefaultErrorHandler() === 'function');
+  assert.equal(typeof engine.getDefaultErrorHandler(), 'function');
 });
 
-test('Error handler for not expect error', (t) => {
+test('Error handler for not expect error', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
@@ -24,13 +24,13 @@ test('Error handler for not expect error', (t) => {
   const res = mockResponse();
   errorHandler(new Error('Not expected error'), mockRequest(), res, () => {
   });
-  t.is(res.statusCode, 500);
+  assert.equal(res.statusCode, 500);
   const err = JSON.parse(res._getData());
-  t.is(err.name, 'RuntimeException');
-  t.is(err.message, 'Not expected error');
+  assert.equal(err.name, 'RuntimeException');
+  assert.equal(err.message, 'Not expected error');
 });
 
-test('Error handler for RuntimeException', (t) => {
+test('Error handler for RuntimeException', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
@@ -41,13 +41,13 @@ test('Error handler for RuntimeException', (t) => {
   const res = mockResponse();
   errorHandler(new RuntimeException('Runtime'), mockRequest(), res, () => {
   });
-  t.is(res.statusCode, 500);
+  assert.equal(res.statusCode, 500);
   const err = JSON.parse(res._getData());
-  t.is(err.name, 'RuntimeException');
-  t.is(err.message, 'Runtime');
+  assert.equal(err.name, 'RuntimeException');
+  assert.equal(err.message, 'Runtime');
 });
 
-test('Error handler for LogicException', (t) => {
+test('Error handler for LogicException', () => {
   const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
   const engine = new EvaEngine({
     projectRoot,
@@ -58,8 +58,8 @@ test('Error handler for LogicException', (t) => {
   const res = mockResponse();
   errorHandler(new LogicException('Logic'), mockRequest(), res, () => {
   });
-  t.is(res.statusCode, 400);
+  assert.equal(res.statusCode, 400);
   const err = JSON.parse(res._getData());
-  t.is(err.name, 'LogicException');
-  t.is(err.message, 'Logic');
+  assert.equal(err.name, 'LogicException');
+  assert.equal(err.message, 'Logic');
 });

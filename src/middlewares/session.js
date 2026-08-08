@@ -1,6 +1,7 @@
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import constitute from 'constitute';
+import DI from '../di.js';
 import Config from '../services/config.js';
 import Redis from '../services/redis.js';
 import Namespace from '../services/namespace.js';
@@ -33,7 +34,11 @@ function SessionMiddleware(_config, redis, namespace) {
         client: config.store.client || redis.getInstance()
       }));
       RedisClient.client.on('error', (err) => {
-        throw err;
+        try {
+          DI.get('logger').error('Session Redis store error:', err);
+        } catch {
+          console.error('Session Redis store error:', err);
+        }
       });
       store = RedisClient;
     } else {

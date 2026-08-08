@@ -1,5 +1,6 @@
 import Ioredis from 'ioredis';
 import constitute from 'constitute';
+import DI from '../di.js';
 import Config from './config.js';
 import ServiceInterface from './interface.js';
 
@@ -45,7 +46,14 @@ class Redis extends ServiceInterface {
     this.client = new Ioredis(Object.assign({
       enableOfflineQueue: true //make redis connect failings throw error
     }, this.options || this.config.get('redis')));
-    this.client.on('error', () => {});
+    this.client.on('error', (err) => {
+      try {
+        DI.get('logger').error('Redis client error:', err);
+      } catch {
+        //Logger not bound yet, keep the error visible on stderr
+        console.error('Redis client error:', err);
+      }
+    });
     return this.client;
   }
 }

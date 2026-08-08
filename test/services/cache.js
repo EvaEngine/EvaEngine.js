@@ -1,77 +1,78 @@
-import test from 'ava';
+import test, { beforeEach, after } from 'node:test';
+import assert from 'node:assert/strict';
 import DI from '../../src/di.js';
 import * as providers from '../../src/services/providers.js';
 
 DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 const cache = DI.get('cache');
 
-test.beforeEach('Flush all', () => {
-  cache.flush();
+beforeEach(async () => {
+  await cache.flush();
 });
-test.after.always('Close Redis', () => DI.get('redis').cleanup());
+after(() => DI.get('redis').cleanup());
 
-test('Cache get && set && del', async (t) => {
+test('Cache get && set && del', async () => {
   await cache.set('foo', 'bar');
-  t.is(await cache.get('foo'), 'bar');
+  assert.equal(await cache.get('foo'), 'bar');
   await cache.del('foo');
-  t.is(await cache.get('foo'), null);
+  assert.equal(await cache.get('foo'), null);
 });
 
-test('Cache namespace get & set', async (t) => {
+test('Cache namespace get & set', async () => {
   await cache.namespace('ns').set('foo', 'bar');
-  t.is(await cache.namespace('ns').get('foo'), 'bar');
-  t.is(await cache.namespace('ns1').has('foo'), false);
+  assert.equal(await cache.namespace('ns').get('foo'), 'bar');
+  assert.equal(await cache.namespace('ns1').has('foo'), false);
 });
 
-test('Cache namespace flush', async (t) => {
+test('Cache namespace flush', async () => {
   await cache.namespace('ns').set('foo', 'bar');
   await cache.namespace('ns1').set('foo', 'bar');
   await cache.namespace('ns').flush();
-  t.is(await cache.namespace('ns').has('foo'), false);
-  t.is(await cache.namespace('ns1').has('foo'), true);
+  assert.equal(await cache.namespace('ns').has('foo'), false);
+  assert.equal(await cache.namespace('ns1').has('foo'), true);
 });
 
-test('Cache set nx || xx', async(t) => {
+test('Cache set nx || xx', async () => {
   let ret = await cache.set('foo', 'bar', 0, 'xx');
 
-  t.true(ret === null);
+  assert.equal(ret, null);
 
   ret = await cache.set('foo', 'bar', 0, 'nx');
-  t.true(ret === 'OK');
+  assert.equal(ret, 'OK');
   ret = await cache.set('foo', 'bar', 0, 'nx');
-  t.true(ret === null);
+  assert.equal(ret, null);
 
   ret = await cache.set('foo', 'bar', 0, 'xx');
-  t.true(ret === 'OK');
+  assert.equal(ret, 'OK');
   ret = await cache.set('foo', 'bar', 1, 'xx');
-  t.true(ret === 'OK');
+  assert.equal(ret, 'OK');
 
   await cache.flush();
 });
 
-test('Cache namespace set nx || xx', async(t) => {
+test('Cache namespace set nx || xx', async () => {
   let ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
 
-  t.true(ret === null);
+  assert.equal(ret, null);
 
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
-  t.true(ret === 'OK');
+  assert.equal(ret, 'OK');
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'nx');
-  t.true(ret === null);
+  assert.equal(ret, null);
 
   ret = await cache.namespace('ns').set('foo', 'bar', 0, 'xx');
-  t.true(ret === 'OK');
+  assert.equal(ret, 'OK');
   ret = await cache.namespace('ns').set('foo', 'bar', 1, 'xx');
-  t.true(ret === 'OK');
+  assert.equal(ret, 'OK');
 
   await cache.namespace('ns').flush();
 });
 
-test('Cache namespace flush returns', async(t) => {
-  t.is(await cache.namespace('ns').flush(), 0);
+test('Cache namespace flush returns', async () => {
+  assert.equal(await cache.namespace('ns').flush(), 0);
 
   await cache.namespace('ns').set('foo1', 'bar1', 0, 'nx');
   await cache.namespace('ns').set('foo2', 'bar2', 0, 'xx');
   await cache.namespace('ns').set('foo3', 'bar3');
-  t.is(await cache.namespace('ns').flush(), 2);
+  assert.equal(await cache.namespace('ns').flush(), 2);
 });

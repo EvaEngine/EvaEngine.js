@@ -1,67 +1,68 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import { OrderScaffold, FilterScaffold } from '../../src/utils/api_scaffold.js';
 
-test('Order Scaffold Works normal', (t) => {
+test('Order Scaffold Works normal', () => {
   const orderScaffold = new OrderScaffold();
   orderScaffold.setFields(['startDate']);
-  t.deepEqual({
+  assert.deepEqual({
     start_date: ['startDate', 'ASC'],
     '-start_date': ['startDate', 'DESC']
   }, orderScaffold.getAvailableOrders());
-  t.deepEqual(orderScaffold.getOrderByQuery('-start_date'), [['startDate', 'DESC']]);
-  t.deepEqual(orderScaffold.getOrderByQuery('unknown order'), []);
+  assert.deepEqual(orderScaffold.getOrderByQuery('-start_date'), [['startDate', 'DESC']]);
+  assert.deepEqual(orderScaffold.getOrderByQuery('unknown order'), []);
 });
 
-test('Order Scaffold Works with default order', (t) => {
+test('Order Scaffold Works with default order', () => {
   const orderScaffold = new OrderScaffold();
   orderScaffold.setFields(['id', 'startDate'], 'id');
-  t.deepEqual(orderScaffold.getOrderByQuery(null), [['id', 'DESC']]);
-  t.deepEqual(orderScaffold.getOrderByQuery('unknown order'), [['id', 'DESC']]);
+  assert.deepEqual(orderScaffold.getOrderByQuery(null), [['id', 'DESC']]);
+  assert.deepEqual(orderScaffold.getOrderByQuery('unknown order'), [['id', 'DESC']]);
 });
 
-test('Order Scaffold Works with camel case', (t) => {
+test('Order Scaffold Works with camel case', () => {
   const orderScaffold = new OrderScaffold('camel');
   orderScaffold.setFields(['start_date']);
-  t.deepEqual(orderScaffold.getAvailableOrders(), {
+  assert.deepEqual(orderScaffold.getAvailableOrders(), {
     startDate: ['start_date', 'ASC'],
     '-startDate': ['start_date', 'DESC']
   });
-  t.deepEqual(orderScaffold.getOrderByQuery('-startDate'), [['start_date', 'DESC']]);
+  assert.deepEqual(orderScaffold.getOrderByQuery('-startDate'), [['start_date', 'DESC']]);
 });
 
-test('Order Scaffold Works with multi order', (t) => {
+test('Order Scaffold Works with multi order', () => {
   const orderScaffold = new OrderScaffold();
   orderScaffold.setFields(['id', 'startDate']);
-  t.deepEqual(
+  assert.deepEqual(
     orderScaffold.getOrderByQuery('-id,start_date'),
     [['id', 'DESC'], ['startDate', 'ASC']]
   );
 });
 
-test('Filter Scaffold support string equal', (t) => {
+test('Filter Scaffold support string equal', () => {
   const filterScaffold = new FilterScaffold();
   filterScaffold.addFilterSchema('createdAt');
   const schema = filterScaffold.getFilterSchema();
-  t.true(Object.keys(schema).includes('createdAt'));
+  assert.ok(Object.keys(schema).includes('createdAt'));
   const conditions = filterScaffold.getConditions({
     created_at: 'foo'
   });
-  t.deepEqual({
+  assert.deepEqual({
     createdAt: 'foo'
   }, conditions);
 });
 
-test('Filter Scaffold support number', (t) => {
+test('Filter Scaffold support number', () => {
   const filterScaffold = new FilterScaffold();
   filterScaffold.addFilterSchema('totalAmount', 'number');
   const schema = filterScaffold.getFilterSchema();
-  t.true(Object.keys(schema).includes('totalAmount'));
-  t.deepEqual({
+  assert.ok(Object.keys(schema).includes('totalAmount'));
+  assert.deepEqual({
     totalAmount: 123
   }, filterScaffold.getConditions({
     total_amount: 123
   }));
-  t.deepEqual({
+  assert.deepEqual({
     totalAmount: {
       $gte: 100,
       $lte: 200
@@ -71,31 +72,34 @@ test('Filter Scaffold support number', (t) => {
     total_amount_$lte: 200
   }));
 
-  t.throws(() => filterScaffold.getConditions({
+  assert.throws(() => filterScaffold.getConditions({
     total_amount_$gte: 100,
     total_amount: 200
-  }, { message: /conflict/ }));
+  }), (e) => {
+    assert.match(e.message, /conflict/);
+    return true;
+  });
 });
 
-test('Filter Scaffold replace default operators', (t) => {
+test('Filter Scaffold replace default operators', () => {
   const filterScaffold = new FilterScaffold();
   filterScaffold.addFilterSchema('totalAmount', 'number', { operators: [] });
   const schema = filterScaffold.getFilterSchema();
-  t.true(schema.totalAmount.operators.length === 0);
-  t.deepEqual({}, filterScaffold.getConditions({
+  assert.equal(schema.totalAmount.operators.length, 0);
+  assert.deepEqual({}, filterScaffold.getConditions({
     total_amount_$gte: 100
   }));
-  t.deepEqual({
+  assert.deepEqual({
     totalAmount: 100
   }, filterScaffold.getConditions({
     total_amount: 100
   }));
 });
 
-test('Filter Scaffold skip without value', (t) => {
+test('Filter Scaffold skip without value', () => {
   const filterScaffold = new FilterScaffold();
   filterScaffold.addFilterSchema('totalAmount', 'number');
-  t.deepEqual({
+  assert.deepEqual({
     totalAmount: {
       $gte: 100
     }

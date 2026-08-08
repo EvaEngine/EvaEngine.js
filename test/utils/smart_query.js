@@ -1,21 +1,21 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import moment from 'moment-timezone';
 import { Op } from 'sequelize';
 import SmartQuery from '../../src/utils/smart_query.js';
 
 moment.tz.setDefault('Asia/Shanghai');
 
-test('SmartQuery: equal', (t) => {
-  t.deepEqual(
+test('SmartQuery: equal', () => {
+  assert.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).equal('title').where,
     { title: { [Op.eq]: 'foo' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).equal('title').equal('content').where,
     { title: { [Op.eq]: 'foo' } }
   );
-  // test default value
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       title: 'foo',
       redundant: 'bar'
@@ -24,124 +24,120 @@ test('SmartQuery: equal', (t) => {
   );
 });
 
-test('SmartQuery: like', (t) => {
-  t.deepEqual(
+test('SmartQuery: like', () => {
+  assert.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).like('title').where,
     { title: { [Op.like]: '%foo%' } }
   );
-  // test default value
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ titlex: 'foo', redundant: 'bar' }).like('title', 'title', 'defaultTitle').where,
     { title: { [Op.like]: '%defaultTitle%' } }
   );
 });
 
-test('SmartQuery: startsWith', (t) => {
-  t.deepEqual(
+test('SmartQuery: startsWith', () => {
+  assert.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).startsWith('title').where,
     { title: { [Op.like]: 'foo%' } }
   );
-  // test default value
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ titlex: 'foo', redundant: 'bar' }).startsWith('title', 'title', 'defaultTitle').where,
     { title: { [Op.like]: 'defaultTitle%' } }
   );
 });
 
-test('SmartQuery: endsWith', (t) => {
-  t.deepEqual(
+test('SmartQuery: endsWith', () => {
+  assert.deepEqual(
     new SmartQuery({ title: 'foo', redundant: 'bar' }).endsWith('title').where,
     { title: { [Op.like]: '%foo' } }
   );
-  // test default value
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ titlex: 'foo', redundant: 'bar' }).endsWith('title', 'title', 'defaultTitle').where,
     { title: { [Op.like]: '%defaultTitle' } }
   );
 });
-test('SmartQuery: gte', (t) => {
-  t.deepEqual(
+test('SmartQuery: gte', () => {
+  assert.deepEqual(
     new SmartQuery({ created_starts: 12345 }).gte('created_starts', 'createdAt').where,
     { createdAt: { [Op.gte]: 12345 } }
   );
 });
-test('SmartQuery: lte', (t) => {
-  t.deepEqual(
+test('SmartQuery: lte', () => {
+  assert.deepEqual(
     new SmartQuery({ created_ends: 12345 }).lte('created_ends', 'createdAt').where,
     { createdAt: { [Op.lte]: 12345 } }
   );
 });
 
-test('SmartQuery: in', (t) => {
-  t.deepEqual(
+test('SmartQuery: in', () => {
+  assert.deepEqual(
     new SmartQuery({ uids: '3,4', redundant: 'bar' }).in('uids', 'userId').where,
     { userId: { [Op.in]: ['3', '4'] } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ status: ['pending', 'deleted'], redundant: 'bar' }).in('status').where,
     { status: { [Op.in]: ['pending', 'deleted'] } }
   );
-  // test default value
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ redundant: 'bar' }).in('status', 'status', 'published,approved').where,
     { status: { [Op.in]: ['published', 'approved'] } }
   );
 });
 
-test('SmartQuery: notIn', (t) => {
-  t.deepEqual(
+test('SmartQuery: notIn', () => {
+  assert.deepEqual(
     new SmartQuery({ uids: '3,4', redundant: 'bar' }).notIn('uids', 'userId').where,
     { userId: { [Op.notIn]: ['3', '4'] } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ uids: [3, 4], redundant: 'bar' }).notIn('uids', 'userId').where,
     { userId: { [Op.notIn]: [3, 4] } }
   );
 });
 
-test('SmartQuery: range', (t) => {
-  t.deepEqual(
+test('SmartQuery: range', () => {
+  assert.deepEqual(
     new SmartQuery({ minUid: 3, maxUid: 4 }).range('minUid', 'maxUid', 'userId').where,
     { userId: { [Op.gte]: 3, [Op.lte]: 4 } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ minUid: 3 }).range('minUid', 'maxUid', 'userId').where,
     { userId: { [Op.gte]: 3 } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ maxUid: 4 }).range('minUid', 'maxUid', 'userId').where,
     { userId: { [Op.lte]: 4 } }
   );
 });
 
-test('SmartQuery: dateRange', (t) => {
-  t.deepEqual(
+test('SmartQuery: dateRange', () => {
+  assert.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01',
       createdEnd: '2016-01-01'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
     { createdAt: { [Op.gte]: '1451577600', [Op.lte]: '1451663999' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
     { createdAt: { [Op.gte]: '1451577600' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdEnd: '2016-01-01'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
     { createdAt: { [Op.lte]: '1451663999' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01 03:05',
       createdEnd: '2016-01-01 04:05'
     }).dateRange('createdStart', 'createdEnd', 'createdAt').where,
     { createdAt: { [Op.gte]: '1451577600', [Op.lte]: '1451663999' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdStart: 'xxxx',
       createdEnd: 'xxxx'
@@ -149,8 +145,8 @@ test('SmartQuery: dateRange', (t) => {
     {}
   );
 });
-test('SmartQuery: dateTimeRange', (t) => {
-  t.deepEqual(
+test('SmartQuery: dateTimeRange', () => {
+  assert.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01',
       createdEnd: '2016-01-01'
@@ -158,20 +154,20 @@ test('SmartQuery: dateTimeRange', (t) => {
     { createdAt: { [Op.gte]: '1451577600', [Op.lte]: '1451577600' } }
   );
 
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdStart: '2016-01-01 03:05',
       createdEnd: '2016-01-01 12:05:03'
     }).dateTimeRange('createdStart', 'createdEnd', 'createdAt').where,
     { createdAt: { [Op.gte]: '1451588700', [Op.lte]: '1451621103' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdEnd: '2016-01-01 12:05:03'
     }).dateTimeRange('createdStart', 'createdEnd', 'createdAt').where,
     { createdAt: { [Op.lte]: '1451621103' } }
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({
       createdStart: 'xxxx',
       createdEnd: 'xxxx'
@@ -179,84 +175,84 @@ test('SmartQuery: dateTimeRange', (t) => {
     {}
   );
 });
-test('SmartQuery: orderable', (t) => {
-  t.deepEqual(
+test('SmartQuery: orderable', () => {
+  assert.deepEqual(
     new SmartQuery({ order: 'createdAt' }).orderable(['createdAt']).order,
     [
       ['createdAt', 'ASC']
     ]
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ order: '-createdAt' }).orderable(['createdAt']).order,
     [
       ['createdAt', 'DESC']
     ]
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({}).orderable(['createdAt']).order,
     [
       ['createdAt', 'DESC']
     ]
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({ order: 'test' }).orderable(['createdAt'], { test: ['deletedAt', 'DESC'] }).order,
     [
       ['deletedAt', 'DESC']
     ]
   );
-  t.deepEqual(
+  assert.deepEqual(
     new SmartQuery({}).orderable(['createdAt'], { test: ['deletedAt', 'DESC'] }, ['id', 'DESC']).order,
     [
       ['id', 'DESC']
     ]
   );
 });
-test('SmartQuery: determineParam', (t) => {
-  t.is(
+test('SmartQuery: determineParam', () => {
+  assert.equal(
     new SmartQuery({ title: 'foo' }).determineParam('title'),
     true
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ title: '  ' }).determineParam('title'),
     false
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ title: null }).determineParam('title'),
     false
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ foo: 'bar' }).determineParam('title'),
     false
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ uids: [1] }).determineParam('uids'),
     true
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ uids: [1, 2] }).determineParam('uids'),
     true
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ uids: [] }).determineParam('uids'),
     false
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ uids: { foo: 'bar' } }).determineParam('uids'),
     true
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ uids: { foo: 'bar', 'a': 'c' } }).determineParam('uids'),
     true
   );
-  t.is(
+  assert.equal(
     new SmartQuery({ uids: {} }).determineParam('uids'),
     false
   );
 });
-test('SmartQuery: applyWhere', (t) => {
+test('SmartQuery: applyWhere', () => {
   const smartQuery = new SmartQuery({});
   smartQuery.applyWhere('title', '$eq', 'xxx');
-  t.deepEqual(
+  assert.deepEqual(
     smartQuery.where,
     {
       title: {
@@ -265,7 +261,7 @@ test('SmartQuery: applyWhere', (t) => {
     }
   );
   smartQuery.applyWhere('title', '$eq', 'ooo');
-  t.deepEqual(
+  assert.deepEqual(
     smartQuery.where,
     {
       title: {
@@ -274,7 +270,7 @@ test('SmartQuery: applyWhere', (t) => {
     }
   );
   smartQuery.applyWhere('title', '$in', 'bar');
-  t.deepEqual(
+  assert.deepEqual(
     smartQuery.where,
     {
       title: {
@@ -285,10 +281,10 @@ test('SmartQuery: applyWhere', (t) => {
   );
 });
 
-test('SmartQuery: getCriteria includes where and order', (t) => {
+test('SmartQuery: getCriteria includes where and order', () => {
   const smartQuery = new SmartQuery({ title: 'foo' });
   smartQuery.like('title').orderable(['createdAt'], {}, ['id', 'DESC']);
-  t.deepEqual(
+  assert.deepEqual(
     smartQuery.getCriteria(),
     {
       where: { title: { [Op.like]: '%foo%' } },
@@ -297,7 +293,7 @@ test('SmartQuery: getCriteria includes where and order', (t) => {
   );
 });
 
-test('SmartQuery: getCriteria returns empty without conditions', (t) => {
+test('SmartQuery: getCriteria returns empty without conditions', () => {
   const smartQuery = new SmartQuery({});
-  t.deepEqual(smartQuery.getCriteria(), {});
+  assert.deepEqual(smartQuery.getCriteria(), {});
 });

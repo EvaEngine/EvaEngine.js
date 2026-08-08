@@ -1,23 +1,24 @@
-import test from 'ava';
+import test, { before, after } from 'node:test';
+import assert from 'node:assert/strict';
 import Env from '../../src/services/env.js';
 
 let oldEnv = null;
 
-test.before('Set env to production', () => {
+before(() => {
   oldEnv = process.env.NODE_ENV;
   process.env.NODE_ENV = 'production';
 });
-test('Default env', (t) => {
+test('Default env', () => {
   const env = new Env();
-  t.is('production', env.get());
-  t.false(env.isDevelopment());
-  t.true(env.isProduction());
-  t.false(env.isTest());
+  assert.equal('production', env.get());
+  assert.equal(env.isDevelopment(), false);
+  assert.ok(env.isProduction());
+  assert.equal(env.isTest(), false);
 });
-test('Is Singleton mode', (t) => {
+test('Is Singleton mode', () => {
   const env = new Env();
-  t.is('production', env.get());
+  assert.equal('production', env.get());
 });
-test.after('Restore env', () => {
+after(() => {
   process.env.NODE_ENV = oldEnv;
 });

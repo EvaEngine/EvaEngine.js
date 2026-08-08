@@ -161,10 +161,6 @@ export class Fragment {
       };
     }
 
-    if (!this.isUnknown()) {
-      return {};
-    }
-
     if (this.isException()) {
       if (!this.getParentFragment()) {
         return {};

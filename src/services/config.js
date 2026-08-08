@@ -91,6 +91,7 @@ class Config extends ServiceInterface {
 
   reload() {
     this.config = null;
+    this.mergedFiles = [];
   }
 
   /**

@@ -1,16 +1,17 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import {
   getHostFullUrl,
 } from './../../src/utils/host.js';
 
-test('Host full url', (t) => {
-  t.is(getHostFullUrl({
+test('Host full url', () => {
+  assert.equal(getHostFullUrl({
     protocol: 'http',
     originalUrl: '/foo',
     get: () => 'evaengine.com'
   }), 'http://evaengine.com/foo');
 
-  t.is(getHostFullUrl({
+  assert.equal(getHostFullUrl({
     protocol: 'http',
     originalUrl: '/foo',
     get: () => 'evaengine.com'

@@ -1,4 +1,5 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import DI from '../../src/di.js';
 import * as exceptions from './../../src/exceptions/index.js';
 import * as providers from '../../src/services/providers.js';
@@ -6,15 +7,13 @@ import * as providers from '../../src/services/providers.js';
 DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 const eventManager = DI.get('event_manager');
 
-test('Register non function', async(t) => {
-  t.throws(() => eventManager.addListener('foo'), { instanceOf: exceptions.RuntimeException });
-  t.throws(() => eventManager.addListener(class Foo {
-  }), { instanceOf: exceptions.RuntimeException });
+test('Register non function', () => {
+  assert.throws(() => eventManager.addListener('foo'), exceptions.RuntimeException);
+  assert.throws(() => eventManager.addListener(class Foo {
+  }), exceptions.RuntimeException);
 });
 
-
-test('Register standard class', async(t) => {
-  t.plan(9);
+test('Register standard class', () => {
   let isLogin = false;
   class Foo {
     get prefix() {
@@ -27,27 +26,27 @@ test('Register standard class', async(t) => {
 
     afterLogin() {
       isLogin = true;
-      t.true(isLogin);
     }
   }
   eventManager.addListener(Foo);
-  const events = eventManager.getAllowEvents()
-    t.true(events instanceof Set);
-  t.is(events.size, 4);
-  t.true(events.has('foo:login:before'));
-  t.true(events.has('foo:login:after'));
-  t.true(events.has('foo:register:before'));
-  t.true(events.has('foo:register:after'));
-  t.deepEqual(eventManager.getEmitter().eventNames(), ['foo:login:after']);
-  t.false(isLogin);
+  const events = eventManager.getAllowEvents();
+  assert.ok(events instanceof Set);
+  assert.equal(events.size, 4);
+  assert.ok(events.has('foo:login:before'));
+  assert.ok(events.has('foo:login:after'));
+  assert.ok(events.has('foo:register:before'));
+  assert.ok(events.has('foo:register:after'));
+  assert.deepEqual(eventManager.getEmitter().eventNames(), ['foo:login:after']);
+  assert.equal(isLogin, false);
   eventManager.emit('foo:login:after');
+  assert.ok(isLogin);
 });
 
-test('Emit non exists event', async(t) => {
-  t.throws(() => eventManager.emit('non-exists'), { instanceOf: exceptions.RuntimeException });
+test('Emit non exists event', () => {
+  assert.throws(() => eventManager.emit('non-exists'), exceptions.RuntimeException);
 });
 
-test('Register repeat event', async(t) => {
+test('Register repeat event', () => {
   class Bar {
     get prefix() {
       return 'foo';
@@ -57,5 +56,5 @@ test('Register repeat event', async(t) => {
       return ['login', 'other'];
     }
   }
-  t.throws(() => eventManager.addListener(Bar), { instanceOf: exceptions.RuntimeException });
+  assert.throws(() => eventManager.addListener(Bar), exceptions.RuntimeException);
 });

@@ -1,4 +1,6 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { EventEmitter } from 'events';
 import Joi from 'joi';
 import DI from '../../src/di.js';
 import * as serviceProviders from '../../src/services/providers.js';
@@ -14,7 +16,7 @@ const getAuth = () => DI.get('auth')();
 const getValidator = () => DI.get('validator');
 const response = () => mockResponse();
 
-test('auth rejects token without expiration', async (t) => {
+test('auth rejects token without expiration', async () => {
   const originalFind = DI.get('jwt').find;
   DI.get('jwt').find = async () => ({ uid: 7 });
   const request = mockRequest({ headers: { 'x-token': 'missing-expiration' } });
@@ -22,16 +24,16 @@ test('auth rejects token without expiration', async (t) => {
     const error = await new Promise(resolve => {
       getAuth()(request, response(), resolve);
     });
-    t.true(error instanceof UnauthorizedException);
-    t.is(error.message, 'Token expired');
+    assert.ok(error instanceof UnauthorizedException);
+    assert.equal(error.message, 'Token expired');
   } catch (error) {
-    t.fail(error.message);
+    assert.fail(error.message);
   } finally {
     DI.get('jwt').find = originalFind;
   }
 });
 
-test('validator accepts valid Joi 18 schema', async (t) => {
+test('validator accepts valid Joi 18 schema', async () => {
   const middleware = getValidator()(() => ({
     query: Joi.object({ page: Joi.number().integer().required() })
   }));
@@ -40,10 +42,10 @@ test('validator accepts valid Joi 18 schema', async (t) => {
   await middleware(request, response(), () => {
     called = true;
   });
-  t.true(called);
+  assert.ok(called);
 });
 
-test('validator rejects invalid Joi 18 schema', async (t) => {
+test('validator rejects invalid Joi 18 schema', async () => {
   const middleware = getValidator()(() => ({
     body: Joi.object({ name: Joi.string().required() })
   }));
@@ -52,19 +54,43 @@ test('validator rejects invalid Joi 18 schema', async (t) => {
     const error = await new Promise(resolve => {
       middleware(request, response(), resolve);
     });
-    t.true(error instanceof FormInvalidateException);
+    assert.ok(error instanceof FormInvalidateException);
   } catch (error) {
-    t.fail(error.message);
+    assert.fail(error.message);
   }
 });
 
-test('session middleware initializes with connect-redis 10', (t) => {
-  const middleware = DI.get('session')();
-  t.is(typeof middleware, 'function');
-  t.pass();
+test('session store redis errors are logged instead of thrown', () => {
+  const config = DI.get('config');
+  const originalStore = config.get('session').store;
+  const fakeClient = new EventEmitter();
+  config.get().session.store = { client: fakeClient };
+
+  const logger = DI.get('logger');
+  const originalError = logger.error;
+  let logged = null;
+  logger.error = (msg, err) => {
+    logged = { msg, err };
+  };
+
+  try {
+    const middleware = DI.get('session')();
+    assert.equal(typeof middleware, 'function');
+    assert.doesNotThrow(() => fakeClient.emit('error', new Error('redis down')));
+  } finally {
+    config.get().session.store = originalStore;
+    logger.error = originalError;
+  }
+  assert.ok(logged);
+  assert.equal(logged.err.message, 'redis down');
 });
 
-test('Kong auth accepts consumer headers', async (t) => {
+test('session middleware initializes with connect-redis 10', () => {
+  const middleware = DI.get('session')();
+  assert.equal(typeof middleware, 'function');
+});
+
+test('Kong auth accepts consumer headers', async () => {
   const request = mockRequest({ headers: {
     'x-consumer-custom-id': '9',
     'x-consumer-custom-username': 'nine'
@@ -72,13 +98,13 @@ test('Kong auth accepts consumer headers', async (t) => {
   const result = await new Promise((resolve, reject) => {
     new AuthKongMiddleware()()(request, response(), error => error ? reject(error) : resolve(request));
   });
-  t.deepEqual(result.auth, { uid: 9, mobile: 'nine' });
+  assert.deepEqual(result.auth, { uid: 9, mobile: 'nine' });
 });
 
-test('Kong auth rejects anonymous consumer', async (t) => {
+test('Kong auth rejects anonymous consumer', async () => {
   const request = mockRequest({ headers: { 'x-anonymous-consumer': 'true' } });
   const error = await new Promise(resolve => {
     new AuthKongMiddleware()()(request, response(), resolve);
   });
-  t.true(error instanceof UnauthorizedException);
+  assert.ok(error instanceof UnauthorizedException);
 });

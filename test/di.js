@@ -1,36 +1,45 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import { RuntimeException } from '../src/exceptions/index.js';
 import DI from '../src/di.js';
 import constitute from 'constitute';
 
-test('throw exception when nothing bound', (t) => {
-  t.throws(() => DI.get('not_bound'), { instanceOf: RuntimeException });
+test('throw exception when nothing bound', () => {
+  assert.throws(() => DI.get('not_bound'), RuntimeException);
 });
-test('bind value', async(t) => {
+test('bind value', () => {
   class ValueClass {
   }
   DI.bindValue(ValueClass, 123);
-  t.is(DI.get(ValueClass), 123);
+  assert.equal(DI.get(ValueClass), 123);
 });
-test('bind method', async(t) => {
+test('bind value by string key', () => {
+  DI.bindValue('answer', 42);
+  assert.equal(DI.get('answer'), 42);
+  DI.bindValue('options', { a: 1, b: 'two' });
+  assert.deepEqual(DI.get('options'), { a: 1, b: 'two' });
+  DI.bindValue('nullable', null);
+  assert.equal(DI.get('nullable'), null);
+});
+test('bind method', () => {
   DI.bindMethod('foo', () => () => 'bar');
   const method = DI.get('foo');
-  t.true(typeof method === 'function');
-  t.is('bar', method());
+  assert.equal(typeof method, 'function');
+  assert.equal('bar', method());
 });
-test('bind class', async(t) => {
+test('bind class', () => {
   class Bar {
   }
   DI.bindClass('bar', Bar);
-  t.true(DI.get('bar') instanceof Bar);
-  t.true(Object.keys(DI.getBound()).includes('bar'));
+  assert.ok(DI.get('bar') instanceof Bar);
+  assert.ok(Object.keys(DI.getBound()).includes('bar'));
 });
-test('reset container', async(t) => {
+test('reset container', () => {
   class ValueClass {
   }
   DI.bindValue(ValueClass, 123);
-  t.true(Object.keys(DI.getBound()).length > 0);
+  assert.ok(Object.keys(DI.getBound()).length > 0);
   DI.reset();
-  t.is(Object.keys(DI.getBound()).length, 0);
-  t.true(DI.getContainer() instanceof constitute.Container);
+  assert.equal(Object.keys(DI.getBound()).length, 0);
+  assert.ok(DI.getContainer() instanceof constitute.Container);
 });

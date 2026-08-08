@@ -24,9 +24,10 @@ export const requestToCacheKey = (req, hashStrategy) => {
     method,
     originalUrl,
     query: originQuery,
-    route,
-    uid = null //Custom rule
+    route
   } = req;
+  //Prefer uid resolved by auth middleware, keep req.uid as custom rule fallback
+  const uid = (req.auth && req.auth.uid) || req.uid || null;
   const query = { ...originQuery };
   delete query.flush;
   if (hashStrategy && typeof hashStrategy !== 'function') {

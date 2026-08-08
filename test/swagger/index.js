@@ -1,4 +1,5 @@
-import test from 'ava';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import path from 'path';
 import fs from 'fs';
 import Sequelize from 'sequelize';
@@ -6,59 +7,78 @@ import { ExSwagger } from '../../src/swagger/index.js';
 import * as exceptions from '../../src/exceptions/index.js';
 import Entities from './../../src/entities/index.js';
 
-test('Could get file lists', async(t) => {
+const compileDistPath = `${import.meta.dirname}/_example/exports`;
+const demoEntities = new Entities(
+  `${import.meta.dirname}/../_demo_project/entities`,
+  new Sequelize('database', null, null, { dialect: 'mysql' })
+);
+
+test('Could get file lists', async () => {
   const files = await ExSwagger.scanFiles(`${import.meta.dirname}/_example/**/*.js`);
   const ctrpath = `${import.meta.dirname}${path.sep}_example${path.sep}controller.js`.split(path.sep).join('/');
-  t.true(files.includes(ctrpath));
+  assert.ok(files.includes(ctrpath));
 });
 
-test('Could parse annotations', async(t) => {
+test('Could parse annotations', async () => {
   const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${import.meta.dirname}/_example/controller.js`]);
-  t.is(annotationContainers.length, 1);
-  t.is(annotationContainers[0].getAnnotations().length, 6);
+  assert.equal(annotationContainers.length, 1);
+  assert.equal(annotationContainers[0].getAnnotations().length, 6);
 });
 
-test('Could parse swagger docs', async(t) => {
+test('Could parse swagger docs', async () => {
   const annotationContainers = await ExSwagger.filesToAnnotationsContainers([`${import.meta.dirname}/_example/controller.js`]);
   const fragments = annotationContainers[0].collectFragments();
-  t.is(fragments.length, 4);
-  t.true(fragments[0].isDefinition());
-  t.true(typeof fragments[0].value === 'object');
-  t.true(typeof fragments[0].description === 'string');
-  t.true(fragments[1].isPath());
-  t.true(typeof fragments[1].value === 'object');
-  t.true(typeof fragments[1].description === 'string');
-  t.true(fragments[2].isException());
-  t.true(typeof fragments[2].value === 'string');
-  t.true(typeof fragments[2].description === 'string');
-  t.is(1, annotationContainers[0].collectYamlErrors().length);
-  //TODO: test unknown
+  assert.equal(fragments.length, 4);
+  assert.ok(fragments[0].isDefinition());
+  assert.equal(typeof fragments[0].value, 'object');
+  assert.equal(typeof fragments[0].description, 'string');
+  assert.ok(fragments[1].isPath());
+  assert.equal(typeof fragments[1].value, 'object');
+  assert.equal(typeof fragments[1].description, 'string');
+  assert.ok(fragments[2].isException());
+  assert.equal(typeof fragments[2].value, 'string');
+  assert.equal(typeof fragments[2].description, 'string');
+  assert.equal(1, annotationContainers[0].collectYamlErrors().length);
 });
-test('Scan exceptions', async(t) => {
+
+test('Scan exceptions', async () => {
   const scannedExceptions = await ExSwagger.scanExceptions(
     `${import.meta.dirname}/../../src/exceptions/**/*.js`, exceptions.StandardException
   );
-  t.true(Object.keys(scannedExceptions).length >= 12);
+  assert.ok(Object.keys(scannedExceptions).length >= 12);
 });
 
-test('default properties', async(t) => {
+test('default properties', async () => {
   const exSwagger = new ExSwagger({
     swaggerDocsTemplate: {},
     sourceRootPath: '/foo'
   });
   const states = exSwagger.getStates();
-  t.true(states.sourceFilesPath.includes('/foo/**/*.js'));
+  assert.ok(states.sourceFilesPath.includes('/foo/**/*.js'));
 });
 
-test('Generate json file', async(t) => {
-  const compileDistPath = `${import.meta.dirname}/_example/exports`;
+test('Generate json file', async () => {
   const exSwagger = new ExSwagger({
     compileDistPath,
-    extraSourcePaths: [`${import.meta.dirname}/../../../lib/utils/**/*.js`],
-    models: new Entities(`${import.meta.dirname}/../_demo_project/entities`, new Sequelize('database', null, null, { dialect: 'mysql' })),
+    models: demoEntities,
     swaggerDocsTemplate: { definitions: {}, paths: {} },
     sourceRootPath: `${import.meta.dirname}/_example`
   });
   await exSwagger.exportJson();
-  t.truthy(JSON.parse(fs.readFileSync(`${compileDistPath}/docs.json`)));
+  assert.ok(JSON.parse(fs.readFileSync(`${compileDistPath}/docs.json`)));
+});
+
+test('throws annotation produces exception definition and response', async () => {
+  const exSwagger = new ExSwagger({
+    compileDistPath,
+    models: demoEntities,
+    swaggerDocsTemplate: { definitions: {}, paths: {} },
+    sourceRootPath: `${import.meta.dirname}/_example`
+  });
+  const docs = await exSwagger.exportJson(`${compileDistPath}/docs-exception.json`);
+  assert.ok(docs.definitions.LogicException);
+  assert.equal(
+    docs.paths['/estimates/price'].get.responses['400'].schema.$ref,
+    '#/definitions/LogicException'
+  );
 });
