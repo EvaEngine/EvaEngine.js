@@ -22,7 +22,7 @@ Sequelize.prototype.validateIsUnique = (col, msg) => {
         .keys(schema)
         .filter(field => schema[field].primaryKey)
         .forEach((pk) => {
-          conditions.where[pk] = { $ne: self[pk] };
+          conditions.where[pk] = { [Sequelize.Op.ne]: self[pk] };
         });
     }).then(() =>
       self.Model.count(conditions).then((found) => {

@@ -1,5 +1,15 @@
 import moment from 'moment-timezone';
+import { Op } from 'sequelize';
 import { InvalidArgumentException } from '../exceptions/index.js';
+
+const OPERATORS = {
+  $eq: Op.eq,
+  $like: Op.like,
+  $in: Op.in,
+  $notIn: Op.notIn,
+  $gte: Op.gte,
+  $lte: Op.lte
+};
 
 /**
  * 自动根据 req.query 生成 sequelize 查询条件, 自动判断参数清单中是否有值
@@ -265,7 +275,7 @@ export default class SmartQuery {
       criteria.order = this.order;
     }
 
-    if (this.where instanceof Object && this.where.length > 0) {
+    if (Object.keys(this.where).length > 0) {
       criteria.where = this.where;
     }
 
@@ -311,7 +321,7 @@ export default class SmartQuery {
     if (!Object.keys(this.where).includes(filedName)) {
       this.where[filedName] = {};
     }
-    this.where[filedName][predicate] = value;
+    this.where[filedName][OPERATORS[predicate] || predicate] = value;
   }
 
   /**

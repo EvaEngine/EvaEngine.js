@@ -1,6 +1,5 @@
 import constitute from 'constitute';
 import crypto from 'crypto';
-import util from 'util';
 import moment from 'moment-timezone';
 import Logger from '../services/logger.js';
 import Cache from '../services/cache.js';
@@ -65,7 +64,7 @@ export const requestToCacheKey = (req, hashStrategy) => {
  */
 function ViewCacheMiddleware(cache, logger) {
   return (options = {}) => {
-    if (!util.isObject(options)) {
+    if (options === null || typeof options !== 'object') {
       options = {
         ttl: options
       };
