@@ -1,99 +1,9 @@
 import constitute from 'constitute';
-import request from 'request-promise-native';
 import Config from './config.js';
 import Logger from './logger.js';
+import { createRequestClient } from '../utils/request_client.js';
 import { HttpRequestLogicException, HttpRequestIOException } from '../exceptions/index.js';
 import ServiceInterface from './interface.js';
-
-export const deepClone = obj =>
-  JSON.parse(JSON.stringify(obj));
-
-const TOO_LONG_BODY = '____TLDR____';
-
-let debugFlag = false;
-/* eslint-disable */
-//Mod version of https://github.com/request/request-debug
-export const requestDebug = (logger, maxBodyLength = process.env.MAX_REQUEST_DEBUG_BODY || 3000) => {
-  if (debugFlag === true) {
-    return;
-  }
-
-  let proto = {};
-  let debugId = 0;
-  if (request.Request) {
-    proto = request.Request.prototype;
-  } else if (request.get && request.post) {
-    // The object returned by request.defaults() doesn't include the
-    // Request property, so do this horrible thing to get at it.  Per
-    // Wikipedia, port 4 is unassigned.
-    const req = request('http://localhost:4').on('error', () => {
-    });
-    proto = req.constructor.prototype;
-  } else {
-    throw new Error('Pass the object returned by require("request") to this function.');
-  }
-  if (proto._initBeforeDebug) {
-    return;
-  }
-
-  proto._initBeforeDebug = proto.init;
-
-  const ignoreDebug = (headers) => {
-    if (!headers || Object.keys(headers).length < 1) {
-      return {};
-    }
-    return Object.keys(headers)
-      .filter(key => !key.startsWith('x-debug'))
-      .reduce((res, key) => (res[key] = headers[key], res), {});
-  };
-
-  proto.init = function () {
-    if (this._debugId) {
-      return;
-    }
-    this.on('request', function (req) {
-      const data = {
-        headers: deepClone(this.headers)
-      };
-      if (this.body) {
-        data.body = maxBodyLength > 0 && this.body.toString().length < maxBodyLength ? this.body.toString('utf8') : TOO_LONG_BODY;
-      }
-
-      logger.verbose('[HTTP_REQUEST_%s] [%s %s] [REQ_HEADERS: %s] [REQ_BODY: %s]', this._debugId,
-        this.method.toUpperCase(), this.uri.href, JSON.stringify(data.headers), data.body || ''
-      );
-    }).on('response', function (res) {
-      if (this.callback) {
-        return;
-      }
-
-      const bodyLength = res.headers['content-length'] || (res.body ? res.body.toString().length : 0);
-      logger.verbose('[HTTP_RESPONSE_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
-        this.method.toUpperCase(), this.uri.href, res.statusCode, JSON.stringify(ignoreDebug(res.headers)),
-        bodyLength > maxBodyLength ? TOO_LONG_BODY : res.body || ''
-      );
-    }).on('complete', function (res) {
-      if (!this.callback) {
-        return;
-      }
-
-      const bodyLength = res.headers['content-length'] || (res.body ? res.body.toString().length : 0);
-      logger.verbose('[HTTP_RESPONSE_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
-        this.method.toUpperCase(), this.uri.href, res.statusCode, JSON.stringify(ignoreDebug(res.headers)),
-        bodyLength > maxBodyLength ? TOO_LONG_BODY : res.body || ''
-      );
-    }).on('redirect', function () {
-
-      logger.verbose('[HTTP_REDIRECT_%s] [%s %s] [%s] [RES_HEADERS: %s] [RES_BODY: %s]', this._debugId,
-        this.method.toUpperCase(), this.uri.href, this.response.statusCode, JSON.stringify(ignoreDebug(this.response.headers)), '');
-    });
-    this._debugId = ++debugId;
-    return proto._initBeforeDebug.apply(this, arguments);
-  };
-
-  debugFlag = true;
-};
-/* eslint-enable */
 
 class HttpClient extends ServiceInterface {
   /**
@@ -103,12 +13,11 @@ class HttpClient extends ServiceInterface {
   constructor(config, logger) {
     super();
     this.config = config.get();
-    this.client = request;
-    requestDebug(logger);
+    this.client = createRequestClient(logger);
   }
 
     getProto() {
-    return request;
+    return this.client;
   }
 
   getInstance() {

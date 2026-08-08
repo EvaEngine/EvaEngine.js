@@ -56,8 +56,6 @@
     "morgan": "^1.11.0",
     "mysql2": "^3.23.2",
     "node-mocks-http": "~1.18.1",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.9",
     "sequelize": "^6.37.8",
     "swagger-ui-dist": "^5.32.11",
     "winston": "^3.19.0",
@@ -75,7 +73,6 @@
     "eslint": "^9.39.5",
     "eslint-plugin-import": "^2.32.0",
     "globals": "^17.8.0",
-    "nock": "^14.0.17",
     "pre-commit": "^2.0.0",
     "semantic-release": "^25.0.8"
   }
