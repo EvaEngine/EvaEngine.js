@@ -50,7 +50,7 @@
 ## 工程要点
 - 遵循 `.ai/defaults/*`
 - 冲突优先级：代码 > 测试 > ADR > docs > memory
-- 主干 `master`；Conventional Commits；SemVer + semantic-release
+- 主干 `main`；Conventional Commits；SemVer + semantic-release
 - **消费方只依赖 README**；`docs/` 仅维护本库
 - 公共行为变更：测试 + README（必要时 components）
 - 使用并提交 `package-lock.json`（无 `package-lock: false`）

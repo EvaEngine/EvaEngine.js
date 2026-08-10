@@ -40,7 +40,7 @@ class Config extends ServiceInterface {
     endpoint,
     name,
     profiles,
-    label = 'master'
+    label = 'main'
   }) {
     if (!this.config) {
       this.config = this.loadConfigFromFiles();

@@ -30,7 +30,7 @@ Version: 1.0
 
 ## 发布与 Git
 - SemVer；Conventional Commits（feat/fix/docs/refactor/chore…）
-- 主干为 `master`；semantic-release 自动发版 npm
+- 主干为 `main`；semantic-release 自动发版 npm
 - 一次只完成一个功能；不混杂无关重构与依赖大升级
 
 ## 可靠性

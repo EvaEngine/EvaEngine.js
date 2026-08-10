@@ -2,9 +2,9 @@
 
 [![NPM version](https://img.shields.io/npm/v/evaengine.svg?style=flat-square)](http://badge.fury.io/js/evaengine)
 [![CI](https://github.com/EvaEngine/EvaEngine.js/actions/workflows/ci.yml/badge.svg)](https://github.com/EvaEngine/EvaEngine.js/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/EvaEngine/EvaEngine.js/branch/master/graph/badge.svg)](https://codecov.io/gh/EvaEngine/EvaEngine.js)
+[![codecov](https://codecov.io/gh/EvaEngine/EvaEngine.js/branch/main/graph/badge.svg)](https://codecov.io/gh/EvaEngine/EvaEngine.js)
 [![npm](https://img.shields.io/npm/dm/evaengine.svg?maxAge=2592000)](https://www.npmjs.com/package/evaengine)
-[![License](https://img.shields.io/npm/l/evaengine.svg?maxAge=2592000?style=plastic)](https://github.com/EvaEngine/EvaEngine.js/blob/master/LICENSE)
+[![License](https://img.shields.io/npm/l/evaengine.svg?maxAge=2592000?style=plastic)](https://github.com/EvaEngine/EvaEngine.js/blob/main/LICENSE)
 
 **Application runtime** for Node.js microservices: one engine for **HTTP**, **CLI**, and **cron**, with DI, providers, middleware, config, cache, auth helpers, entities (Sequelize), exceptions, and Swagger generation.
 
@@ -441,4 +441,4 @@ npm run build
 npm test          # needs Redis on 127.0.0.1:6379 for some tests
 ```
 
-Release: semantic-release on `master` (Conventional Commits). Maintainer maps live under `docs/` in git only; they are **not** required for npm consumers.
+Release: semantic-release on `main` (Conventional Commits). Maintainer maps live under `docs/` in git only; they are **not** required for npm consumers.
