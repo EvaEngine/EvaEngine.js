@@ -26,12 +26,6 @@
       }
     ],
     [
-      "@semantic-release/github",
-      {
-        "assets": []
-      }
-    ],
-    [
       "@semantic-release/git",
       {
         "assets": ["package.json", "CHANGELOG.md"],

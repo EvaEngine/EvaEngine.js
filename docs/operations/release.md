@@ -6,8 +6,8 @@
 ## 机制
 - 主干：`main`
 - `semantic-release` + conventionalcommits
-- 插件：commit-analyzer、release-notes、changelog、npm、github、git（回写 `package.json`、`CHANGELOG.md`）
-- Workflow：`.github/workflows/release.yml`（push main；需 `GITHUB_TOKEN`、`NPM_TOKEN`）
+- 插件：commit-analyzer、release-notes、changelog、npm、git（回写 `package.json`、`CHANGELOG.md`）
+- Workflow：`.github/workflows/release.yml`（push main；需 `NPM_TOKEN`）
 - CI 验证：`.github/workflows/ci.yml`（lint/build/test/pack dry-run；Node 24；Redis service）
 
 ## 发布物

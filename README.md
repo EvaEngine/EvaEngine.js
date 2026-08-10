@@ -6,31 +6,31 @@
 [![npm](https://img.shields.io/npm/dm/evaengine.svg?maxAge=2592000)](https://www.npmjs.com/package/evaengine)
 [![License](https://img.shields.io/npm/l/evaengine.svg?maxAge=2592000?style=plastic)](https://github.com/EvaEngine/EvaEngine.js/blob/main/LICENSE)
 
-**Application runtime** for Node.js microservices: one engine for **HTTP**, **CLI**, and **cron**, with DI, providers, middleware, config, cache, auth helpers, entities (Sequelize), exceptions, and Swagger generation.
+面向 Node.js 微服务的 **Application Runtime**：同一套引擎覆盖 **HTTP**、**CLI**、**定时任务**，并提供 DI、Provider、中间件、配置、缓存、鉴权辅助、实体（Sequelize）、异常体系与 Swagger 生成。
 
-> **Consumers (humans & agents):** this README is the full public guide. You do **not** need the repo `docs/` tree to use the package.
+> **消费方（人与 agent）：** 本 README 即为完整对外说明。使用本包**不需要**阅读仓库内的 `docs/`。
 
-## Requirements
+## 环境要求
 
 - Node.js **≥ 24**
-- ESM (`"type": "module"`)
-- npm (or any client that installs from the npm registry)
+- ESM（`"type": "module"`）
+- npm（或其它可从 npm  registry 安装的客户端）
 
-## Install
+## 安装
 
 ```bash
 npm install evaengine
 ```
 
-Optional starter: [EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js).
+可选脚手架：[EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)。
 
-## Import (important)
+## 导入方式（重要）
 
-The package **default export** is a single `core` object. Named top-level exports are only `default` and `core` (same object).
+包的 **default 导出** 是一个 `core` 对象。顶层具名导出只有 `default` 与 `core`（同一对象）。
 
 ```js
 import eva from 'evaengine';
-// or: import { core as eva } from 'evaengine';
+// 或：import { core as eva } from 'evaengine';
 
 const {
   EvaEngine,
@@ -45,41 +45,41 @@ const {
   exceptions,
   swagger,
   utils,
-  commands,       // built-in CLI commands
+  commands,       // 内置 CLI 命令
   Joi,
   sequelize
 } = eva;
 ```
 
-Do **not** rely on `import { EvaEngine } from 'evaengine'` — that named export is not provided.
+**不要**依赖 `import { EvaEngine } from 'evaengine'`——该具名导出不存在。
 
 ---
 
-## Mental model
+## 心智模型
 
 ```text
 new EvaEngine(meta, mode?)
-  → base services bound (env, config, logger, namespace, now, event_manager)
-  → bootstrap()                 # web services + middleware providers
+  → 绑定 base 服务（env, config, logger, namespace, now, event_manager）
+  → bootstrap()                 # web 服务 + 中间件 Provider
   → use(...) / registerCommands
   → run() | runHttps() | runCLI() | runCrontab() | runCommand()
 ```
 
-| Mode | Typical flow |
-|------|----------------|
-| `web` (default) | `bootstrap()` → `use()` → `run()` / `runHttps()` |
+| 模式 | 典型流程 |
+|------|----------|
+| `web`（默认） | `bootstrap()` → `use()` → `run()` / `runHttps()` |
 | `cli` | `registerCommands()` → `runCLI()` / `runCrontab()` / `runCommand()` |
 
-**Process-level facts (plan for one engine per process):**
+**进程级事实（按每进程一个 Engine 规划）：**
 
-- `DI` is a **global** container.
-- `EvaEngine.getApp()` is a **module-level** Express app singleton.
-- `bootstrap()` registers **web** service + middleware providers. CLI paths register CLI services inside `getCLI` / `runCrontab`.
-- Built-in `EventManager` is **in-process only** (not a message queue).
+- `DI` 是**全局**容器。
+- `EvaEngine.getApp()` 是**模块级** Express app 单例。
+- `bootstrap()` 注册 **web** 服务与中间件 Provider；CLI 路径在 `getCLI` / `runCrontab` 内注册 CLI 服务。
+- 内置 `EventManager` **仅进程内**（不是消息队列）。
 
 ---
 
-## Quick start
+## 快速开始
 
 ### Web
 
@@ -92,12 +92,12 @@ const { UnauthorizedException } = exceptions;
 const engine = new EvaEngine({
   projectRoot: process.cwd(),
   port: Number(process.env.PORT) || 3000
-  // configPath, sourceRoot optional
+  // configPath、sourceRoot 可选
 });
 
 engine.bootstrap();
 
-// Optional cross-cutting middleware (after bootstrap)
+// 可选横切中间件（须在 bootstrap 之后）
 engine.use(DI.get('trace')());
 // engine.use(DI.get('session')());
 // engine.use(DI.get('auth')());
@@ -130,7 +130,7 @@ await engine.runCLI();
 // node app.js user:create --name=Ada
 ```
 
-### Cron
+### 定时任务
 
 ```js
 import eva from 'evaengine';
@@ -140,11 +140,11 @@ const { EvaEngine } = eva;
 
 const engine = new EvaEngine({ projectRoot: process.cwd() }, 'cli');
 engine.registerCommands([Jobs]);
-// 6-field cron (seconds) when useSeconds default applies via parse; see runCrontab third arg
+// 六段 cron（含秒）等细节见 runCrontab 第三参数 useSeconds
 engine.runCrontab('0/10 * * * * *', 'hello:world --id=EvaEngine');
 ```
 
-### Built-in CLI binary
+### 内置 CLI 二进制
 
 ```bash
 npx engine
@@ -154,14 +154,14 @@ npx engine make:graphql
 npx engine tramp:dump-config
 ```
 
-With Spring Cloud Config (bin only):
+配合 Spring Cloud Config（仅 bin）：
 
-- `SPRING_CONFIG_ENDPOINT` (required to enable)
-- `SPRING_CONFIG_NAME`, `SPRING_CONFIG_PROFILES`, `SPRING_CONFIG_LABEL`
+- `SPRING_CONFIG_ENDPOINT`（设置后启用）
+- `SPRING_CONFIG_NAME`、`SPRING_CONFIG_PROFILES`、`SPRING_CONFIG_LABEL`
 
 ---
 
-## Project layout (recommended)
+## 推荐项目结构
 
 ```text
 project/
@@ -170,9 +170,9 @@ project/
     config.default.cjs
     config.development.cjs
     config.production.cjs
-    config.local.development.cjs   # gitignored overrides
+    config.local.development.cjs   # 本地覆盖，建议 gitignore
   src/
-    app.js              # web entry
+    app.js              # web 入口
     cli.js
     commands/
     entities/
@@ -182,16 +182,16 @@ project/
 
 ---
 
-## Configuration
+## 配置
 
-Files under `{projectRoot}/config` (override with constructor `configPath`), merged in order:
+配置目录为 `{projectRoot}/config`（可用构造参数 `configPath` 覆盖），按以下顺序合并：
 
-1. Engine defaults (shipped inside the package)
+1. 引擎内置默认（随包提供）
 2. `config.default.cjs`
 3. `config.<NODE_ENV>.cjs`
-4. optional `config.local.<NODE_ENV>.cjs` (missing file is ignored)
+4. 可选 `config.local.<NODE_ENV>.cjs`（不存在则忽略）
 
-Use **CommonJS** `.cjs` in config (loaded via `require`).
+配置文件使用 **CommonJS** `.cjs`（经 `require` 加载）。
 
 ```js
 // config/config.default.cjs
@@ -201,7 +201,7 @@ module.exports = {
   cache: { prefix: 'myapp', driver: 'redis' },
   token: {
     secret: process.env.TOKEN_SECRET || '',
-    provider: undefined, // set 'kong' to use Kong JWT + auth middleware
+    provider: undefined, // 设为 'kong' 时使用 Kong JWT 与对应 auth 中间件
     faker: { enable: false, key: 'eva', uid: 1 }
   },
   session: {
@@ -222,35 +222,35 @@ module.exports = {
 };
 ```
 
-Read config at runtime:
+运行时读取：
 
 ```js
 const config = DI.get('config');
 config.get('redis.host');
-config.get(); // whole object
+config.get(); // 完整对象
 ```
 
-### Environment variables
+### 环境变量
 
-| Variable | Role |
-|----------|------|
-| `NODE_ENV` | Selects `config.<env>.cjs` |
-| `PORT` | Common app port (pass into constructor if you use it) |
-| `LOG_LEVEL` | Overrides logger level |
-| `TZ` | Default timezone for moment (`Asia/Shanghai` if unset) |
-| `CLI_NAME` | Logger label in CLI mode |
-| `MAX_REQUEST_DEBUG_BODY` | Debug middleware body limit |
-| `SEQUELIZE_REPLICATION_CONFIG_KEY` | Alternate key under `db` for replication config |
-| `SPRING_CONFIG_*` | Bin remote config (see above) |
+| 变量 | 作用 |
+|------|------|
+| `NODE_ENV` | 选择 `config.<env>.cjs` |
+| `PORT` | 常见应用端口（使用时传入构造参数） |
+| `LOG_LEVEL` | 覆盖日志级别 |
+| `TZ` | moment 默认时区（未设置时为 `Asia/Shanghai`） |
+| `CLI_NAME` | CLI 模式下 logger 标签 |
+| `MAX_REQUEST_DEBUG_BODY` | debug 中间件 body 限制 |
+| `SEQUELIZE_REPLICATION_CONFIG_KEY` | `db` 下 replication 配置的替代键名 |
+| `SPRING_CONFIG_*` | bin 远程配置（见上文） |
 
 ---
 
-## DI & services
+## DI 与服务
 
 ```js
 DI.get('logger').info('hello');
 DI.get('redis').getInstance();
-DI.get('cache'); // cache facade
+DI.get('cache'); // 缓存门面
 DI.get('jwt');
 DI.get('http_client');
 DI.get('rest_client');
@@ -261,13 +261,13 @@ DI.get('env');
 DI.get('validator_base');
 ```
 
-| DI name | Bound in |
-|---------|----------|
-| `env`, `config`, `logger`, `namespace`, `now`, `event_manager` | constructor (base) |
-| `redis`, `cache`, `http_client`, `rest_client`, `validator_base`, `jwt` | `bootstrap()` (web) or CLI run path |
-| Middleware names below | `bootstrap()` |
+| DI 名 | 绑定时机 |
+|-------|----------|
+| `env`、`config`、`logger`、`namespace`、`now`、`event_manager` | 构造时（base） |
+| `redis`、`cache`、`http_client`、`rest_client`、`validator_base`、`jwt` | `bootstrap()`（web）或 CLI 执行路径 |
+| 下文中间件名 | `bootstrap()` |
 
-**Custom provider:**
+**自定义 Provider：**
 
 ```js
 import eva from 'evaengine';
@@ -283,44 +283,44 @@ class MyApiProvider extends ServiceProvider {
 }
 
 engine.registerService(MyApiProvider);
-// or replace whole lists:
+// 或替换整表：
 // EvaEngine.setServiceProvidersForWeb([...EvaEngine.getServiceProvidersForWeb(), MyApiProvider]);
 ```
 
-Testing helpers: `DI.reset()`, `DI.registerMockedProviders(providers, configPath)`, `DI.bindClass` / `bindValue` / `bindMethod`.
+测试辅助：`DI.reset()`、`DI.registerMockedProviders(providers, configPath)`、`DI.bindClass` / `bindValue` / `bindMethod`。
 
 ---
 
-## Middleware
+## 中间件
 
-After `bootstrap()`, factories are bound by name. **Call the factory** (note double invoke where shown):
+`bootstrap()` 之后按名称绑定工厂。**需要调用工厂**（注意部分场景二次调用）：
 
 ```js
 engine.use(DI.get('trace')());
 engine.use(DI.get('session')());
 engine.use(DI.get('auth')());
-// validator is a higher-order factory:
+// validator 是高阶工厂：
 engine.use('/items', DI.get('validator')(() => ({
   query: eva.Joi.object({ page: eva.Joi.number().integer().required() })
 })), handler);
 ```
 
-| Name | Role |
+| 名称 | 作用 |
 |------|------|
-| `session` | `express-session` (Redis store via connect-redis) |
-| `auth` | JWT from `X-Token` or `api_key`, or session `uid`; optional faker token |
-| `trace` | Request tracing (works with namespace) |
-| `validator` | Joi request validation |
-| `view_cache` | Response caching helper |
-| `debug` | Debug output |
+| `session` | `express-session`（经 connect-redis 的 Redis 存储） |
+| `auth` | 从 `X-Token` 或 `api_key` 取 JWT，或 session `uid`；可选 faker token |
+| `trace` | 请求追踪（与 namespace 协作） |
+| `validator` | Joi 请求校验 |
+| `view_cache` | 响应缓存辅助 |
+| `debug` | 调试输出 |
 
-If `config.token.provider === 'kong'`, both `jwt` service and `auth` middleware switch to Kong variants.
+当 `config.token.provider === 'kong'` 时，`jwt` 服务与 `auth` 中间件均切换为 Kong 实现。
 
-Use `wrapper(async (req,res) => …)` so thrown `exceptions.*` reach the default error handler.
+使用 `wrapper(async (req,res) => …)`，以便抛出的 `exceptions.*` 进入默认错误处理器。
 
 ---
 
-## Commands
+## 命令（Command）
 
 ```js
 import eva from 'evaengine';
@@ -342,13 +342,13 @@ export class HelloWorld extends Command {
 }
 ```
 
-Register with `engine.registerCommands(moduleExports)` or arrays of modules. Names come from `getName()`.
+通过 `engine.registerCommands(moduleExports)` 或模块数组注册。名称来自 `getName()`。
 
-Engine APIs: `runCLI()`, `runCommand('name --flag=1')`, `runCrontab(expression, 'name --flag=1', useSeconds?)`, `clearCommands()`, `clearCrontabs()`.
+Engine API：`runCLI()`、`runCommand('name --flag=1')`、`runCrontab(expression, 'name --flag=1', useSeconds?)`、`clearCommands()`、`clearCrontabs()`。
 
 ---
 
-## Entities (Sequelize)
+## 实体（Sequelize）
 
 ```js
 import path from 'path';
@@ -357,14 +357,14 @@ import eva from 'evaengine';
 const { Entities, DI } = eva;
 
 const entities = new Entities(path.join(process.cwd(), 'src/entities'));
-entities.init(); // builds Sequelize from config.db + scans directory
+entities.init(); // 按 config.db 构建 Sequelize 并扫描目录
 
 const User = entities.get('user');
 const all = entities.getAll();
 await entities.getTransaction(async (t) => { /* … */ });
 ```
 
-Entity file (CJS or ESM factory loaded via `require`):
+实体文件（经 `require` 加载的 CJS 或 ESM 工厂）：
 
 ```js
 // src/entities/user.cjs
@@ -377,7 +377,7 @@ module.exports = (sequelize, DataTypes) =>
 
 ---
 
-## Exceptions
+## 异常
 
 ```js
 import eva from 'evaengine';
@@ -389,21 +389,21 @@ const {
   UnauthorizedException,
   ResourceNotFoundException,
   RuntimeException
-  // …see package `exceptions` export
+  // …完整列表见包导出 exceptions
 } = eva.exceptions;
 ```
 
-Default HTTP error handler (installed in `run` / `runHttps`) maps `StandardException` subclasses to JSON + status; production strips stack details.
+默认 HTTP 错误处理器在 `run` / `runHttps` 时挂载：将 `StandardException` 子类映射为 JSON 与状态码；生产环境会剥离 stack 等细节。
 
 ---
 
 ## Swagger
 
-Use `eva.swagger` (`ExSwagger`, annotation helpers) to generate Swagger 2.0 from source comments and models. Wire generation in your app script; UI assets come from `swagger-ui-dist` dependency.
+使用 `eva.swagger`（`ExSwagger`、注解辅助等）从源码注释与模型生成 Swagger 2.0。在应用脚本中自行接入生成流程；UI 资源来自依赖 `swagger-ui-dist`。
 
 ---
 
-## EvaEngine API surface
+## EvaEngine API 一览
 
 ```text
 constructor({ projectRoot, configPath?, sourceRoot?, port?, config?, logger?, namespace? }, mode?='web')
@@ -421,16 +421,16 @@ static get/set BaseServiceProviders | ServiceProvidersForWeb | ServiceProvidersF
 
 ---
 
-## What this is not
+## 本库不是什么
 
-- Not only an Express wrapper — HTTP is one entry
-- Not your domain framework or business rules layer
-- Not a message bus (use a real MQ for reliable delivery)
-- Not a full ORM product — Sequelize integration helpers only
+- 不只是 Express 薄封装——HTTP 只是入口之一
+- 不是业务领域框架或业务规则层
+- 不是消息总线（可靠投递请用真正的 MQ）
+- 不是完整 ORM 产品——仅提供 Sequelize 集成辅助
 
 ---
 
-## Library development (this repo)
+## 本仓库开发
 
 ```bash
 git clone https://github.com/EvaEngine/EvaEngine.js.git
@@ -438,7 +438,7 @@ cd EvaEngine.js
 npm install
 npm run lint
 npm run build
-npm test          # needs Redis on 127.0.0.1:6379 for some tests
+npm test          # 部分测试需要本机 Redis 127.0.0.1:6379
 ```
 
-Release: semantic-release on `main` (Conventional Commits). Maintainer maps live under `docs/` in git only; they are **not** required for npm consumers.
+发版：在 `main` 上由 semantic-release（Conventional Commits）执行——仅发布 npm，不创建 GitHub Release。维护者文档在 git 的 `docs/` 下，**npm 消费方无需阅读**。
