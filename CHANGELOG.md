@@ -1,3 +1,14 @@
+## [1.0.3](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.2...v1.0.3) (2026-08-10)
+
+### Bug Fixes
+
+* bug ([9d67baa](https://github.com/EvaEngine/EvaEngine.js/commit/9d67baab3ba955ab868d73ee4d2f69059db316e6))
+* docs ([8a3d9fa](https://github.com/EvaEngine/EvaEngine.js/commit/8a3d9fad1eee6fbdf55b997695760de66f1d73d7))
+* docs ([5224e8a](https://github.com/EvaEngine/EvaEngine.js/commit/5224e8a7d634a475fc8acf776bb5892ba4763ab0))
+* docs ([63ffba2](https://github.com/EvaEngine/EvaEngine.js/commit/63ffba2827cc526d9cd9221e59fb6502b29435e4))
+* remove deps ([d4be322](https://github.com/EvaEngine/EvaEngine.js/commit/d4be322b27dcc8735474542e1c3b42c0aeeae6d5))
+* remove deps ([2811d03](https://github.com/EvaEngine/EvaEngine.js/commit/2811d03bb3689e6a39718eb36782ad5e5f0b51ff))
+
 ## [1.0.2](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.1...v1.0.2) (2026-08-08)
 
 ### Bug Fixes
