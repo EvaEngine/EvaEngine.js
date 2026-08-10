@@ -4,7 +4,6 @@
   "description": "EvaEngine for Node.js, a micro service development engine",
   "license": "MIT",
   "type": "module",
-  "package-lock": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/EvaEngine/EvaEngine.js.git"
