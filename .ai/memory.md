@@ -9,7 +9,7 @@
 
 ## 当前焦点
 - 进行中：无
-- 下一步：无（README 消费方文档 + ADR 升格 + archive 清理已完成）
+- 下一步：无
 
 ## 雷区与禁忌
 - 全局 DI + 模块级 `app`：多 Engine 并存隔离未保证（Confirmed；ADR-0002）
