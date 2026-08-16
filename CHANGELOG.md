@@ -1,3 +1,9 @@
+## [1.0.6](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.5...v1.0.6) (2026-08-16)
+
+### Bug Fixes
+
+* pass CLI arguments to commands ([3bc4727](https://github.com/EvaEngine/EvaEngine.js/commit/3bc4727b29c4d287bf11f4e33b81ecf0fe88e5a2))
+
 ## [1.0.5](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.4...v1.0.5) (2026-08-10)
 
 ### Bug Fixes
