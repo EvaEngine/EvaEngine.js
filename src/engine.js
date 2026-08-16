@@ -175,7 +175,7 @@ export default class EvaEngine {
       || !{}.hasOwnProperty.call(command, 'getDescription')) {
       throw new RuntimeException('Command require getSpec and getDescription static method');
     }
-    const { argv } = yargs([])
+    const { argv } = yargs(process.argv.slice(2))
       .command(commandName, command.getDescription(), Object.assign({
         verbose: {
           alias: 'v',

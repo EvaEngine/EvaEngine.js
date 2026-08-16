@@ -70,6 +70,43 @@ test('CLI with commands', () => {
   assert.equal(Array.isArray(engine.getCommands()), false);
 });
 
+test('CLI passes command arguments to commands', async () => {
+  class TestCommand extends Command {
+    static getName() {
+      return 'hello:world';
+    }
+
+    static getDescription() {
+      return 'something';
+    }
+
+    static getSpec() {
+      return {
+        storage: { type: 'string' },
+        uri: { type: 'string' }
+      };
+    }
+  }
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot
+  }, 'cli');
+  engine.registerCommands({ test: TestCommand });
+
+  const originalArgv = process.argv;
+  process.argv = ['node', 'cli.js', 'hello:world', '--storage=s3', '--uri=/tmp/source'];
+  try {
+    await engine.runCLI();
+  } finally {
+    process.argv = originalArgv;
+  }
+
+  const argv = engine.getCommand().getArgv();
+  assert.deepEqual(argv._, ['hello:world']);
+  assert.equal(argv.storage, 's3');
+  assert.equal(argv.uri, '/tmp/source');
+});
+
 test('Run commands', async () => {
   class TestCommand extends Command {
     static getName() {
