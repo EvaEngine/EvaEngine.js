@@ -19,6 +19,16 @@ test('Logger init', () => {
   assert.ok(logger.getInstance() instanceof winston.Logger);
   assert.equal(Object.keys(logger.getInstance().transports).length, 2);
 });
+test('Logger interpolates printf placeholders', () => {
+  const logger = new Logger(new Env(), new Config());
+  logger.setLogFile(`${import.meta.dirname}/../_demo_project/logs/placeholder.log`);
+  logger.setLevel('debug');
+  const info = logger.getInstance().format.transform({
+    message: 'Url %s saved to %s',
+    [Symbol.for('splat')]: ['https://example.test', '/tmp/example.html']
+  });
+  assert.equal(info.message, 'Url https://example.test saved to /tmp/example.html');
+});
 after(() => {
   process.env.NODE_ENV = oldEnv;
 });

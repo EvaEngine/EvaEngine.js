@@ -75,6 +75,7 @@ class Logger extends ServiceInterface {
   factory(logPath, key = 'global', level = this.level) {
     const timestamp = () => moment().format();
     return logPath ? winston.createLogger({
+      format: winston.format.splat(),
       transports: [
         new (winston.transports.Console)({
           name: `${key}-console`,
@@ -92,6 +93,7 @@ class Logger extends ServiceInterface {
         })
       ]
     }) : winston.createLogger({
+      format: winston.format.splat(),
       transports: [
         new (winston.transports.Console)({
           name: `${key}-console`,
