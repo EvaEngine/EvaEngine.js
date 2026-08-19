@@ -1,3 +1,9 @@
+## [1.0.7](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.6...v1.0.7) (2026-08-19)
+
+### Bug Fixes
+
+* command cli ([775a532](https://github.com/EvaEngine/EvaEngine.js/commit/775a5326252fad4811266e0ecd7654c2b350522d))
+
 ## [1.0.6](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.5...v1.0.6) (2026-08-16)
 
 ### Bug Fixes
