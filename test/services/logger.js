@@ -28,6 +28,7 @@ test('Logger interpolates printf placeholders', () => {
     [Symbol.for('splat')]: ['https://example.test', '/tmp/example.html']
   });
   assert.equal(info.message, 'Url https://example.test saved to /tmp/example.html');
+  assert.match(info[Symbol.for('message')], /"message":"Url https:\/\/example\.test saved to \/tmp\/example\.html"/);
 });
 after(() => {
   process.env.NODE_ENV = oldEnv;
