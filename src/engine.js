@@ -492,7 +492,7 @@ export default class EvaEngine {
     if (!commandName) {
       this.logger.info('Available commands:');
       Object.entries(this.commands).forEach(([name, commandClass]) => {
-        this.logger.info('-', (`${name}  `).padEnd(30, '-'), commandClass.getDescription());
+        this.logger.info(`- ${(`${name}  `).padEnd(30, '-')} ${commandClass.getDescription()}`);
       });
       return;
     }
