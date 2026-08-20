@@ -31,8 +31,7 @@ export default {
     port: 3306,
     database: '',
     dialectOptions: {
-      multipleStatements: true,
-      timeout: 3
+      multipleStatements: true
     },
     replication: {
       write: {
