@@ -1,3 +1,9 @@
+## [1.0.9](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.8...v1.0.9) (2026-08-19)
+
+### Bug Fixes
+
+* log format ([993d2e8](https://github.com/EvaEngine/EvaEngine.js/commit/993d2e8e1df4a11a3d2cbf09411b04a33c46bf84))
+
 ## [1.0.8](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.7...v1.0.8) (2026-08-19)
 
 ### Bug Fixes
