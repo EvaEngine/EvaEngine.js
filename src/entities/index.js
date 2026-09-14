@@ -53,22 +53,18 @@ export default class Entities {
    * @returns {*}
    */
   static addTracer(options = {}) {
-    const logger = DI.get('logger');
     return Object.assign(options, {
       benchmark: true,
       logging: (...args) => {
         const tracer = DI.get('namespace').get('tracer');
         const [query, cost] = args;
-        let pushed = false;
         if (tracer && cost > 0) {
           tracer.queries.push({
             query,
             cost: cost * 1000,
             finishedAt: getMicroTimestamp()
           });
-          pushed = true;
         }
-        logger.verbose(...args, !pushed ? '| Tracer' : '');
       }
     });
   }
@@ -137,9 +133,13 @@ export default class Entities {
       if (process.env.SEQUELIZE_REPLICATION_CONFIG_KEY) {
         dbConfig.replication = dbConfig[process.env.SEQUELIZE_REPLICATION_CONFIG_KEY];
       }
+      const sequelizeOptions = Object.assign({}, config.sequelize, dbConfig);
+      if (sequelizeOptions.logging !== false) {
+        Object.assign(sequelizeOptions, Entities.addTracer());
+      }
       this.sequelize = new Sequelize(
         config.db.database, null, null,
-        Object.assign({}, config.sequelize, dbConfig, Entities.addTracer())
+        sequelizeOptions
       );
     } else {
       this.sequelize = typeof this.sequelize === 'function' ? this.sequelize() : this.sequelize;
@@ -148,8 +148,7 @@ export default class Entities {
     this.scan(this.entitiesPath, withAssociate);
     this.scanned = true;
 
-    //TODO: mask password in logging
-    logger.debug('Entities init by scanned %s, Replication: %j', this.entitiesPath, this.sequelize.options.replication);
+    logger.debug('Entities init by scanned %s', this.entitiesPath);
     return this;
   }
 

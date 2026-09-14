@@ -113,8 +113,8 @@ export default class EvaEngine {
     this.logger = logger || DI.get('logger');
     this.config = config || DI.get('config');
     this.namespace = namespace || DI.get('namespace');
-    this.logger.info('Engine started, Meta:', this.meta);
-    this.logger.debug('Engine config files loaded:', this.config.getMergedFiles());
+    this.logger.info('Engine started, Meta: %j', this.meta);
+    this.logger.debug('Engine config files loaded: %j', this.config.getMergedFiles());
   }
 
   /**
@@ -157,7 +157,7 @@ export default class EvaEngine {
       throw new RuntimeException('No command registered yet');
     }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
-    this.logger.debug('Bound services', Object.keys(DI.getBound()));
+    this.logger.debug('Bound services %j', Object.keys(DI.getBound()));
     const [, , commandNameFromArgv] = process.argv;
 
     const commandName = commandNameInput || commandNameFromArgv;
@@ -281,7 +281,7 @@ export default class EvaEngine {
     } else {
       registerCommandClass(commands);
     }
-    this.logger.debug('Registered commands', Object.keys(this.commands));
+    this.logger.debug('Registered commands %j', Object.keys(this.commands));
     return this;
   }
 
@@ -334,7 +334,7 @@ export default class EvaEngine {
       ((err, req, res, next) => { //eslint-disable-line no-unused-vars
         let exception = err;
         if (!(err instanceof Error)) {
-          this.logger.error(req.method, req.originalUrl || req.url, '|', exception);
+          this.logger.error('%s %s | %o', req.method, req.originalUrl || req.url, exception);
           exception = (new RuntimeException('Unknown error')).setPrevError(err);
         }
         if (!(exception instanceof StandardException)) {
@@ -343,10 +343,12 @@ export default class EvaEngine {
         if (exception instanceof RuntimeException) {
           //TODO: report to sentry
           //TODO: with req & res
-          this.logger.error(req.method, req.originalUrl || req.url, '|', exception);
+          this.logger.error('%s %s | %o', req.method, req.originalUrl || req.url, exception);
         } else {
           this.logger.warn(
-            req.method, req.originalUrl || req.url, '|',
+            '%s %s | %o',
+            req.method,
+            req.originalUrl || req.url,
             exception.getImportance() > 0 ? exception : exception.message
           );
         }
@@ -388,7 +390,7 @@ export default class EvaEngine {
           killTimer.unref();
           this.server.close();
         } catch (e) {
-          this.logger.error('Error when exit', e.stack);
+          this.logger.error('Error when exit %s', e.stack);
         }
       });
   }
@@ -422,11 +424,11 @@ export default class EvaEngine {
         // handle specific listen errors with friendly messages
         switch (error.code) {
           case 'EACCES':
-            this.logger.error(bind, 'requires elevated privileges');
+            this.logger.error('%s requires elevated privileges', bind);
             process.exit(1);
             break;
           case 'EADDRINUSE':
-            this.logger.error(bind, 'is already in use');
+            this.logger.error('%s is already in use', bind);
             process.exit(1);
             break;
           default:
@@ -441,8 +443,8 @@ export default class EvaEngine {
   bootstrap() {
     this.registerServiceProviders(EvaEngine.getServiceProvidersForWeb());
     this.registerServiceProviders(EvaEngine.getMiddlewareProviders());
-    this.logger.info('Engine bootstrapped under env', DI.get('env').get());
-    this.logger.debug('Bound services', Object.keys(DI.getBound()));
+    this.logger.info('Engine bootstrapped under env %s', DI.get('env').get());
+    this.logger.debug('Bound services %j', Object.keys(DI.getBound()));
     return this;
   }
 
@@ -460,7 +462,7 @@ export default class EvaEngine {
     this.server = http.createServer(EvaEngine.getApp());
     this.server.listen(port || this.port);
     this.server.on('error', this.getServerErrorHandler());
-    this.logger.info('Engine running http server by listening', this.port);
+    this.logger.info('Engine running http server by listening on %s', this.port);
     return this;
   }
 
@@ -474,7 +476,7 @@ export default class EvaEngine {
     this.server = https.createServer(options, EvaEngine.getApp());
     this.server.listen(port || this.port);
     this.server.on('error', this.getServerErrorHandler());
-    this.logger.info('Engine running http server by listening', this.port);
+    this.logger.info('Engine running http server by listening on %s', this.port);
     return this;
   }
 
@@ -497,8 +499,8 @@ export default class EvaEngine {
       return;
     }
 
-    this.logger.debug('Start run command', commandName);
-    this.logger.debug('Received arguments', argv);
+    this.logger.debug('Start run command %s', commandName);
+    this.logger.debug('Received arguments %j', argv);
     const CommandClass = this.commands[commandName];
     this.command = new CommandClass(argv);
     await this.command.run();
@@ -515,7 +517,7 @@ export default class EvaEngine {
       throw new RuntimeException('No command registered yet');
     }
     this.registerServiceProviders(EvaEngine.getServiceProvidersForCLI());
-    this.logger.debug('Bound services', Object.keys(DI.getBound()));
+    this.logger.debug('Bound services %j', Object.keys(DI.getBound()));
     //Cron jobs run in local time, matching the previous later.date.localTime() default
     this.logger.info('Cron job using %s Timezone', 'Local');
     const [commandName, ...options] = commandString.split(' ');

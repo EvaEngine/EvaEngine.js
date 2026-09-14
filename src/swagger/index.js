@@ -549,14 +549,15 @@ export class ExSwagger {
       );
       Object.assign(exceptions, exceptionsInFile);
       this.logger.debug(
-        'Scanner found %s exceptions',
-        Object.keys(exceptions).length, Object.keys(exceptions)
+        'Scanner found %s exceptions: %j',
+        Object.keys(exceptions).length,
+        Object.keys(exceptions)
       );
     }
     const modelDefinitions = this.models ?
       ExSwagger.modelsToSwaggerDefinitions(this.models, this.modelBlacklist) : new Map();
     const swaggerDocs = ExSwagger.mergeAll(template, fragments, exceptions, modelDefinitions);
-    this.logger.debug('Export to', dist);
+    this.logger.debug('Export to %s', dist);
     await fs.writeFileSync(dist, JSON.stringify(swaggerDocs));
     return swaggerDocs;
   }

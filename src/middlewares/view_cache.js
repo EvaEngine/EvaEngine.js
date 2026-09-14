@@ -113,7 +113,7 @@ function ViewCacheMiddleware(cache, logger) {
           headersFilter(res) : defaultHeadersFilter(res);
         if (res.statusCode <= 500) {
           cache.namespace(namespace).set(cacheKey, { headers, body }, ttl).catch((e) => {
-            logger.error('View cache set failed for %s', cacheKey, e);
+            logger.error('View cache set failed for %s: %o', cacheKey, e);
           });
         }
       };

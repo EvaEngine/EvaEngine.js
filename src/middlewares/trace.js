@@ -232,7 +232,7 @@ function TraceMiddleware(ns, config, logger, client) {
         method: 'POST',
         json: zipkins
       }).catch((e) => {
-        logger.error('Error happened on sending tracing data', e);
+        logger.error('Error happened on sending tracing data: %o', e);
       });
     };
 
