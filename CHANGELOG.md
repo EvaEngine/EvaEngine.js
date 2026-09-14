@@ -1,3 +1,9 @@
+## [1.0.11](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.10...v1.0.11) (2026-09-14)
+
+### Bug Fixes
+
+* normalize logger arguments ([9fd0217](https://github.com/EvaEngine/EvaEngine.js/commit/9fd0217bed492db5707aea8612331aae7fea1d52))
+
 ## [1.0.10](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.9...v1.0.10) (2026-08-20)
 
 ### Bug Fixes
