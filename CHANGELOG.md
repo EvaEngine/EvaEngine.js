@@ -1,3 +1,9 @@
+## [1.0.12](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.11...v1.0.12) (2026-09-28)
+
+### Bug Fixes
+
+* **deps:** update vulnerable dependency resolutions ([3d6ec25](https://github.com/EvaEngine/EvaEngine.js/commit/3d6ec25a82840fd5a7fe7dd9927d2d36d449404f))
+
 ## [1.0.11](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.10...v1.0.11) (2026-09-14)
 
 ### Bug Fixes
