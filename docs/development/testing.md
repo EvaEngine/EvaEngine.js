@@ -12,6 +12,8 @@
 ## Bootstrap
 `test/bootstrap.js`：`DI.registerMockedProviders` 全部 service providers，config 指向 `test/_demo_project/config`。并 patch `util.isFunction` 兼容。
 
+本地完整测试需要可访问的 Redis（默认 `127.0.0.1:6379`）；CI 的测试依赖来源见 `.github/workflows/ci.yml`。不要以跳过 Redis 相关测试来替代环境准备。
+
 ## 布局
 - 与源码对应：`test/di.js`、`engine.js`、`services/*`、`middlewares/*`、`utils/*`、`entities`、`exceptions`、`swagger`、`commands`
 - 夹具：`test/_demo_project`、`test/swagger/_example`、`test/_helpers`

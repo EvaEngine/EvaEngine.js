@@ -26,6 +26,7 @@ Express 中间件工厂 + Middleware Providers（`DI.bindMethod`）。由 engine
 ## 雷区
 - Auth faker：`token.faker.enable` + key/uid（仅显式配置时）
 - 多实现切换必须与 services 侧 JWT Provider 一致
+- `session` 中间件当前读取根配置的 `cookie`，而内置默认把 cookie 选项置于 `session.cookie`；改内置默认或消费方 session 配置时，核对 `src/middlewares/session.js` 与 `src/config/index.js` 的实际键路径，避免把 cookie 选项放到不会被读取的位置。
 
 ## 相关
 - 测试：`test/middlewares/*`（security/trace/view_cache）
