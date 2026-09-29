@@ -1,3 +1,9 @@
+## [1.0.13](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.12...v1.0.13) (2026-09-29)
+
+### Bug Fixes
+
+* **deps:** bump js-yaml to 5.4.2 ([11ade08](https://github.com/EvaEngine/EvaEngine.js/commit/11ade08e4c5b17896df4475eaa3ea774408e7bb8))
+
 ## [1.0.12](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.11...v1.0.12) (2026-09-28)
 
 ### Bug Fixes
