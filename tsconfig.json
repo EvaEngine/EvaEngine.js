@@ -9,8 +9,8 @@
     "noFallthroughCasesInSwitch": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "allowJs": true,
-    "checkJs": false,
+    "erasableSyntaxOnly": true,
+    "rewriteRelativeImportExtensions": true,
     "skipLibCheck": true,
     "types": ["node"],
     "noEmit": true

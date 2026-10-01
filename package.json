@@ -9,9 +9,9 @@
     "url": "https://github.com/EvaEngine/EvaEngine.js.git"
   },
   "scripts": {
-    "prestart": "node src/index.js",
+    "prestart": "node src/index.ts",
     "prepublish": "npm run test",
-    "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.js --test --test-concurrency=1 --experimental-test-coverage \"test/di.js\" \"test/engine.js\" \"test/error_handlers.js\" \"test/index.js\" \"test/exceptions/index.js\" \"test/entities/index.js\" \"test/commands/make_entity.js\" \"test/middlewares/*.js\" \"test/services/*.js\" \"test/swagger/index.js\" \"test/utils/*.js\"",
+    "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.ts --test --test-concurrency=1 --experimental-test-coverage \"test/di.ts\" \"test/engine.ts\" \"test/error_handlers.ts\" \"test/index.ts\" \"test/exceptions/index.ts\" \"test/entities/index.ts\" \"test/commands/make_entity.ts\" \"test/middlewares/*.ts\" \"test/services/*.ts\" \"test/swagger/index.ts\" \"test/utils/*.ts\"",
     "lint": "eslint src test index.js",
     "build": "node --check src/index.js",
     "ci:check": "npm run lint && npm run build",
