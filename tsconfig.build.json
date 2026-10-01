@@ -2,12 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
-    "allowJs": false,
     "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
     "incremental": true,
-    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "tsBuildInfoFile": "node_modules/.cache/evaengine.tsbuildinfo",
     "outDir": "dist",
     "rootDir": "src"
   },

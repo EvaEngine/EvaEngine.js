@@ -9,14 +9,14 @@
     "url": "https://github.com/EvaEngine/EvaEngine.js.git"
   },
   "scripts": {
-    "prestart": "node src/index.ts",
     "prepublish": "npm run test",
     "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.ts --test --test-concurrency=1 --experimental-test-coverage \"test/di.ts\" \"test/engine.ts\" \"test/error_handlers.ts\" \"test/index.ts\" \"test/exceptions/index.ts\" \"test/entities/index.ts\" \"test/commands/make_entity.ts\" \"test/middlewares/*.ts\" \"test/services/*.ts\" \"test/swagger/index.ts\" \"test/utils/*.ts\"",
-    "lint": "eslint src test index.js",
-    "build": "node --check src/index.js",
+    "lint": "eslint src test",
+    "build": "tsc -p tsconfig.build.json && node scripts/rewrite-dts.mjs",
     "ci:check": "npm run lint && npm run build",
     "semantic-release": "semantic-release",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "prestart": "node src/index.ts"
   },
   "engines": {
     "node": ">=24.0.0"
@@ -28,7 +28,7 @@
     "micro service",
     "orm"
   ],
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "bin": {
     "engine": "./bin/engine"
   },
@@ -89,5 +89,6 @@
     "uuid": "^11.1.1",
     "undici@^6.0.0": "^6.29.0",
     "undici@^7.0.0": "^7.29.1"
-  }
+  },
+  "types": "dist/index.d.ts"
 }

@@ -45,3 +45,5 @@ src/config/sequelize.json
 lib/*
 .nyc_output
 yarn.lock
+# TypeScript build output
+dist
