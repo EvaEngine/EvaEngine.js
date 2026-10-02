@@ -21,13 +21,13 @@
   → run() | runHttps() | runCLI() | runCrontab() | runCommand()
 ```
 
-Package 入口：`index.js` → `src/index.js`（`main`: `src/index.js`）。CLI bin：`bin/engine`。
+Package 入口：`src/index.ts` → tsc 编译为 `dist/index.js`（`main`/`types`: `dist/index.js` / `dist/index.d.ts`）。CLI bin：`bin/engine`（shim → `dist/bin.js`，实现 `src/bin.ts`）。
 
 ### 关键结构
 | 路径 | 角色 |
 |---|---|
-| `src/engine.js` | Runtime 中枢 |
-| `src/di.js` | 全局 DI（constitute） |
+| `src/engine.ts` | Runtime 中枢 |
+| `src/di.ts` | 全局 DI（constitute） |
 | `src/services/` | 能力实现 + `providers.js` |
 | `src/middlewares/` | HTTP 横切 + `providers.js` |
 | `src/commands/` | Command 基类与内置命令 |

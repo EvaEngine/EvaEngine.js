@@ -37,6 +37,8 @@
   ],
   "author": "AlloVince",
   "dependencies": {
+    "@types/express": "^5.0.6",
+    "@types/lodash": "^4.17.25",
     "acorn": "^8.18.0",
     "app-root-path": "^3.1.0",
     "cloud-config-client": "^1.6.2",
@@ -67,9 +69,7 @@
     "@semantic-release/git": "^10.0.0",
     "@semantic-release/npm": "^13.0.0",
     "@semantic-release/release-notes-generator": "^14.0.0",
-    "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",
-    "@types/lodash": "^4.17.25",
     "@types/moment-timezone": "^0.5.13",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.19.0",

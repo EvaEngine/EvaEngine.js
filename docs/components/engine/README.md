@@ -35,5 +35,5 @@ DI、services/providers、middlewares/providers、exceptions、utils/cron、expr
 - TZ 在模块加载时设置
 
 ## 相关代码
-- `src/engine.js`、`src/index.js`、`bin/engine`
+- `src/engine.ts`、`src/index.ts`、`bin/engine`（shim，实现 `src/bin.ts`）
 - 测试：`test/engine.js`、`test/error_handlers.js`

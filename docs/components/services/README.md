@@ -29,8 +29,8 @@
 
 ## 主要路径
 - 实现：`src/services/*.js`
-- 装配：`src/services/providers.js`
-- 导出集合：`src/services/index.js`（不含 Kong JWT、providers）
+- 装配：`src/services/providers.ts`
+- 导出集合：`src/services/index.ts`（不含 Kong JWT、providers）
 - 基类：`ServiceInterface`（`getProto()`）
 
 ## Config 要点

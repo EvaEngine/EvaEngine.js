@@ -25,5 +25,5 @@ Sequelize、DI(config/logger/namespace)、exceptions、utils 时间戳；`create
 - uniqueInsert 仅允许有限值类型
 
 ## 相关
-- `src/entities/index.js`
+- `src/entities/index.ts`
 - 测试：`test/entities/index.js`、夹具 `test/_demo_project/entities`

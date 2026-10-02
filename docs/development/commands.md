@@ -6,10 +6,10 @@
 ## npm scripts
 | 命令 | 作用 |
 |---|---|
-| `npm run lint` | ESLint：`src` `test` `index.js` |
-| `npm run build` | 语法检查 `src/index.js` |
+| `npm run lint` | ESLint（typescript-eslint）：`src` `test` |
+| `npm run build` | tsc 编译 `dist/` 并生成声明文件（`scripts/rewrite-dts.mjs` 后处理） |
 | `npm run ci:check` | lint + build |
-| `npm test` | node:test，concurrency=1，含 coverage 实验旗标 |
+| `npm test` | node:test 原生运行 .ts 用例，concurrency=1，含 coverage 实验旗标 |
 | `npm run release` / `semantic-release` | 发版（CI 主用） |
 
 ## Make

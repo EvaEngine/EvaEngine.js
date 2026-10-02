@@ -11,7 +11,7 @@
 - 解析失败有 `AcornParsingException` / `YamlParsingException`
 
 ## 主要导出
-`Fragment`、`Annotation`、`AnnotationsContainer`、`ExSwagger`、`MODEL_TO_FRAGMENT_TYPES_MAPPING` 等（`src/swagger/index.js`）
+`Fragment`、`Annotation`、`AnnotationsContainer`、`ExSwagger`、`MODEL_TO_FRAGMENT_TYPES_MAPPING` 等（`src/swagger/index.ts`）
 
 ## 雷区
 - 注释格式与文件扫描路径敏感；改解析需对照 `test/swagger`

@@ -6,7 +6,7 @@
 ## 职责
 无/弱状态工具集，供 engine、services、应用复用。
 
-## 主要成员（`src/utils/index.js` 导出）
+## 主要成员（`src/utils/index.ts` 导出）
 - `wrapper`：async 中间件错误转发
 - `pagination` / `paginationFilter`
 - `cron`（engine 直接自 `cron.js` import：`parseCron`、`setCronInterval`）

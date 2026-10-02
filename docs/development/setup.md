@@ -23,9 +23,9 @@ npm test
 ```
 
 ## 项目形态
-- ESM 库；`main`: `src/index.js`；根 `index.js` re-export
-- 无独立 transpile 构建；`build` = `node --check src/index.js`
-- 编辑器：`.editorconfig`；ESLint flat：`eslint.config.js`
+- ESM 库；源码为严格 TypeScript（`src/**/*.ts`，仅可擦除语法）；`main`/`types`: `dist/index.js` / `dist/index.d.ts`（tsc 编译产物）
+- 开发态零构建：Node ≥24 原生 type stripping 直接运行 .ts（无 tsx）；`build` = `tsc -p tsconfig.build.json` + `scripts/rewrite-dts.mjs`（声明文件说明符改写、ambient 类型随包）
+- 编辑器：`.editorconfig`；ESLint flat：`eslint.config.js`（typescript-eslint）
 
 ## 相关
 - `commands.md`、`testing.md`

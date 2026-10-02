@@ -22,6 +22,8 @@
 npm install evaengine
 ```
 
+本包源码为 TypeScript，npm 发布 `dist/` 编译产物并自带 `.d.ts` 类型声明（`@types/express`、`@types/lodash` 随 dependencies 自动安装，严格模式下类型开箱即用）；上述导入契约不受影响。
+
 可选脚手架：[EvaSkeleton.js](https://github.com/EvaEngine/EvaSkeleton.js)。
 
 ## 导入方式（重要）
@@ -440,5 +442,7 @@ npm run lint
 npm run build
 npm test          # 部分测试需要本机 Redis 127.0.0.1:6379
 ```
+
+仓库源码为严格 TypeScript（仅可擦除语法），Node ≥24 原生直接运行 `src/**/*.ts`，日常开发无转译步骤；`npm run build` 用 tsc 编译发布产物 `dist/` 并生成声明文件。本地 CLI 可直接 `node src/bin.ts`，或先 build 后走 `./bin/engine`（shim → `dist/bin.js`）。
 
 发版：在 `main` 上由 semantic-release（Conventional Commits）执行——仅发布 npm，不创建 GitHub Release。维护者文档在 git 的 `docs/` 下，**npm 消费方无需阅读**。
