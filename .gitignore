@@ -50,3 +50,6 @@ dist
 
 # ZCode session-local artifacts
 .zcode/
+
+# Redis dump files
+*.rdb
