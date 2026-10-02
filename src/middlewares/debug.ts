@@ -1,6 +1,6 @@
+import { Dependencies } from '../di.ts';
 import morgan from 'morgan';
 import os from 'os';
-import constitute from 'constitute';
 import Logger from '../services/logger.ts';
 import type { Request, Response } from 'express';
 
@@ -80,5 +80,5 @@ function DebugMiddleware(logger: Logger) {
     );
 }
 
-constitute.Dependencies(Logger)(DebugMiddleware);
+Dependencies(Logger)(DebugMiddleware);
 export default DebugMiddleware;

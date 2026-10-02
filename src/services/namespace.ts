@@ -1,5 +1,4 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import constitute from 'constitute';
 import Config from './config.ts';
 import { OperationUnsupportedException } from '../exceptions/index.ts';
 import ServiceInterface from './interface.ts';
@@ -139,6 +138,8 @@ class Namespace extends ServiceInterface {
   store: Store | null;
   name: string | null;
 
+  static dependencies = [Config];
+
   constructor(config: Config) {
     super();
     this.config = config.get('namespace') as NamespaceConfig;
@@ -216,5 +217,4 @@ class Namespace extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Config)(Namespace);
 export default Namespace;

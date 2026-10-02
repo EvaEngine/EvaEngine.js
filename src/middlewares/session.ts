@@ -1,7 +1,6 @@
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
-import constitute from 'constitute';
-import DI from '../di.ts';
+import DI, { Dependencies } from '../di.ts';
 import Config from '../services/config.ts';
 import Redis from '../services/redis.ts';
 import type { RequestHandler } from 'express';
@@ -53,6 +52,6 @@ function SessionMiddleware(_config: Config, redis: Redis) {
     return middleware;
   };
 }
-constitute.Dependencies(Config, Redis)(SessionMiddleware);
+Dependencies(Config, Redis)(SessionMiddleware);
 
 export default SessionMiddleware;

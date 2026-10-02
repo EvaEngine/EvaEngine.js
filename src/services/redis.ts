@@ -1,6 +1,5 @@
 import Ioredis from 'ioredis';
 import type { Redis as RedisClient, RedisOptions } from 'ioredis';
-import constitute from 'constitute';
 import DI from '../di.ts';
 import Config from './config.ts';
 import ServiceInterface from './interface.ts';
@@ -14,6 +13,8 @@ class Redis extends ServiceInterface {
   config: Config;
   options: RedisOptions | null;
   client: RedisClient | null;
+
+  static dependencies = [Config];
 
   constructor(config: Config) {
     super();
@@ -62,5 +63,4 @@ class Redis extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Config)(Redis);
 export default Redis;

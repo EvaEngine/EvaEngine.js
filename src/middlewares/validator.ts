@@ -1,5 +1,5 @@
+import { Dependencies } from '../di.ts';
 import Joi from 'joi';
-import constitute from 'constitute';
 import wrapper from '../utils/wrapper.ts';
 import { FormInvalidateException } from '../exceptions/index.ts';
 import ValidatorBase from '../services/joi.ts';
@@ -51,6 +51,6 @@ function ValidatorMiddleware(validatorBase: ValidatorBase) {
     });
 }
 
-constitute.Dependencies(ValidatorBase)(ValidatorMiddleware);
+Dependencies(ValidatorBase)(ValidatorMiddleware);
 
 export default ValidatorMiddleware;

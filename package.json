@@ -43,7 +43,6 @@
     "@types/lodash": "^4.17.25",
     "acorn": "^8.18.0",
     "connect-redis": "^10.0.0",
-    "constitute": "^1.6.2",
     "doctrine": "^3.0.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",

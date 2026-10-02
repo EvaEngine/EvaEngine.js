@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import HttpClient from './http_client.ts';
 import Namespace from './namespace.ts';
 import { RestServiceLogicException, RestServiceIOException } from '../exceptions/index.ts';
@@ -15,6 +14,8 @@ class RestClient extends ServiceInterface {
   client: HttpClient;
   ns: Namespace;
   baseUrl: string | null;
+
+  static dependencies = [HttpClient, Namespace];
 
   constructor(client: HttpClient, ns: Namespace) {
     super();
@@ -115,5 +116,4 @@ class RestClient extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(HttpClient, Namespace)(RestClient);
 export default RestClient;

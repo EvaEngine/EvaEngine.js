@@ -27,7 +27,7 @@ Package 入口：`src/index.ts` → tsc 编译为 `dist/index.js`（`main`/`type
 | 路径 | 角色 |
 |---|---|
 | `src/engine.ts` | Runtime 中枢 |
-| `src/di.ts` | 全局 DI（constitute） |
+| `src/di.ts` | 全局 DI（内置原生容器） |
 | `src/services/` | 能力实现 + `providers.js` |
 | `src/middlewares/` | HTTP 横切 + `providers.js` |
 | `src/commands/` | Command 基类与内置命令 |
@@ -44,7 +44,7 @@ Package 入口：`src/index.ts` → tsc 编译为 `dist/index.js`（`main`/`type
 - `cli`：构造时 mode=`cli`；CLI providers 在执行命令路径注册
 
 ### 栈（事实）
-Node ≥24 ESM · Express 5 · constitute · Sequelize 6 · Joi · ioredis · Winston · yargs · moment-timezone · swagger-ui-dist
+Node ≥24 ESM · Express 5 · Sequelize 6 · Joi · ioredis · Winston · yargs · moment-timezone · swagger-ui-dist
 
 ### 数据流摘要
 - **配置**：内置默认 ← `config.default.cjs` ← `config.<NODE_ENV>.cjs` ← 可选 local

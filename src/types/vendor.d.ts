@@ -4,23 +4,6 @@
  * when upgrading these dependencies.
  */
 
-declare module 'constitute' {
-  export class Container {
-    constitute<T = unknown>(target: unknown): T;
-    bindClass(target: unknown, ...args: unknown[]): unknown;
-    bindValue(target: unknown, ...args: unknown[]): unknown;
-    bindMethod(target: unknown, ...args: unknown[]): unknown;
-  }
-  export function Dependencies(
-    ...dependencies: unknown[]
-  ): <T>(target: T) => T;
-  const constitute: {
-    Container: typeof Container;
-    Dependencies: typeof Dependencies;
-  };
-  export default constitute;
-}
-
 declare module 'doctrine' {
   export interface AnnotationTag {
     title: string;

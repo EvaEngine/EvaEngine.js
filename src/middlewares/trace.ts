@@ -1,4 +1,4 @@
-import constitute from 'constitute';
+import { Dependencies } from '../di.ts';
 import { randomString, getHostFullUrl, getHostPort, getHostIp, getMicroTimestamp } from '../utils/index.ts';
 import Namespace from '../services/namespace.ts';
 import Config from '../services/config.ts';
@@ -302,6 +302,6 @@ function TraceMiddleware(ns: Namespace, config: Config, logger: Logger, client: 
   };
 }
 
-constitute.Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware);
+Dependencies(Namespace, Config, Logger, HttpClient)(TraceMiddleware);
 
 export default TraceMiddleware;

@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import moment from 'moment-timezone';
 import { getTimestamp, getDatabaseDatetime } from '../utils/datetime.ts';
 import Logger from './logger.ts';
@@ -7,6 +6,8 @@ import ServiceInterface from './interface.ts';
 class Now extends ServiceInterface {
   logger: Logger;
   now: number | null;
+
+  static dependencies = [Logger];
 
   constructor(logger: Logger) {
     super();
@@ -44,5 +45,4 @@ class Now extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Logger)(Now);
 export default Now;

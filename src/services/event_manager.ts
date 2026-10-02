@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import EventEmitter from 'events';
 import camelCase from 'lodash/camelCase.js';
 import { RuntimeException } from '../exceptions/index.ts';
@@ -20,6 +19,8 @@ class EventManager extends ServiceInterface {
   logger: Logger;
   emitter: EventEmitter;
   events: Set<string>;
+
+  static dependencies = [Logger];
 
   constructor(logger: Logger) {
     super();
@@ -87,5 +88,4 @@ class EventManager extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Logger)(EventManager);
 export default EventManager;

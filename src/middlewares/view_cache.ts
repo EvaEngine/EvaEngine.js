@@ -1,4 +1,4 @@
-import constitute from 'constitute';
+import { Dependencies } from '../di.ts';
 import crypto from 'crypto';
 import moment from 'moment-timezone';
 import Logger from '../services/logger.ts';
@@ -126,6 +126,6 @@ function ViewCacheMiddleware(cache: Cache, logger: Logger) {
   };
 }
 
-constitute.Dependencies(Cache, Logger)(ViewCacheMiddleware);
+Dependencies(Cache, Logger)(ViewCacheMiddleware);
 
 export default ViewCacheMiddleware;

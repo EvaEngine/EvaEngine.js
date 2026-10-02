@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import { OperationUnsupportedException } from '../exceptions/index.ts';
 import Redis from './redis.ts';
 import DI from '../di.ts';
@@ -195,6 +194,8 @@ class Cache extends ServiceInterface {
   driver: string | undefined;
   store: Store | null;
 
+  static dependencies = [Config, Redis];
+
   constructor(config: Config) {
     super();
     this.config = config.get('cache') as CacheConfig;
@@ -250,5 +251,4 @@ class Cache extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Config, Redis)(Cache);
 export default Cache;

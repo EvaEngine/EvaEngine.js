@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import sequelize from 'sequelize';
 import Joi from 'joi';
 import EvaEngine, * as engine from './engine.ts';
@@ -34,7 +33,6 @@ const core = {
   commands,
   dependencies: {
     Joi,
-    constitute,
     sequelize
   },
   exceptions,

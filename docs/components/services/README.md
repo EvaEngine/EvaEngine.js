@@ -39,7 +39,7 @@
 ## 雷区
 - Logger 标签：web 用 `web{port}`，cli 用 `CLI_NAME` 或 `cli`
 - Redis `lazyConnect` 等来自配置；`cleanup`/`isConnected` 供退出
-- constitute `Dependencies` 装饰在类上（如 Config←Env）
+- 依赖声明在目标上：类用 `static dependencies`（如 Config←Env），函数工厂用 `Dependencies(...)(fn)`
 
 ## 相关
 - 测试：`test/services/*`

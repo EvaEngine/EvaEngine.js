@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import moment from 'moment-timezone';
 import winston from 'winston';
 import { inspect } from 'util';
@@ -16,6 +15,8 @@ class Logger extends ServiceInterface {
   instance: winston.Logger | null;
   label: string | null;
   logfile: string | null;
+
+  static dependencies = [Env, Config, Namespace];
 
   constructor(env: Env, config: Config, namespace: Namespace) {
     super();
@@ -140,5 +141,4 @@ class Logger extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Env, Config, Namespace)(Logger);
 export default Logger;

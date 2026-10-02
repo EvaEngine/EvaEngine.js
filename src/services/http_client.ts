@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import Config from './config.ts';
 import Logger from './logger.ts';
 import { createRequestClient } from '../utils/request_client.ts';
@@ -33,6 +32,8 @@ interface ResponseDump {
 class HttpClient extends ServiceInterface {
   config: object;
   client: ReturnType<typeof createRequestClient>;
+
+  static dependencies = [Config, Logger];
 
   constructor(config: Config, logger: Logger) {
     super();
@@ -89,5 +90,4 @@ class HttpClient extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Config, Logger)(HttpClient);
 export default HttpClient;

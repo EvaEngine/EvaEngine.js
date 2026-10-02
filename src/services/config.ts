@@ -1,7 +1,6 @@
 import get from 'lodash/get.js';
 import merge from 'lodash/merge.js';
 import { createRequire } from 'module';
-import constitute from 'constitute';
 import Env from './env.ts';
 import EngineConfig from '../config/index.ts';
 import ServiceInterface from './interface.ts';
@@ -13,6 +12,8 @@ class Config extends ServiceInterface {
   path: string | null | undefined;
   mergedFiles: string[];
   config: object | null;
+
+  static dependencies = [Env];
 
   constructor(env: Env) {
     super();
@@ -76,5 +77,4 @@ class Config extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Env)(Config);
 export default Config;

@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import * as jwt from '../utils/jwt.ts';
 import get from 'lodash/get.js';
 
@@ -15,6 +14,8 @@ interface KongTokenConfig {
 class KongJsonWebToken extends ServiceInterface {
   restClient: RestClient;
   config: KongTokenConfig;
+
+  static dependencies = [Config, RestClient];
 
   constructor(config: Config, restClient: RestClient) {
     super();
@@ -75,5 +76,4 @@ class KongJsonWebToken extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Config, RestClient)(KongJsonWebToken);
 export default KongJsonWebToken;

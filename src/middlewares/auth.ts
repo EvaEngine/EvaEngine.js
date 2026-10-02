@@ -1,4 +1,4 @@
-import constitute from 'constitute';
+import { Dependencies } from '../di.ts';
 import wrapper from '../utils/wrapper.ts';
 import { UnauthorizedException } from '../exceptions/index.ts';
 import Config from '../services/config.ts';
@@ -69,5 +69,5 @@ function AuthMiddleware(_config: Config, token: JsonWebToken, now: Now) {
     throw new UnauthorizedException('No authority token found');
   });
 }
-constitute.Dependencies(Config, JsonWebToken, Now)(AuthMiddleware);
+Dependencies(Config, JsonWebToken, Now)(AuthMiddleware);
 export default AuthMiddleware;

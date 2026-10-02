@@ -1,4 +1,3 @@
-import constitute from 'constitute';
 import * as jwt from '../utils/jwt.ts';
 import Config from './config.ts';
 import Redis from './redis.ts';
@@ -13,6 +12,8 @@ interface TokenConfig {
 class JsonWebToken extends ServiceInterface {
   redis: RedisClient;
   config: TokenConfig;
+
+  static dependencies = [Config, Redis];
 
   constructor(config: Config, redis: Redis) {
     super();
@@ -90,5 +91,4 @@ class JsonWebToken extends ServiceInterface {
   }
 }
 
-constitute.Dependencies(Config, Redis)(JsonWebToken);
 export default JsonWebToken;
