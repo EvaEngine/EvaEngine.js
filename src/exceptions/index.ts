@@ -1,8 +1,37 @@
-import * as appRoot from 'app-root-path';
+import { existsSync } from 'node:fs';
 import path from 'path';
 import { format } from 'util';
 import crc32 from '../utils/crc32.ts';
 import type { ValidationError } from 'joi';
+
+/**
+ * Resolve the consumer application root the way app-root-path did: walk up
+ * from the working directory to the nearest ancestor (or self) containing a
+ * package.json, falling back to the working directory itself. generateCode
+ * relies on it to strip the machine-specific prefix from exception file
+ * paths so that error codes stay stable across environments.
+ */
+let appRootPath: string | null = null;
+
+function findAppRoot(): string {
+  if (appRootPath === null) {
+    const cwd = path.resolve(process.cwd());
+    let dir = cwd;
+    for (;;) {
+      if (existsSync(path.join(dir, 'package.json'))) {
+        appRootPath = dir;
+        break;
+      }
+      const parent = path.dirname(dir);
+      if (parent === dir) {
+        appRootPath = cwd;
+        break;
+      }
+      dir = parent;
+    }
+  }
+  return appRootPath;
+}
 
 /**
  * Request/promise style error carrying a response, see
@@ -77,7 +106,7 @@ export class StandardException extends Error {
    * Hash an exception into an 18 bits code
    */
   static generateCode(className: string, fileName = import.meta.filename) {
-    const namespace = fileName.replace(appRoot.path, '').split(path.sep).join('/');
+    const namespace = fileName.replace(findAppRoot(), '').split(path.sep).join('/');
     const group = fileName === import.meta.filename ? '11111' : crc32(namespace).toString().substring(0, 5);
     return parseInt(`${group}000${StandardException.hash(className)}`, 10);
   }

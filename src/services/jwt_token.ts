@@ -1,5 +1,5 @@
 import constitute from 'constitute';
-import jwt from 'jwt-simple';
+import * as jwt from '../utils/jwt.ts';
 import Config from './config.ts';
 import Redis from './redis.ts';
 import ServiceInterface from './interface.ts';

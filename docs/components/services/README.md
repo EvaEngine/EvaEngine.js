@@ -15,9 +15,9 @@
 | DI 名 | 类 | 说明 |
 |---|---|---|
 | env | Env | NODE_ENV 等 |
-| config | Config | 文件合并 + 可选 Spring |
+| config | Config | 文件合并 |
 | logger | Logger | Winston |
-| namespace | Namespace | CLS（continuation-local-storage） |
+| namespace | Namespace | AsyncLocalStorage 请求上下文 |
 | now | Now | 可测时钟 |
 | event_manager | EventManager | 进程内事件 |
 | redis | Redis | ioredis 包装 |
@@ -34,8 +34,7 @@
 - 基类：`ServiceInterface`（`getProto()`）
 
 ## Config 要点
-合并：`EngineConfig(src/config)` + `config.default.cjs` + `config.<env>.cjs` + 可选 `config.local.<env>.cjs`。  
-`resolveSpringConfig` 供远程覆盖（bin 使用）。
+合并：`EngineConfig(src/config)` + `config.default.cjs` + `config.<env>.cjs` + 可选 `config.local.<env>.cjs`。
 
 ## 雷区
 - Logger 标签：web 用 `web{port}`，cli 用 `CLI_NAME` 或 `cli`

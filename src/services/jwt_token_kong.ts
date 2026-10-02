@@ -1,5 +1,5 @@
 import constitute from 'constitute';
-import jwt from 'jwt-simple';
+import * as jwt from '../utils/jwt.ts';
 import get from 'lodash/get.js';
 
 import { RuntimeException } from '../exceptions/index.ts';

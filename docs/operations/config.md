@@ -1,7 +1,7 @@
 # 配置与环境变量
 
 ## 何时读
-排障配置加载、对接 Spring Config、查默认键时。
+排障配置加载、查默认键时。
 
 ## 文件配置（应用侧）
 路径默认 `{projectRoot}/config`：
@@ -20,8 +20,6 @@
 | `PORT` | 常见于应用；engine 构造也接 port |
 | `MAX_REQUEST_DEBUG_BODY` | debug 中间件相关 |
 | `SEQUELIZE_REPLICATION_CONFIG_KEY` | 覆盖 db.replication 来源键 |
-| `SPRING_CONFIG_ENDPOINT` | bin 拉远程配置 |
-| `SPRING_CONFIG_NAME` / `PROFILES` / `LABEL` | Spring 参数 |
 
 ## 密钥
 禁止把真实 secret 写入仓库；session.secret、token.secret 等必须在部署环境覆盖。

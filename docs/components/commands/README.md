@@ -17,7 +17,6 @@
 
 ## bin/engine
 - mode cli，注册 `commands` 包导出
-- 可选 `SPRING_CONFIG_*` 拉远程配置
 - finally 尝试 redis cleanup
 
 ## 相关

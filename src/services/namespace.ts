@@ -1,11 +1,17 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import constitute from 'constitute';
-import { createNamespace, getNamespace, destroyNamespace, reset } from 'continuation-local-storage';
-import type { Namespace as ClsNamespace } from 'continuation-local-storage';
 import Config from './config.ts';
 import { OperationUnsupportedException } from '../exceptions/index.ts';
 import ServiceInterface from './interface.ts';
 
+/**
+ * CLS 语义的上下文是键值集合；AsyncLocalStorage 的 context 是单个值，
+ * 因此用 Map 承载，保持 get(key)/set(key, value) 的消费方式不变。
+ */
+type ClsContext = Map<string, unknown>;
+
 const stores: Record<string, Store> = {};
+const namespaces = new Map<string, AsyncLocalStorage<ClsContext>>();
 
 export class Store {
   // Concrete stores forward their arguments to the underlying namespace
@@ -35,7 +41,7 @@ export class Store {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  run(callback: () => unknown, ...args: unknown[]): unknown {
+  run(callback: (context?: unknown, ...args: unknown[]) => unknown, ...args: unknown[]): unknown {
     return callback();
   }
 
@@ -62,50 +68,63 @@ export class NullStore extends Store {
 
 export class NsStore extends Store {
   name: string;
+  storage: AsyncLocalStorage<ClsContext>;
 
   constructor(name: string) {
     super();
     this.name = name;
-    createNamespace(name);
+    this.storage = new AsyncLocalStorage();
+    namespaces.set(name, this.storage);
   }
 
   override get(key: string): unknown {
-    return getNamespace(this.name)!.get(key);
+    return this.storage.getStore()?.get(key);
   }
 
   override set(key: string, value: unknown): this {
-    getNamespace(this.name)!.set(key, value);
+    // 在 run 上下文之外没有可写的 context；原 CLS 行为只对 run 内的消费方可见，
+    // 这里保持一致，直接丢弃。
+    this.storage.getStore()?.set(key, value);
     return this;
   }
 
-  override bind(...args: unknown[]): unknown {
-    return getNamespace(this.name)!.bind(...(args as [fn: (...args: unknown[]) => unknown, context?: object]));
+  override bind<T extends (...args: never[]) => unknown>(fn: T): (...args: never[]) => unknown {
+    // Node 24 已移除 AsyncLocalStorage 实例的 bind，这里按其原语义实现：
+    // 捕获绑定时刻的 context，调用时重新进入。
+    const context = this.storage.getStore();
+    return (...args: never[]) => this.storage.run(context as ClsContext, () => fn(...args));
   }
 
-  override active(): unknown {
-    // CLS exposes `active` as the current context property while the original
-    // code calls it as a method, so the call shape is kept via an assertion.
-    return (getNamespace(this.name)!.active as unknown as () => unknown)();
+  override active(): ClsContext | undefined {
+    return this.storage.getStore();
   }
 
-  override run(...args: unknown[]): unknown {
-    return getNamespace(this.name)!.run(...(args as [fn: (...args: unknown[]) => unknown, ...args: unknown[]]));
+  override run(callback: (context: ClsContext, ...args: unknown[]) => unknown, ...args: unknown[]): unknown {
+    // CLS 的 run 会把新建的 context 作为回调首参传入（Sequelize._clsRun 依赖此行为）
+    const context = new Map();
+    return this.storage.run(context, () => callback(context, ...args));
   }
 
-  override bindEmitter(...args: unknown[]): unknown {
-    return getNamespace(this.name)!.bindEmitter(...args);
+  override bindEmitter(emitter: unknown): unknown {
+    // AsyncLocalStorage 通过 async chain 自动传播上下文，无需 CLS 式的 emitter 绑定；
+    // 保留方法以兼容原调用面（trace 中间件等），原样返回 emitter。
+    return emitter;
   }
 
-  override getContext(): ClsNamespace {
-    return getNamespace(this.name)!;
+  override getContext(): NsStore {
+    // CLS 消费方（Sequelize.useCLS、session clsify）只依赖 get/set/run/bind 方法面，
+    // NsStore 自身即满足该接口，直接返回实例。
+    return this;
   }
 
-  override createContext(): object {
-    return getNamespace(this.name)!.createContext();
+  override createContext(): ClsContext {
+    return new Map();
   }
 
   override reset(): this {
-    reset(this.name);
+    this.storage.disable();
+    this.storage = new AsyncLocalStorage();
+    namespaces.set(this.name, this.storage);
     return this;
   }
 }
@@ -157,7 +176,8 @@ class Namespace extends ServiceInterface {
   }
 
   destroy(name: string): this {
-    destroyNamespace(name);
+    namespaces.get(name)?.disable();
+    namespaces.delete(name);
     delete stores[name];
     return this;
   }

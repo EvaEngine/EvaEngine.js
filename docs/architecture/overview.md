@@ -47,7 +47,7 @@ Package 入口：`src/index.ts` → tsc 编译为 `dist/index.js`（`main`/`type
 Node ≥24 ESM · Express 5 · constitute · Sequelize 6 · Joi · ioredis · Winston · yargs · moment-timezone · swagger-ui-dist
 
 ### 数据流摘要
-- **配置**：内置默认 ← `config.default.cjs` ← `config.<NODE_ENV>.cjs` ← 可选 local；可选 Spring Cloud（bin）
+- **配置**：内置默认 ← `config.default.cjs` ← `config.<NODE_ENV>.cjs` ← 可选 local
 - **HTTP**：Express app（模块级单例）← middleware（DI 取出）← 路由 ← 默认错误处理器
 - **CLI/Cron**：注册 Command 类 → yargs 解析 → `command.run()`
 - **DI**：Provider.register → bindClass/bindValue/bindMethod → `DI.get(name)`

@@ -4,16 +4,9 @@ import constitute from 'constitute';
 import DI from '../di.ts';
 import Config from '../services/config.ts';
 import Redis from '../services/redis.ts';
-import Namespace from '../services/namespace.ts';
 import type { RequestHandler } from 'express';
-import type { Namespace as ClsNamespace } from 'continuation-local-storage';
 
 let middleware: RequestHandler | null = null;
-
-//Fix issue https://github.com/othiym23/node-continuation-local-storage/issues/29
-const clsifyMiddleware = (fn: RequestHandler, ns: ClsNamespace): RequestHandler =>
-  (req, res, next) =>
-    fn.call(this, req, res, ns.bind(next));
 
 interface SessionConfig {
   store?: { client?: unknown; [key: string]: unknown } | null;
@@ -22,7 +15,7 @@ interface SessionConfig {
   saveUninitialized?: boolean;
 }
 
-function SessionMiddleware(_config: Config, redis: Redis, namespace: Namespace) {
+function SessionMiddleware(_config: Config, redis: Redis) {
   return () => {
     if (middleware) {
       return middleware;
@@ -55,12 +48,11 @@ function SessionMiddleware(_config: Config, redis: Redis, namespace: Namespace) 
       saveUninitialized: config.saveUninitialized
     });
 
-    return namespace.isEnabled() ?
-      //Store 基类 getContext() 类型为 unknown，运行时由 NsStore 返回 CLS namespace
-      clsifyMiddleware(middleware, namespace.use().getContext() as ClsNamespace) :
-      middleware;
+    // AsyncLocalStorage 经 async chain 自动传播上下文，不再需要 CLS 时代
+    // 针对 othiym23/node-continuation-local-storage#29 的 clsify 绑定补丁
+    return middleware;
   };
 }
-constitute.Dependencies(Config, Redis, Namespace)(SessionMiddleware);
+constitute.Dependencies(Config, Redis)(SessionMiddleware);
 
 export default SessionMiddleware;

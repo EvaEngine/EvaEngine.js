@@ -158,11 +158,6 @@ npx engine make:graphql
 npx engine tramp:dump-config
 ```
 
-配合 Spring Cloud Config（仅 bin）：
-
-- `SPRING_CONFIG_ENDPOINT`（设置后启用）
-- `SPRING_CONFIG_NAME`、`SPRING_CONFIG_PROFILES`、`SPRING_CONFIG_LABEL`
-
 ---
 
 ## 推荐项目结构
@@ -245,7 +240,6 @@ config.get(); // 完整对象
 | `CLI_NAME` | CLI 模式下 logger 标签 |
 | `MAX_REQUEST_DEBUG_BODY` | debug 中间件 body 限制 |
 | `SEQUELIZE_REPLICATION_CONFIG_KEY` | `db` 下 replication 配置的替代键名 |
-| `SPRING_CONFIG_*` | bin 远程配置（见上文） |
 
 ---
 

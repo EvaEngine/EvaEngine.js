@@ -12,14 +12,6 @@ engine.registerCommands([commands]);
 
 const logger = DI.get('logger');
 try {
-  if (process.env.SPRING_CONFIG_ENDPOINT) {
-    await DI.get('config').resolveSpringConfig({
-      endpoint: process.env.SPRING_CONFIG_ENDPOINT,
-      name: process.env.SPRING_CONFIG_NAME || 'unknown-spring-config-name',
-      profiles: process.env.SPRING_CONFIG_PROFILES || process.env.NODE_ENV,
-      label: process.env.SPRING_CONFIG_LABEL || 'main'
-    });
-  }
   await engine.runCLI();
 } catch (error) {
   //用 exitCode 而非 process.exit，让 finally 里的 Redis 清理自然完成后进程才结束

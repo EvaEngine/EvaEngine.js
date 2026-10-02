@@ -1,10 +1,7 @@
 import get from 'lodash/get.js';
-import isString from 'lodash/isString.js';
 import merge from 'lodash/merge.js';
-import set from 'lodash/set.js';
 import { createRequire } from 'module';
 import constitute from 'constitute';
-import * as springConfigClient from 'cloud-config-client';
 import Env from './env.ts';
 import EngineConfig from '../config/index.ts';
 import ServiceInterface from './interface.ts';
@@ -28,34 +25,6 @@ class Config extends ServiceInterface {
   setPath(path: string | undefined): this {
     this.path = path;
     return this;
-  }
-
-  /**
-   * Resolve configurations from Spring Cloud Config Server.
-   */
-  async resolveSpringConfig({
-    endpoint,
-    name,
-    profiles,
-    label = 'main'
-  }: {
-    endpoint: string;
-    name: string;
-    profiles?: string | string[];
-    label?: string;
-  }): Promise<void> {
-    if (!this.config) {
-      this.config = this.loadConfigFromFiles();
-    }
-    const configRemote = await springConfigClient.load({
-      endpoint,
-      name,
-      profiles: isString(profiles) ? profiles.split(',') : [],
-      label
-    });
-    configRemote.forEach((key, value) => {
-      set(this.config as object, key, value);
-    });
   }
 
   get(key?: string): unknown {

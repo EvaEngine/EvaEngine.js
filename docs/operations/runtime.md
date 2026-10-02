@@ -10,7 +10,7 @@
 | CLI | mode=`cli` → `registerCommands` → `runCLI` |
 | Cron | `registerCommands` → `runCrontab(seq, cmdString)` |
 | 单次命令 | `runCommand(cmdString)` |
-| bin | `bin/engine` → runCLI + 可选 Spring + redis cleanup |
+| bin | `bin/engine` → runCLI + redis cleanup |
 
 ## 资源
 - HTTP server：`getServer()`；uncaughtException 默认尝试 `server.close` 后延时 exit
