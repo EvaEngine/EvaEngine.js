@@ -132,6 +132,8 @@ await engine.runCLI();
 // node app.js user:create --name=Ada
 ```
 
+命令不存在或 `run()` 抛出异常时，进程以退出码 1 结束。
+
 ### 定时任务
 
 ```js

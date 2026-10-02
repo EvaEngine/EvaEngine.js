@@ -22,6 +22,8 @@ try {
   }
   await engine.runCLI();
 } catch (error) {
+  //用 exitCode 而非 process.exit，让 finally 里的 Redis 清理自然完成后进程才结束
+  process.exitCode = 1;
   if (error instanceof exceptions.StandardException) {
     logger.warn(error.getDetails());
     logger.warn(error.message);
