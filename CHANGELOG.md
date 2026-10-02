@@ -1,3 +1,21 @@
+## [2.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.14...v2.0.0) (2026-10-02)
+
+### ⚠ BREAKING CHANGES
+
+* requires Node >= 24 (engines). The published package
+entry is the compiled dist/ with bundled .d.ts instead of src/*.js
+sources, so installing from Git needs a local build. DI.get is typed
+for known service names, Entities.get/getAll return ModelStatic-based
+types with a generic parameter, and Engine.use is typed as Express.use,
+which changes inferred types for TypeScript consumers.
+
+Also ignores ZCode session artifacts (.zcode/) that had leaked into the
+toolchain commit.
+
+### Features
+
+* rewrite the codebase in TypeScript ([9e3ed68](https://github.com/EvaEngine/EvaEngine.js/commit/9e3ed682479505e7684b6bc7bbb3c408f5bd6a5e))
+
 ## [1.0.14](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.13...v1.0.14) (2026-09-29)
 
 ### Bug Fixes
