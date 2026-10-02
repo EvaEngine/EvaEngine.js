@@ -365,7 +365,15 @@ entities.init(); // 按 config.db 构建 Sequelize 并扫描目录
 
 const User = entities.get('user');
 const all = entities.getAll();
-await entities.getTransaction(async (t) => { /* … */ });
+
+const transaction = await entities.getTransaction();
+try {
+  await User.create({ name: 'Ada' }, { transaction });
+  await transaction.commit();
+} catch (error) {
+  await transaction.rollback();
+  throw error;
+}
 ```
 
 实体文件（经 `require` 加载的 CJS 或 ESM 工厂）：
