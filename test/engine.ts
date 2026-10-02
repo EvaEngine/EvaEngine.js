@@ -1,0 +1,148 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import path from 'path';
+import EvaEngine, { DI } from '../src/engine.ts';
+import { RuntimeException } from '../src/exceptions/index.ts';
+import Command from '../src/commands/index.ts';
+
+test('default properties', () => {
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot,
+    port: 3000
+  });
+  const meta = engine.getMeta();
+  assert.equal(meta.projectRoot, projectRoot);
+  assert.equal(meta.configPath, `${projectRoot}${path.sep}config`);
+  assert.equal(meta.sourceRoot, `${projectRoot}${path.sep}src`);
+  assert.equal(meta.port, 3000);
+  assert.equal(engine.getDI(), DI);
+});
+
+test('create app', () => {
+  assert.ok(Object.prototype.hasOwnProperty.call(EvaEngine.getApp(), 'use'));
+  assert.ok(Object.prototype.hasOwnProperty.call(EvaEngine.getApp(), 'route'));
+});
+
+test('bootstrap', () => {
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot,
+    port: 3000
+  });
+  engine.bootstrap();
+  assert.ok(Object.keys(DI.getBound()).length > 10);
+});
+
+test('CLI without commands', () => {
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot
+  }, 'cli');
+  assert.equal(engine.getMeta().mode, 'cli');
+  assert.throws(() => engine.getCLI(), RuntimeException);
+});
+
+test('CLI with commands', () => {
+  class TestCommand extends Command {
+    static override getName(): string {
+      return 'hello:world';
+    }
+
+    static override getDescription(): string {
+      return 'something';
+    }
+
+    static override getSpec(): object {
+      return {};
+    }
+  }
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot
+  }, 'cli');
+  engine.registerCommands({ test: TestCommand });
+  assert.equal(Object.keys(engine.getCommands()).length, 1);
+  assert.ok(Object.prototype.hasOwnProperty.call(engine.getCLI('hello:world'), '$0'));
+  assert.equal(engine.getCommandName(), 'hello:world');
+  engine.clearCommands();
+  assert.equal(Object.keys(engine.getCommands()).length, 0);
+  assert.equal(Array.isArray(engine.getCommands()), false);
+});
+
+test('CLI passes command arguments to commands', async () => {
+  class TestCommand extends Command {
+    static override getName(): string {
+      return 'hello:world';
+    }
+
+    static override getDescription(): string {
+      return 'something';
+    }
+
+    static override getSpec(): object {
+      return {
+        storage: { type: 'string' },
+        uri: { type: 'string' }
+      };
+    }
+  }
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot
+  }, 'cli');
+  engine.registerCommands({ test: TestCommand });
+
+  const originalArgv = process.argv;
+  process.argv = ['node', 'cli.js', 'hello:world', '--storage=s3', '--uri=/tmp/source'];
+  try {
+    await engine.runCLI();
+  } finally {
+    process.argv = originalArgv;
+  }
+
+  // getCommand 返回基础 Command 契约，基础方法无需断言
+  const argv = engine.getCommand()?.getArgv();
+  assert.deepEqual(argv?._, ['hello:world']);
+  assert.equal(argv?.storage, 's3');
+  assert.equal(argv?.uri, '/tmp/source');
+});
+
+test('Run commands', async () => {
+  class TestCommand extends Command {
+    static override getName(): string {
+      return 'hello:world';
+    }
+
+    static override getDescription(): string {
+      return 'something';
+    }
+
+    static override getSpec(): object {
+      return {};
+    }
+
+    foo?: string;
+
+    getFoo(): string | undefined {
+      return this.foo;
+    }
+
+    override run(): void {
+      this.foo = 'bar';
+    }
+  }
+  const projectRoot = path.normalize(`${import.meta.dirname}/_demo_project`);
+  const engine = new EvaEngine({
+    projectRoot
+  }, 'cli');
+  engine.registerCommands({ test: TestCommand });
+  await engine.runCLI('hello:world');
+  assert.equal((engine.getCommand() as TestCommand).getFoo(), 'bar');
+});
+
+test('rejects unknown command and cron without commands', async () => {
+  const engine = new EvaEngine({ projectRoot: path.normalize(`${import.meta.dirname}/_demo_project`) }, 'cli');
+  await assert.rejects(engine.runCommand('missing'), RuntimeException);
+  assert.throws(() => engine.runCrontab('* * * * *', 'missing'), RuntimeException);
+});

@@ -26,5 +26,5 @@ constitute、`ServiceProvider` 基类、`RuntimeException`
 - 测试并行会互相污染 → 当前 `npm test` 使用 `--test-concurrency=1`
 
 ## 相关
-- `src/services/providers.js`（`ServiceProvider`）
+- `src/services/providers.ts`（`ServiceProvider`）
 - 测试：`test/di.js`、`test/bootstrap.js`

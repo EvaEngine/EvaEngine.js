@@ -1,8 +1,7 @@
 *
 !.ai/**/*
-!src/**/*
+!dist/**/*
 !bin/**/*
 !template/**/*
-!index.js
 !package.json
 !README.md

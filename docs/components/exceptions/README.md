@@ -16,5 +16,5 @@
 - Swagger 可映射 exception → 文档片段
 
 ## 相关
-- `src/exceptions/index.js`
+- `src/exceptions/index.ts`
 - 测试：`test/exceptions/index.js`、`test/error_handlers.js`

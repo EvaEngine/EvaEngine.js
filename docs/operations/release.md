@@ -11,8 +11,11 @@
 - CI 验证：`.github/workflows/ci.yml`（lint/build/test/pack dry-run；Node 24；Redis service）
 
 ## 发布物
-`.npmignore` 白名单：`src/**`、`bin/**`、`template/**`、`index.js`、`package.json`、`README.md`
+`.npmignore` 白名单：`dist/**`、`bin/**`、`template/**`、`package.json`、`README.md`
 （注意：业务 docs/ 默认不进包，除非改 npmignore）
+
+`prepack` 钩子在每次 `npm pack` / `npm publish`（含 semantic-release 的 publish 步骤）前自动执行
+`npm run build`，干净 checkout 直接打包也会产出 dist；构建为清理后全量重建，无增量缓存。
 
 ## 相关
 - `.releaserc.json`、`CHANGELOG.md`

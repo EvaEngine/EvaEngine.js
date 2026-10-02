@@ -9,14 +9,16 @@
     "url": "https://github.com/EvaEngine/EvaEngine.js.git"
   },
   "scripts": {
-    "prestart": "node src/index.js",
     "prepublish": "npm run test",
-    "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.js --test --test-concurrency=1 --experimental-test-coverage \"test/di.js\" \"test/engine.js\" \"test/error_handlers.js\" \"test/index.js\" \"test/exceptions/index.js\" \"test/entities/index.js\" \"test/commands/make_entity.js\" \"test/middlewares/*.js\" \"test/services/*.js\" \"test/swagger/index.js\" \"test/utils/*.js\"",
-    "lint": "eslint src test index.js",
-    "build": "node --check src/index.js",
-    "ci:check": "npm run lint && npm run build",
+    "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.ts --test --test-concurrency=1 --experimental-test-coverage \"test/di.ts\" \"test/engine.ts\" \"test/error_handlers.ts\" \"test/index.ts\" \"test/bin.ts\" \"test/exceptions/index.ts\" \"test/entities/index.ts\" \"test/commands/make_entity.ts\" \"test/middlewares/*.ts\" \"test/services/*.ts\" \"test/swagger/index.ts\" \"test/utils/*.ts\"",
+    "lint": "eslint src test",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\" && tsc -p tsconfig.build.json && node scripts/rewrite-dts.mjs",
+    "ci:check": "npm run lint && npm run typecheck && npm run build",
+    "prepack": "npm run build",
     "semantic-release": "semantic-release",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "prestart": "node src/index.ts"
   },
   "engines": {
     "node": ">=24.0.0"
@@ -28,7 +30,7 @@
     "micro service",
     "orm"
   ],
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "bin": {
     "engine": "./bin/engine"
   },
@@ -37,6 +39,8 @@
   ],
   "author": "AlloVince",
   "dependencies": {
+    "@types/express": "^5.0.6",
+    "@types/lodash": "^4.17.25",
     "acorn": "^8.18.0",
     "app-root-path": "^3.1.0",
     "cloud-config-client": "^1.6.2",
@@ -67,16 +71,26 @@
     "@semantic-release/git": "^10.0.0",
     "@semantic-release/npm": "^13.0.0",
     "@semantic-release/release-notes-generator": "^14.0.0",
+    "@types/express-session": "^1.19.0",
+    "@types/moment-timezone": "^0.5.13",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.19.0",
+    "@types/sequelize": "^4.28.20",
+    "@types/winston": "^2.4.4",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "eslint": "^9.39.5",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
     "globals": "^17.8.0",
     "pre-commit": "^2.0.0",
-    "semantic-release": "^25.0.8"
+    "semantic-release": "^25.0.8",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.0"
   },
   "overrides": {
     "uuid": "^11.1.1",
     "undici@^6.0.0": "^6.29.0",
     "undici@^7.0.0": "^7.29.1"
-  }
+  },
+  "types": "dist/index.d.ts"
 }

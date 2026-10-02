@@ -1,32 +1,3 @@
 #!/usr/bin/env node
-import { EvaEngine, DI, exceptions, commands } from '../index.js';
-
-const engine = new EvaEngine({
-  projectRoot: process.cwd()
-}, 'cli');
-engine.registerCommands([commands]);
-
-const logger = DI.get('logger');
-try {
-  if (process.env.SPRING_CONFIG_ENDPOINT) {
-    await DI.get('config').resolveSpringConfig({
-      endpoint: process.env.SPRING_CONFIG_ENDPOINT,
-      name: process.env.SPRING_CONFIG_NAME || 'unknown-spring-config-name',
-      profiles: process.env.SPRING_CONFIG_PROFILES || process.env.NODE_ENV,
-      label: process.env.SPRING_CONFIG_LABEL || 'main'
-    });
-  }
-  await engine.runCLI();
-} catch (error) {
-  if (error instanceof exceptions.StandardException) {
-    logger.warn(error.getDetails());
-    logger.warn(error.message);
-  } else {
-    logger.error(error);
-  }
-} finally {
-  const redis = DI.get('redis');
-  if (redis.isConnected()) {
-    await redis.cleanup();
-  }
-}
+//Thin launcher: the CLI implementation lives in src/bin.ts and is compiled to dist
+import '../dist/bin.js';
