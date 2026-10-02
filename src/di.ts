@@ -14,6 +14,13 @@ import type Now from './services/now.ts';
 import type Redis from './services/redis.ts';
 import type RestClient from './services/rest_client.ts';
 import type ValidatorBase from './services/joi.ts';
+import type AuthKongMiddleware from './middlewares/auth_kong.ts';
+import type AuthMiddleware from './middlewares/auth.ts';
+import type DebugMiddleware from './middlewares/debug.ts';
+import type SessionMiddleware from './middlewares/session.ts';
+import type TraceMiddleware from './middlewares/trace.ts';
+import type ValidatorMiddleware from './middlewares/validator.ts';
+import type ViewCacheMiddleware from './middlewares/view_cache.ts';
 
 /**
  * Engine metadata shared between the EvaEngine runtime, service providers and mocks.
@@ -69,6 +76,14 @@ export default class DI {
   static get(name: 'validator_base'): ValidatorBase;
   static get(name: 'event_manager'): EventManager;
   static get(name: 'jwt'): JsonWebToken | KongJsonWebToken;
+  //bindMethod 绑定的中间件经 constitute 注入依赖后，get 返回的是注入完成的内层工厂，
+  //即中间件函数的返回值；auth 由 provider 按 config 在两套实现间切换
+  static get(name: 'trace'): ReturnType<typeof TraceMiddleware>;
+  static get(name: 'session'): ReturnType<typeof SessionMiddleware>;
+  static get(name: 'auth'): ReturnType<typeof AuthMiddleware | typeof AuthKongMiddleware>;
+  static get(name: 'debug'): ReturnType<typeof DebugMiddleware>;
+  static get(name: 'validator'): ReturnType<typeof ValidatorMiddleware>;
+  static get(name: 'view_cache'): ReturnType<typeof ViewCacheMiddleware>;
   static get<T>(service: abstract new (...args: never[]) => T): T;
   static get<T = unknown>(name: string): T;
   static get(service: unknown): unknown {

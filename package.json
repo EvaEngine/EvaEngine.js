@@ -12,8 +12,9 @@
     "prepublish": "npm run test",
     "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.ts --test --test-concurrency=1 --experimental-test-coverage \"test/di.ts\" \"test/engine.ts\" \"test/error_handlers.ts\" \"test/index.ts\" \"test/exceptions/index.ts\" \"test/entities/index.ts\" \"test/commands/make_entity.ts\" \"test/middlewares/*.ts\" \"test/services/*.ts\" \"test/swagger/index.ts\" \"test/utils/*.ts\"",
     "lint": "eslint src test",
-    "build": "tsc -p tsconfig.build.json && node scripts/rewrite-dts.mjs",
+    "build": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\" && tsc -p tsconfig.build.json && node scripts/rewrite-dts.mjs",
     "ci:check": "npm run lint && npm run build",
+    "prepack": "npm run build",
     "semantic-release": "semantic-release",
     "release": "semantic-release",
     "prestart": "node src/index.ts"

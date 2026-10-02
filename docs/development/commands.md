@@ -7,8 +7,9 @@
 | 命令 | 作用 |
 |---|---|
 | `npm run lint` | ESLint（typescript-eslint）：`src` `test` |
-| `npm run build` | tsc 编译 `dist/` 并生成声明文件（`scripts/rewrite-dts.mjs` 后处理） |
+| `npm run build` | 清理并全量重建 `dist/`（无增量缓存），tsc 编译并生成声明文件（`scripts/rewrite-dts.mjs` 后处理） |
 | `npm run ci:check` | lint + build |
+| `prepack` | `npm pack` / `npm publish` 前自动执行 `npm run build`，保证打包产物对应当前源码 |
 | `npm test` | node:test 原生运行 .ts 用例，concurrency=1，含 coverage 实验旗标 |
 | `npm run release` / `semantic-release` | 发版（CI 主用） |
 

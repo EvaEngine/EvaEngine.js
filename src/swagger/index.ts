@@ -1,6 +1,6 @@
 /*eslint new-cap: [1]*/
 import fs, { type GlobOptionsWithoutFileTypes } from 'fs';
-import { createRequire } from 'module';
+import { createRequire, stripTypeScriptTypes } from 'module';
 import { format } from 'util';
 import assert from 'assert';
 import merge from 'lodash/merge.js';
@@ -467,10 +467,11 @@ export class ExSwagger {
     const results: AnnotationsContainer[] = [];
     for (const file of files) {
       const comments: acorn.Comment[] = [];
-      const source = await fs.readFileSync(file);
+      const source = await fs.readFileSync(file, 'utf8');
+      // acorn 只支持 JS；TS 源文件先擦除类型语法（strip 模式保留注释，swagger 注解不受影响）
+      const code = /\.(ts|mts|cts)$/.test(file) ? stripTypeScriptTypes(source) : source;
       try {
-        // acorn 类型只声明 string 入参；运行时按原实现传入 Buffer，不做编码转换
-        acorn.parse(source as unknown as string, {
+        acorn.parse(code, {
           ecmaVersion: 'latest',
           sourceType: 'module',
           allowImportExportEverywhere: true,
@@ -560,6 +561,8 @@ export class ExSwagger {
     fileGroups.forEach((fileGroup) => {
       files = files.concat(fileGroup);
     });
+    // 声明文件是构建产物，不是注解来源（发布态 glob 同时命中 .js 与 .d.ts）
+    files = files.filter((file) => !file.endsWith('.d.ts'));
     if (!files || files.length < 1) {
       throw new RuntimeException('No swagger source files found');
     }
@@ -673,9 +676,9 @@ export class ExSwagger {
     swaggerDocsPath = `${compileDistPath}/docs.json`,
     sourceFilesPath = `${sourceRootPath}/**/*.js`,
     exceptionInterface = StandardException,
-    // 注解扫描靠 acorn 解析源码文本，只支持 JS；本包 utils 在编译产物 dist 中始终是 .js
+    // 注解扫描在解析前对 TS 文件做类型擦除；{js,ts} 同时命中源码态（src/utils/**/*.ts）与发布态（dist/utils/**/*.js）
     extraSourcePaths = [
-      `${import.meta.dirname}/../utils/**/*.js`
+      `${import.meta.dirname}/../utils/**/*.{js,ts}`
     ],
     exceptionPaths
   }: ExSwaggerOptions) {

@@ -90,3 +90,18 @@ test('throws annotation produces exception definition and response', async () =>
     '#/definitions/LogicException'
   );
 });
+
+test('built-in pagination definitions are scanned in source mode', async () => {
+  const exSwagger = new ExSwagger({
+    compileDistPath,
+    models: demoEntities,
+    swaggerDocsTemplate: { definitions: {}, paths: {} },
+    sourceRootPath: `${import.meta.dirname}/_example`
+  });
+  const docs = (await exSwagger.exportJson(`${compileDistPath}/docs-pagination.json`)) as {
+    definitions: Record<string, unknown>;
+  };
+  // utils 分页注解经类型擦除进入扫描结果，源码态与发布态内置定义保持一致
+  assert.ok(docs.definitions.Pagination);
+  assert.ok(docs.definitions.PaginationSnake);
+});

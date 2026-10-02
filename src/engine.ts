@@ -11,6 +11,7 @@ import * as MiddlewareProviders from './middlewares/providers.ts';
 import { StandardException, RuntimeException } from './exceptions/index.ts';
 import { parseCron, setCronInterval } from './utils/cron.ts';
 import type { Express, Router, ErrorRequestHandler } from 'express';
+import type Command from './commands/interface.ts';
 import type { EngineLike, EngineMeta } from './di.ts';
 import type { ServiceProvider } from './services/providers.ts';
 import type Config from './services/config.ts';
@@ -37,16 +38,8 @@ type YargsArgv = {
   [key: string]: unknown;
 };
 
-type CommandInstance = {
-  run(): unknown;
-};
-
-type CommandClass = {
-  new (argv: YargsArgv): CommandInstance;
-  getName(): string;
-  getDescription(): string;
-  getSpec(): object;
-};
+//注册的命令必须满足基础 Command 契约（含 getArgv/getOptions 等实例能力）
+type CommandClass = typeof Command;
 
 type CommandModule = Record<string, CommandClass>;
 
@@ -87,7 +80,7 @@ let serviceProvidersForCLI: Array<new (engine: EngineLike) => ServiceProvider> =
 export default class EvaEngine {
   server: http.Server | https.Server | null;
   commands: CommandModule;
-  command: CommandInstance | null;
+  command: Command | null;
   commandName: string | null;
   port: number | string | boolean;
   defaultErrorHandler: ErrorRequestHandler | null;
@@ -281,7 +274,7 @@ export default class EvaEngine {
     return this;
   }
 
-  getCommand(): CommandInstance | null {
+  getCommand(): Command | null {
     return this.command;
   }
 
@@ -417,9 +410,9 @@ export default class EvaEngine {
     return this;
   }
 
-  use(...args: unknown[]) {
-    return EvaEngine.getApp().use(...(args as Parameters<Express['use']>));
-  }
+  //声明为 Express.use 的完整契约，保留路径/处理器组合的重载与回调参数推导；实现只做转发
+  use: Express['use'] = (...args: unknown[]) =>
+    EvaEngine.getApp().use(...(args as Parameters<Express['use']>));
 
   run(port?: number | string): this {
     process.on('uncaughtException', this.getUncaughtExceptionHandler());

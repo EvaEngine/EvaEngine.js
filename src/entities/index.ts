@@ -3,7 +3,15 @@ import path from 'path';
 import assert from 'assert';
 import cloneDeep from 'lodash/cloneDeep.js';
 import { Sequelize, Op, QueryTypes } from 'sequelize';
-import type { QueryOptions, Transaction, TransactionOptions, Options as SequelizeOptions } from 'sequelize';
+import type {
+  DataTypes,
+  Model,
+  ModelStatic,
+  QueryOptions,
+  Transaction,
+  TransactionOptions,
+  Options as SequelizeOptions
+} from 'sequelize';
 import { createRequire } from 'module';
 import DI from '../di.ts';
 import { getMicroTimestamp } from '../utils/index.ts';
@@ -52,9 +60,16 @@ type UniqueValidatorModel = {
 
 type EntityFactory = (sequelize: Sequelize, dataTypes: typeof Sequelize) => EntityModel;
 
-type EntityModel = {
-  name: string;
+//扫描到的实体是 Sequelize 模型类，保留完整静态查询能力；associate 是真实扩展点
+type EntityModel = ModelStatic<Model> & {
   associate?: (entities: Record<string, EntityModel>) => void;
+};
+
+//运行时 Sequelize 类挂载了 DataTypes/Op/QueryTypes 等静态属性，但上游声明未暴露，作为兼容入口显式补齐
+type SequelizeStatic = typeof Sequelize & {
+  DataTypes: typeof DataTypes;
+  Op: typeof Op;
+  QueryTypes: typeof QueryTypes;
 };
 
 export default class Entities {
@@ -112,8 +127,9 @@ export default class Entities {
         const entityModule: unknown = require(path.join(entitiesPath, file));
         const entityFactory = ((entityModule as { default?: unknown }).default || entityModule) as
           EntityFactory | EntityModel;
+        // 模型类同样满足 typeof 'function'（带构造签名），运行时保持原判定：仅工厂被调用
         const entity = typeof entityFactory === 'function' ?
-          entityFactory(sequelize, Sequelize) : entityFactory;
+          (entityFactory as EntityFactory)(sequelize, Sequelize) : entityFactory;
         this.entities[entity.name] = entity;
       });
 
@@ -266,8 +282,8 @@ export default class Entities {
     }, options));
   }
 
-  getSequelize(): typeof Sequelize {
-    return Sequelize;
+  getSequelize(): SequelizeStatic {
+    return Sequelize as SequelizeStatic;
   }
 
   getInstance(): Sequelize {
@@ -276,9 +292,9 @@ export default class Entities {
     return this.sequelize as Sequelize;
   }
 
-  get(name: string): EntityModel {
+  get<T extends EntityModel = EntityModel>(name: string): T {
     this.init();
-    return this.entities[name];
+    return this.entities[name] as T;
   }
 
   getAll(): Record<string, EntityModel> {

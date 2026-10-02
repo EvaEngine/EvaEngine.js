@@ -101,11 +101,11 @@ test('CLI passes command arguments to commands', async () => {
     process.argv = originalArgv;
   }
 
-  // getCommand() 的静态类型只暴露 run，实际实例即本测试定义的 TestCommand
-  const argv = (engine.getCommand() as TestCommand).getArgv();
-  assert.deepEqual(argv._, ['hello:world']);
-  assert.equal(argv.storage, 's3');
-  assert.equal(argv.uri, '/tmp/source');
+  // getCommand 返回基础 Command 契约，基础方法无需断言
+  const argv = engine.getCommand()?.getArgv();
+  assert.deepEqual(argv?._, ['hello:world']);
+  assert.equal(argv?.storage, 's3');
+  assert.equal(argv?.uri, '/tmp/source');
 });
 
 test('Run commands', async () => {
