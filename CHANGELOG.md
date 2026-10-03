@@ -1,3 +1,20 @@
+## [4.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v3.0.0...v4.0.0) (2026-10-03)
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** the runtime dependency ioredis moves to v6, which
+defaults to RESP3 protocol negotiation (HELLO 3) with automatic RESP2
+fallback; consumers behind proxies that do not support HELLO can pass
+protocol: 2 in the redis config.
+
+### Bug Fixes
+
+* **deps:** pair conventionalcommits preset 9 with release-notes-generator 14 ([2118e28](https://github.com/EvaEngine/EvaEngine.js/commit/2118e289938dd71b4300a5e6e0677fe9bfd009b8))
+
+### Miscellaneous Chores
+
+* **deps:** upgrade ioredis to v6 and refresh toolchain ([96664da](https://github.com/EvaEngine/EvaEngine.js/commit/96664da17b41d8ec61a1060cdee51a0f87a73bbf))
+
 ## [3.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v2.0.0...v3.0.0) (2026-10-03)
 
 ### ⚠ BREAKING CHANGES
