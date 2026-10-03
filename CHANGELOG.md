@@ -1,3 +1,9 @@
+## [4.0.1](https://github.com/EvaEngine/EvaEngine.js/compare/v4.0.0...v4.0.1) (2026-10-03)
+
+### Bug Fixes
+
+* preserve dependency bindings and async request context ([76cb0df](https://github.com/EvaEngine/EvaEngine.js/commit/76cb0dffc4ade8c518be4cc804bd17bdb718617f))
+
 ## [4.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v3.0.0...v4.0.0) (2026-10-03)
 
 ### ⚠ BREAKING CHANGES
