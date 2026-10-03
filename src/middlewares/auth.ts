@@ -34,7 +34,7 @@ function AuthMiddleware(_config: Config, token: JsonWebToken, now: Now) {
       return next();
     }
     if (jwToken) {
-      let parsedToken: unknown = {};
+      let parsedToken: unknown;
       try {
         parsedToken = await token.find(jwToken as string);
       } catch {

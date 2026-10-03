@@ -31,8 +31,8 @@ export default (str: string): number => {
     'B40BBE37 C30C8EA1 5A05DF1B 2D02EF8D';
   let crc = 0;
   // x 初始为 number，循环内被赋为 "0x..." 字符串；位运算依赖 JS 的字符串转数值语义
-  let x: number | string = 0;
-  let y = 0;
+  let x: number | string;
+  let y: number;
 
   crc ^= -1;
   for (let i = 0, iTop = str.length; i < iTop; i += 1) {

@@ -48,7 +48,7 @@ class Config extends ServiceInterface {
     this.mergedFiles.push(pathDefault);
     const configEnv: unknown = require(pathEnv);
     this.mergedFiles.push(pathEnv);
-    let configLocal: unknown = {};
+    let configLocal: unknown;
     try {
       configLocal = require(pathLocal);
       this.mergedFiles.push(pathLocal);

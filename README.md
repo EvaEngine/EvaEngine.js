@@ -229,6 +229,8 @@ config.get('redis.host');
 config.get(); // 完整对象
 ```
 
+`redis` 配置项原样透传给 ioredis（当前为 v6：默认以 RESP3 握手，服务端不支持时自动回落 RESP2；若经手的代理不支持 `HELLO`，可传 `protocol: 2`）。
+
 ### 环境变量
 
 | 变量 | 作用 |

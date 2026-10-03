@@ -26,7 +26,7 @@ P1 表示应优先修复：影响包可用性或主要 TS 消费路径；P2 表�
 
 | 检查 | 结果 | 能证明的范围 |
 |---|---|---|
-| `npm run ci:check` | 通过 | ESLint 与发布源码编译、声明后处理通过 |
+| `npm run ci:check` | 通过 | lint（该次评审时为 ESLint）与发布源码编译、声明后处理通过 |
 | `npm test` | 145 tests，145 pass，0 fail | 现有源码态回归用例通过；总行覆盖率 79.53% |
 | `npx tsc --noEmit -p tsconfig.json` | 通过 | 当前 src 与 test 的静态检查通过 |
 | 构建后 pack，再在隔离项目仅安装生产依赖 | 通过 | dist、声明、template、bin 实际进入包 |

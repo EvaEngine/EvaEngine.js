@@ -6,7 +6,7 @@
 ## npm scripts
 | 命令 | 作用 |
 |---|---|
-| `npm run lint` | ESLint（typescript-eslint）：`src` `test` |
+| `npm run lint` | oxlint（correctness/suspicious，含 typescript、import 插件）：`src` `test` |
 | `npm run build` | 清理并全量重建 `dist/`（无增量缓存），tsc 编译并生成声明文件（`scripts/rewrite-dts.mjs` 后处理） |
 | `npm run typecheck` | `tsc --noEmit` 全量类型检查（含 `src` 与 `test`；`npm test` 走 Node 原生类型剥离，不做类型检查） |
 | `npm run ci:check` | lint + typecheck + build |

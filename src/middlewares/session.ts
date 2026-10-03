@@ -20,14 +20,14 @@ function SessionMiddleware(_config: Config, redis: Redis) {
       return middleware;
     }
     const Store = RedisStore;
-    let store: InstanceType<typeof RedisStore> | null = null;
+    let store: InstanceType<typeof RedisStore> | null;
     const config = (_config.get() as { session: SessionConfig }).session;
 
     if (config.store) {
       const RedisClient = new Store(Object.assign({}, config.store, {
         client: config.store.client || redis.getInstance()
       }));
-      RedisClient.client.on('error', (err) => {
+      RedisClient.client.on('error', (err: unknown) => {
         try {
           DI.get('logger').error('Session Redis store error:', err);
         } catch {

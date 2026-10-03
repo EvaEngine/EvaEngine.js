@@ -1,0 +1,19 @@
+{
+  "plugins": ["typescript", "import"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "no-underscore-dangle": "off",
+    "no-extraneous-class": ["error", { "allowEmpty": true, "allowStaticOnly": true }],
+    "import/no-named-as-default": "off"
+  },
+  "ignorePatterns": [
+    "test/_demo_project/**",
+    "test/swagger/_example/**"
+  ]
+}

@@ -46,6 +46,7 @@ type RequestErrorLike = Error & {
  * Make Error be able to work with JSON.stringify()
  */
 if (!('toJSON' in Error.prototype)) {
+  // oxlint-disable-next-line no-extend-native
   Object.defineProperty(Error.prototype, 'toJSON', {
     value: function toJSON(this: Error) {
       const alt: Record<string, unknown> = {};

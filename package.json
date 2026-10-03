@@ -11,7 +11,7 @@
   "scripts": {
     "prepublish": "npm run test",
     "test": "LOG_LEVEL=error NODE_ENV=test node --import ./test/bootstrap.ts --test --test-concurrency=1 --experimental-test-coverage \"test/di.ts\" \"test/engine.ts\" \"test/error_handlers.ts\" \"test/index.ts\" \"test/bin.ts\" \"test/exceptions/index.ts\" \"test/entities/index.ts\" \"test/commands/make_entity.ts\" \"test/middlewares/*.ts\" \"test/services/*.ts\" \"test/swagger/index.ts\" \"test/utils/*.ts\"",
-    "lint": "eslint src test",
+    "lint": "oxlint src test",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "build": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\" && tsc -p tsconfig.build.json && node scripts/rewrite-dts.mjs",
     "ci:check": "npm run lint && npm run typecheck && npm run build",
@@ -46,7 +46,7 @@
     "doctrine": "^3.0.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
-    "ioredis": "^5.11.1",
+    "ioredis": "^6.0.0",
     "joi": "^18.2.3",
     "js-yaml": "^5.4.2",
     "lodash": "^4.18.1",
@@ -60,25 +60,20 @@
     "yargs": "^18.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
-    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^13.0.0",
-    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/git": "^11.0.1",
     "@semantic-release/npm": "^13.0.0",
     "@semantic-release/release-notes-generator": "^14.0.0",
     "@types/express-session": "^1.19.0",
     "@types/moment-timezone": "^0.5.13",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.19.0",
-    "conventional-changelog-conventionalcommits": "^8.0.0",
-    "eslint": "^9.39.5",
-    "eslint-import-resolver-typescript": "^4.4.5",
-    "eslint-plugin-import": "^2.32.0",
-    "globals": "^17.8.0",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
+    "oxlint": "^1.86.0",
     "pre-commit": "^2.0.0",
     "semantic-release": "^25.0.8",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.0"
+    "typescript": "^7.0.2"
   },
   "overrides": {
     "uuid": "^11.1.1",

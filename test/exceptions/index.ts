@@ -15,6 +15,7 @@ import type { ExceptionInput } from './../../src/exceptions/index.ts';
 test('Throw input', () => {
   assert.throws(() => {
     // 测试刻意传入非法输入以验证运行时 TypeError，仅在类型层面声明为声明的入参联合类型
+    // oxlint-disable-next-line no-new
     new RuntimeException([] as unknown as ExceptionInput);
   }, TypeError);
 
@@ -27,6 +28,7 @@ test('Throw input', () => {
   assert.equal((new StandardException(new TypeError('bar_type'))).message, 'bar_type');
   assert.equal((new StandardException(undefined)).setMessage('custom').message, 'custom');
   assert.throws(() => {
+    // oxlint-disable-next-line no-new
     new RuntimeException(new LogicException(undefined));
   }, LogicException);
 });
