@@ -5,6 +5,11 @@ import * as providers from '../../src/services/providers.ts';
 import * as middlewares from '../../src/middlewares/providers.ts';
 import { mockRequest, mockResponse } from '../../src/utils/test.ts';
 import type { RequestHandler } from 'express';
+import TraceMiddleware from '../../src/middlewares/trace.ts';
+import Namespace from '../../src/services/namespace.ts';
+import Config from '../../src/services/config.ts';
+import Logger from '../../src/services/logger.ts';
+import HttpClient from '../../src/services/http_client.ts';
 
 DI.registerMockedProviders(Object.values(providers), `${import.meta.dirname}/../_demo_project/config`);
 //中间件 providers 只做 bind 不读取 config path，原测试按 JS 形态省略该参数
@@ -32,4 +37,35 @@ test('propagates disabled upstream sampling', () => {
   middleware(req, res, () => {
   });
   assert.equal(res.getHeader('X-B3-Sampled'), 0);
+});
+
+test('response events retain their trace after leaving the request context', () => {
+  const config = {
+    get: (key: string) => ({
+      namespace: { enable: true },
+      'trace.enable': true,
+      'trace.api': 'http://trace.test/spans'
+    } as Record<string, unknown>)[key]
+  } as Config;
+  const ns = new Namespace(config).setDefaultName('test.trace.response');
+  const spans: unknown[] = [];
+  const client = {
+    request: (params: { json: unknown }) => {
+      spans.push(params.json);
+      return Promise.resolve();
+    }
+  } as unknown as HttpClient;
+  const middleware = TraceMiddleware(ns, config, DI.get('logger') as Logger, client)('test-service');
+  const responses = ['first', 'second'].map(id => {
+    const req = mockRequest({ headers: { 'x-b3-traceid': id } });
+    const res = mockResponse();
+    middleware(req, res, () => {});
+    res.writeHead(200);
+    return res;
+  });
+  assert.equal(ns.get('tracer'), undefined);
+  responses[1].emit('finish');
+  responses[0].emit('finish');
+  assert.deepEqual(spans.map(span => (span as Array<{ traceId: string }>)[0].traceId), ['second', 'first']);
+  ns.destroy('test.trace.response');
 });

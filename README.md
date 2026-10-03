@@ -289,6 +289,16 @@ engine.registerService(MyApiProvider);
 
 测试辅助：`DI.reset()`、`DI.registerMockedProviders(providers, configPath)`、`DI.bindClass` / `bindValue` / `bindMethod`。
 
+`DI.bindClass(name, Class, dependencies)` resolves the explicit dependency list
+instead of `Class.dependencies`. Named aliases for the same class share one
+singleton, including an instance already resolved by `DI.get(Class)`.
+
+With namespaces enabled, nested `namespace.run()` scopes inherit the parent
+values and keep child writes local. `namespace.use().bind(callback)` preserves
+the captured context, callback arguments, return value, and caller's `this`.
+Trace response listeners retain their own request span even when an event is
+emitted outside that request's async context.
+
 ---
 
 ## 中间件

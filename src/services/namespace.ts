@@ -87,11 +87,13 @@ export class NsStore extends Store {
     return this;
   }
 
-  override bind<T extends (...args: never[]) => unknown>(fn: T): (...args: never[]) => unknown {
-    // Node 24 已移除 AsyncLocalStorage 实例的 bind，这里按其原语义实现：
-    // 捕获绑定时刻的 context，调用时重新进入。
+  override bind<T extends (...args: never[]) => unknown>(fn: T): T {
+    // Capture this namespace's context and re-enter it when the callback runs.
     const context = this.storage.getStore();
-    return (...args: never[]) => this.storage.run(context as ClsContext, () => fn(...args));
+    const storage = this.storage;
+    return function(this: unknown, ...args: never[]) {
+      return storage.run(context as ClsContext, () => fn.apply(this, args));
+    } as T;
   }
 
   override active(): ClsContext | undefined {
@@ -100,13 +102,15 @@ export class NsStore extends Store {
 
   override run(callback: (context: ClsContext, ...args: unknown[]) => unknown, ...args: unknown[]): unknown {
     // CLS 的 run 会把新建的 context 作为回调首参传入（Sequelize._clsRun 依赖此行为）
-    const context = new Map();
+    // Nested scopes inherit request/transaction values, while writes remain
+    // local to the child scope and concurrent requests stay isolated.
+    const context = new Map(this.storage.getStore());
     return this.storage.run(context, () => callback(context, ...args));
   }
 
   override bindEmitter(emitter: unknown): unknown {
-    // AsyncLocalStorage 通过 async chain 自动传播上下文，无需 CLS 式的 emitter 绑定；
-    // 保留方法以兼容原调用面（trace 中间件等），原样返回 emitter。
+    // Async chains preserve context, but emitter listeners use the context of
+    // emit(). Callers needing registration-site context must bind the callback.
     return emitter;
   }
 

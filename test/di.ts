@@ -139,3 +139,40 @@ test('reset isolates singleton cache between containers', () => {
   const after = DI.get(Rebuilt);
   assert.notStrictEqual(before, after);
 });
+
+test('named class bindings honor explicit dependencies and share class singletons', () => {
+  class NamedService {
+    static dependencies = ['unused'];
+    value: number;
+    constructor(value: number) { this.value = value; }
+  }
+  DI.bindValue('answer', 42);
+  DI.bindClass('named_service', NamedService, ['answer']);
+  const instance = DI.get<NamedService>('named_service');
+  assert.equal(instance.value, 42);
+  assert.strictEqual(DI.get(NamedService), instance);
+  DI.bindClass('named_alias', NamedService);
+  assert.strictEqual(DI.get('named_alias'), instance);
+});
+
+test('named bindings resolve through other services and detect alias cycles', () => {
+  DI.bindValue('answer', 42);
+  class Leaf {
+    constructor(value: number) { this.value = value; }
+    value: number;
+  }
+  class Parent {
+    static dependencies = ['named_leaf'];
+    constructor(leaf: Leaf) { this.leaf = leaf; }
+    leaf: Leaf;
+  }
+  DI.bindClass('named_leaf', Leaf, ['answer']);
+  DI.bindClass('named_parent', Parent);
+  assert.equal(DI.get<Parent>('named_parent').leaf.value, 42);
+
+  class Cycle {
+    static dependencies = ['named_cycle'];
+  }
+  DI.bindClass('named_cycle', Cycle);
+  assert.throws(() => DI.get('named_cycle'), /Circular dependency detected/);
+});

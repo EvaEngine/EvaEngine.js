@@ -89,3 +89,29 @@ test('NullStore is a no-op store', () => {
   assert.equal(store.run(() => 'ran'), 'ran');
   assert.throws(() => store.getContext(), OperationUnsupportedException);
 });
+
+test('nested scopes inherit parent values without leaking child writes', () => {
+  const store = new NsStore('test.ns.nested');
+  store.run(() => {
+    store.set('transaction', 'outer');
+    store.set('tracer', 'request');
+    store.run(() => {
+      assert.equal(store.get('transaction'), 'outer');
+      assert.equal(store.get('tracer'), 'request');
+      store.set('transaction', 'inner');
+    });
+    assert.equal(store.get('transaction'), 'outer');
+  });
+});
+
+test('bind preserves receiver, arguments and return type', () => {
+  const store = new NsStore('test.ns.receiver');
+  let bound: (this: { base: number }, value: number) => number;
+  store.run(() => {
+    store.set('increment', 3);
+    bound = store.bind(function(this: { base: number }, value: number) {
+      return this.base + value + (store.get('increment') as number);
+    });
+  });
+  assert.equal(bound!.call({ base: 10 }, 2), 15);
+});

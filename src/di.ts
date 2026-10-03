@@ -265,7 +265,9 @@ export default class DI {
     if (boundKind[service] === BIND_VALUE) {
       return bound[service];
     }
-    return container.resolve(bound[service]);
+    // Resolve the binding itself so explicit arguments and class substitutions
+    // are honored; class instances still share the cache keyed by target.
+    return container.resolve(service);
   }
 
   static bindClass(target: unknown, ...args: unknown[]) {

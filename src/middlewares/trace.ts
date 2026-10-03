@@ -275,7 +275,9 @@ function TraceMiddleware(ns: Namespace, config: Config, logger: Logger, client: 
         return;
       }
       logger.debug('Tracer prepare to send for request %s', spanId);
-      const zipkins = tracerToZipkins(ns.get('tracer') as Tracer | null);
+      // Response events may be emitted outside the request's async context.
+      // This closure retains the span belonging to this response.
+      const zipkins = tracerToZipkins(tracer);
       if (!zipkins) {
         logger.warn('Tracer not send by no data for request %s', spanId);
         return;
