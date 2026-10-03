@@ -1,3 +1,18 @@
+## [3.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v2.0.0...v3.0.0) (2026-10-03)
+
+### ⚠ BREAKING CHANGES
+
+* the dependencies.constitute public export is removed.
+* Spring Cloud Config support is removed. The
+`Config#resolveSpringConfig` method and the `SPRING_CONFIG_*`
+environment variables no longer exist; configuration is loaded from
+local config files only.
+
+### Code Refactoring
+
+* remove Spring Cloud Config support and dormant dependencies ([4a88791](https://github.com/EvaEngine/EvaEngine.js/commit/4a887914d3c7974aa64228e3240cd1f8ae78d1da)), closes [Config#resolveSpringConfig](https://github.com/EvaEngine/Config/issues/resolveSpringConfig) [#29](https://github.com/EvaEngine/EvaEngine.js/issues/29)
+* replace the constitute DI package with a native container ([14c4d2b](https://github.com/EvaEngine/EvaEngine.js/commit/14c4d2b0d2d10fe1faf842cf08b5c81a281a192e))
+
 ## [2.0.0](https://github.com/EvaEngine/EvaEngine.js/compare/v1.0.14...v2.0.0) (2026-10-02)
 
 ### ⚠ BREAKING CHANGES
